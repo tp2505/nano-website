@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nano/news-feed",
+	"title": "News feed",
+	"category": "widgets",
+	"icon": "megaphone",
+	"description": "Renders the latest News items (newest first) from the News post type as the homepage card row.",
+	"keywords": [ "news", "cards", "feed" ],
+	"textdomain": "nano",
+	"supports": {
+		"align": [ "wide", "full" ],
+		"html": false
+	},
+	"attributes": {
+		"count": { "type": "number", "default": 4 },
+		"viewAllUrl": { "type": "string", "default": "/news" },
+		"layout": { "type": "string", "default": "slider" }
+	},
+	"render": "file:./render.php"
+}

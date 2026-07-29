@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nano/page-heading",
+	"version": "0.1.0",
+	"title": "Page Heading",
+	"category": "nano",
+	"icon": "heading",
+	"description": "The current page's title, positioned and styled exactly like the News archive heading.",
+	"textdomain": "nano",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"render": "file:./render.php"
+}

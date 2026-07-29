@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nano/person-page",
+	"version": "0.1.0",
+	"title": "Person Page",
+	"category": "nano",
+	"icon": "businessperson",
+	"description": "Single person: photo, name, role and bio.",
+	"textdomain": "nano",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"render": "file:./render.php"
+}

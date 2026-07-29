@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nano/participants-list",
+	"version": "0.1.0",
+	"title": "Participants List",
+	"category": "nano",
+	"icon": "groups",
+	"description": "Lists every Participant (name, position, one-line bio). Editable and extendable from the Participants menu in wp-admin.",
+	"textdomain": "nano",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"render": "file:./render.php"
+}

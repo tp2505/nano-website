@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nano/related",
+	"version": "0.1.0",
+	"title": "Related",
+	"category": "nano",
+	"icon": "admin-links",
+	"description": "Manual Related section (used on single News and single Event): hand-picked related Events/News as small cards, plus linked People. Renders nothing when both are empty.",
+	"textdomain": "nano",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"render": "file:./render.php"
+}

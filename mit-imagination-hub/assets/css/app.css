@@ -1,0 +1,1985 @@
+/*
+ * MIT Imagination Hub — layout & component styles.
+ * theme.json owns tokens (color, type scale, spacing); this file owns the
+ * grids, the accent-dot motif, video tiles, header/nav, and responsive rules.
+ */
+
+/* Editorial image sizes. Three steps: L (the large feature image — the top
+ * Events image on an Initiative page), the normal two-up card image, and the
+ * small archive thumbnail. --nano-img-l gives feature/hero images (News single,
+ * Class page) the same "L" width as that Events feature image. */
+:root { --nano-img-l: 55.5rem; }
+
+/* ---------------------------------------------------------------------------
+ * Accent-dot motif — the recurring brand graphic beside section headers.
+ * Two render paths: an explicit <span class="nano-dot"> and a ::after on a
+ * heading (.nano-dot-after). Both read --nano-dot, set by the colour modifiers.
+ * ------------------------------------------------------------------------- */
+.nano-dot--purple { --nano-dot: var(--wp--preset--color--accent-purple); }
+.nano-dot--yellow { --nano-dot: var(--wp--preset--color--accent-yellow); }
+.nano-dot--red    { --nano-dot: var(--wp--preset--color--accent-red); }
+.nano-dot--green  { --nano-dot: var(--wp--preset--color--accent-green); }
+.nano-dot--cyan   { --nano-dot: var(--wp--preset--color--accent-cyan); }
+
+.nano-dot {
+	display: inline-block;
+	width: 0.6rem;
+	height: 0.6rem;
+	border-radius: 50%;
+	background: var(--nano-dot, var(--wp--preset--color--accent-purple));
+	vertical-align: middle;
+}
+
+.nano-dot-after::after {
+	content: "";
+	display: inline-block;
+	width: 0.55rem;
+	height: 0.55rem;
+	margin-left: 0.5em;
+	border-radius: 50%;
+	background: var(--nano-dot, var(--wp--preset--color--accent-purple));
+	vertical-align: middle;
+}
+
+/* ---------------------------------------------------------------------------
+ * Shared media tiles — image or video fill their frame; empty = soft surface.
+ * ------------------------------------------------------------------------- */
+.nano-media {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.nano-media--empty {
+	background: var(--wp--preset--color--surface);
+}
+
+/* ---------------------------------------------------------------------------
+ * Header / navigation.
+ * ------------------------------------------------------------------------- */
+.nano-header {
+	padding-top: var(--wp--preset--spacing--30);
+	padding-bottom: var(--wp--preset--spacing--30);
+	border-bottom: 1px solid var(--wp--preset--color--line);
+}
+.nano-header__inner {
+	align-items: center;
+	max-width: none; /* span the full width: logo far left, hamburger far right */
+}
+/* Header brand: designer's Asset-16 compact mark, linked home (the old CSS
+   bracket wordmark around the site title is retired). */
+.nano-brand {
+	display: flex;
+	align-items: center;
+}
+.nano-brand__mark {
+	display: block;
+	height: 2.6rem;
+	width: auto;
+	color: var(--wp--preset--color--contrast);
+}
+/* Hamburger pinned to the top-right on the hero (top bar aligns with "MIT"). */
+.home .nano-header__inner { align-items: flex-start; }
+.home .nano-header .wp-block-navigation__responsive-container-open {
+	margin-top: 7px; /* drop the top bar to line up with the top of "MIT" */
+}
+/* Bigger hamburger toggle in the top-right corner, with thicker bars. */
+.nano-header .wp-block-navigation__responsive-container-open svg {
+	width: 2.6rem;
+	height: 2.6rem;
+}
+.nano-header .wp-block-navigation__responsive-container-open svg path {
+	stroke: currentColor;
+	stroke-width: 1.6; /* fatten the two bars (each ~1.5 tall in the 24 viewBox) */
+}
+.nano-nav a {
+	font-size: var(--wp--preset--font-size--medium);
+	color: var(--wp--preset--color--contrast);
+}
+.nano-nav .wp-block-navigation-item__content:hover { text-decoration: underline; }
+
+/* Header options live in the hamburger pull-down only (overlayMenu: always).
+   Make that overlay readable: white sheet, large dark links + close icon. */
+.wp-block-navigation__responsive-container.is-menu-open {
+	/* No panel tint — the dark membrane lives on the flyout only (see below). */
+	background: transparent !important;
+	/* symmetric horizontal padding -> equal margins on both sides of the menu */
+	padding: var(--wp--preset--spacing--50) 3.5rem 3.5rem;
+	z-index: 100; /* always above the full-screen hero video */
+	inset: 0 0 0 auto;
+	width: 32rem;   /* wide enough to contain the left flyout */
+	max-width: 96vw;
+	box-sizing: border-box;
+}
+@media (max-width: 781px) {
+	/* Half a phone screen is too cramped — go full width on small screens. */
+	.wp-block-navigation__responsive-container.is-menu-open { width: 100vw; }
+	/* Barely-there gray on the menu sheet so it reads as a surface. */
+	/* !important: the base ::before rule (background #fff) sits later in the file */
+	.wp-block-navigation__responsive-container.is-menu-open::before { background: #f8f8f8 !important; }
+}
+.wp-block-navigation__responsive-container.is-menu-open,
+.wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation-item__content,
+.wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__responsive-container-close {
+	color: #111; /* black — reads on the white-tinted main column */
+	text-shadow: none;
+}
+.wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation-item__content {
+	font-size: var(--wp--preset--font-size--large);
+}
+/* Slightly-white tinted strip behind the main (top-level) column — a full-height
+   band on the right, always shown while the menu is open. Same strip geometry as
+   the secondary tint, just at the main column's position. */
+.wp-block-navigation__responsive-container.is-menu-open::before {
+	content: "";
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	width: 14.5rem;   /* ~2rem of white on each side of the right-aligned column → centered */
+	background: #fff;
+	z-index: -1;
+}
+/* The top-level items form a fixed right-hand column; each submenu opens as a
+   flyout to their LEFT (dropping downward), so the top items never shift when a
+   dropdown appears. Needs the parent positioned for the absolute flyout. */
+.is-menu-open .wp-block-navigation-item__content { text-align: right; }
+.is-menu-open .wp-block-navigation-item.has-child { position: relative; }
+
+/* Submenu: collapsed by default; revealed on hover / focus / hover-intent as an
+   absolutely-positioned flyout to the left of its parent. */
+.is-menu-open .wp-block-navigation__submenu-container {
+	display: none !important;
+	position: absolute !important;
+	/* Fixed offset from the (right-aligned) parent edge + fixed width, so all three
+	   flyouts share the same left edge regardless of how long the parent word is. */
+	right: 12.5rem !important;
+	left: auto !important;
+	font-size: var(--wp--preset--font-size--large); /* so the -em offset below scales with the labels */
+	top: -0.6em !important;   /* first item lines up with the parent category */
+	width: 16.5rem !important;
+	box-sizing: border-box;
+	flex-direction: column;
+	align-items: flex-start !important;   /* items share a left vertical edge */
+	text-align: left;
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	min-width: 0;
+	gap: 1.4rem;
+	padding: 1.4rem 1.6rem;
+}
+/* The dark tint: a full-height vertical strip (top to bottom of the screen) at the
+   flyout's fixed column (14.5rem from the right, 16.5rem wide — constant because
+   the panel is right-anchored). Only shows while its flyout is open. */
+.is-menu-open .wp-block-navigation__submenu-container::before {
+	content: "";
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	right: 14.5rem;
+	width: 16.5rem;
+	background: rgba(0, 0, 0, 0.32);
+	z-index: -1;
+}
+.is-menu-open .wp-block-navigation-submenu:hover > .wp-block-navigation__submenu-container,
+.is-menu-open .wp-block-navigation-submenu:focus-within > .wp-block-navigation__submenu-container,
+.is-menu-open .wp-block-navigation-submenu.nano-subopen > .wp-block-navigation__submenu-container {
+	display: flex !important;
+}
+.is-menu-open .wp-block-navigation__submenu-container .wp-block-navigation-item {
+	width: 100% !important;
+	padding: 0 !important;   /* drop WordPress's inset so the flyout is snug + aligns */
+}
+.is-menu-open .wp-block-navigation__submenu-container .wp-block-navigation-item__content {
+	display: block;
+	width: 100%;                                      /* pin every item to the left edge */
+	padding: 0 !important;
+	font-size: var(--wp--preset--font-size--large);   /* larger, matching the top level */
+	text-align: left !important;                      /* left vertical line */
+	color: #fff;                                      /* white — over the dark strip */
+	white-space: nowrap;                              /* keep each label on one line */
+}
+.is-menu-open .wp-block-navigation__submenu-container .wp-block-navigation-item__content:hover {
+	color: #fff;
+	text-decoration: underline;
+}
+/* The four Initiatives read as uppercase in the flyout (matching the homepage),
+   a touch smaller than the mixed-case items so the longest word (CORRELATIONS)
+   keeps clear of the tint edge. */
+.is-menu-open .nano-sub-initiatives .wp-block-navigation__submenu-container .wp-block-navigation-item__content {
+	text-transform: uppercase;
+	font-size: clamp(1.35rem, 1rem + 1.35vw, 1.85rem);
+}
+/* Those items are a size smaller than the other submenus, so the shared top
+   offset leaves them sitting a touch high — nudge this flyout down so ENCOUNTERS
+   lines up on the same baseline as the "Initiatives" label. */
+.is-menu-open .nano-sub-initiatives .wp-block-navigation__submenu-container {
+	top: -0.48em !important;
+}
+
+/* Small phones: the right-anchored flyout (12.5rem offset + 16.5rem panel)
+   cannot fit and bled past the left screen edge — open the submenu in-flow
+   under its parent instead, right-aligned like the rest of the drawer. */
+@media (max-width: 500px) {
+	.is-menu-open .wp-block-navigation__submenu-container {
+		position: static !important;
+		/* size to the labels and hang from the parent's right edge — the
+		   parent li is narrower than the longest label, so width:100% would
+		   overflow and defeat the right alignment */
+		width: max-content !important;
+		margin-left: auto;
+		top: auto !important;
+		padding: 0.6rem 0 0.4rem !important;
+		gap: 1rem;
+	}
+	.is-menu-open .wp-block-navigation__submenu-container::before { display: none; }
+	.is-menu-open .wp-block-navigation__submenu-container .wp-block-navigation-item .wp-block-navigation-item__content {
+		/* footer lavender (#b9bcee), darkened to 5.1:1 on the white drawer */
+		color: #5f64c5;
+		/* WP renders these links as flex containers, so alignment needs
+		   justify-content, not just text-align */
+		text-align: right !important;
+		justify-content: flex-end !important;
+	}
+	.is-menu-open .wp-block-navigation__submenu-container .wp-block-navigation-item .wp-block-navigation-item__content:hover {
+		color: #5f64c5;
+	}
+}
+
+/* Front page: the header overlays the full-screen hero video. */
+.home .wp-site-blocks { position: relative; }
+.home .wp-site-blocks > header.wp-block-template-part {
+	position: absolute;
+	inset: 0 0 auto 0;
+	z-index: 20;
+}
+.home .nano-header { border-bottom: none; }
+/* Hero must start at the very top under the overlaid header (kill the
+   block-gap margin that otherwise collapses out as a white strip). */
+.home .nano-main { margin-top: 0; }
+.home .nano-header .wp-block-navigation__responsive-container-open {
+	color: #fff;
+	text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Secondary pages (News archive, etc.): a compact wordmark top-left that
+   parallax-fades on scroll (handled in nano.js), and a fixed hamburger top-right
+   that stays put. The bar is transparent so content scrolls underneath. */
+body:not(.home) .wp-site-blocks > header.wp-block-template-part {
+	position: fixed;
+	inset: 0 0 auto 0;
+	z-index: 50;
+	pointer-events: none; /* transparent bar must not block the content behind it */
+}
+body:not(.home) .nano-header {
+	border-bottom: none;
+	background: transparent;
+}
+body:not(.home) .nano-header a,
+body:not(.home) .nano-header button { pointer-events: auto; }
+/* The Asset-16 mark is the corner logo; nano.js parallax-fades it on scroll. */
+body:not(.home) .nano-header .nano-brand {
+	transform-origin: left top;
+	will-change: opacity, transform;
+}
+/* Content clears the fixed header. */
+body:not(.home) .nano-main { padding-top: 5rem !important; }
+
+/* ---------------------------------------------------------------------------
+ * Section rhythm.
+ * ------------------------------------------------------------------------- */
+.nano-main > * + * {
+	margin-top: var(--wp--preset--spacing--70);
+}
+/* Full-width hairline above News (same 1px weight as the bracket lines). */
+.nano-rule {
+	height: 0;
+	border-top: 1px solid var(--wp--preset--color--contrast);
+}
+/* Each hairline is the top divider for the section below it: generous space
+   above, tighter space below. Applies to all rules (News, Mission, Initiatives). */
+.nano-main > .nano-rule {
+	margin-top: 4.5rem;
+}
+.nano-main > .nano-rule + * {
+	margin-top: 1.8rem;
+}
+/* Unified divider air: the first/last ink of every section (including art
+   that overflows its box — the S-curl dots above the section heads, the
+   corner curls hanging below the initiative rows) sits 4.5rem from the
+   divider line, matching the hero motto's bottom-line -> divider gap.
+   Offsets measured on the rendered page at desktop width. */
+.nano-main > .nano-rule + .nano-news,
+.nano-main > .nano-rule + .nano-initiatives-section,
+.nano-main > .nano-rule + .nano-newsletter {
+	margin-top: 4.8rem; /* S-curl dot ~1.9rem above the box; ink gap = 3.6rem (80% of the 4.5rem above-gap) */
+}
+.nano-main > .nano-rule + .nano-mission {
+	margin-top: 4.3rem; /* first ink is the small MISSION label; same 3.6rem ink gap */
+}
+.nano-main > .nano-news + .nano-rule {
+	margin-top: 4.05rem; /* slider bottom padding already adds ~0.45rem */
+}
+.nano-main > .nano-initiatives-section + .nano-rule {
+	margin-top: 6.8rem; /* Correlations' corner curl hangs ~2.3rem below the row */
+}
+/* Menu anchors (#newsletter, #initiatives) land with the divider line above the
+   section flush at the very top of the viewport — the 1.8rem matches the rule →
+   section gap, so the rule sits exactly at the top edge. */
+#newsletter,
+#initiatives {
+	scroll-margin-top: 1.8rem;
+}
+
+.nano-section-head {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 4rem; /* clearance for the yellow dot below the bracket */
+}
+.nano-section-title {
+	margin: 0;
+	font-size: var(--wp--preset--font-size--x-large);
+	font-weight: 500;
+}
+/* News bracket: a large "News" with an underline (designer's Asset 13) whose
+   right end rises in an S-curl to a yellow dot. The underline is an elastic svg
+   stroke (.nano-head__lines); the curl (.nano-head__curlg) is a group INSIDE
+   that same svg, so line and curve share one raster pass. */
+.nano-newshead {
+	position: relative;
+	box-sizing: border-box;
+	/* Same underline length as before: the flipped row's text column right
+	   edge: the 1fr text of a 1fr/1.25fr split sharing a 2rem gap inside the
+	   1320px wide container. */
+	width: calc((min(1320px, 100vw - 4rem) - 2rem) / 2.25);
+	min-width: 12rem;
+	padding-bottom: 0.18em;
+}
+.nano-head__curlg {
+	/* The curve's coordinates are rebased so its join with the underline is the
+	   group origin; the % translate uses the same viewport reference as the
+	   line's percentage coordinates, and scale maps the art's 30.49-unit box to
+	   the design width. Separate svg elements rasterize on different
+	   device-pixel phases on iOS (visible step at the seam) — one svg, one
+	   raster pass, can't drift. */
+	transform-box: view-box;
+	transform: translate(100%, 100%) scale(calc(clamp(2.2rem, 0.91rem + 2.81vw, 3.88rem) / 30.49px));
+}
+/* Subpage variant: same design width over the smaller 20.06-unit art box. */
+.nano-head__curlg--sm {
+	transform: translate(100%, 100%) scale(calc(clamp(2.2rem, 0.91rem + 2.81vw, 3.88rem) / 20.06px));
+}
+.nano-section-head__title {
+	margin: 0;
+	font-size: clamp(2.6rem, 5.2vw, 5.4rem);
+	font-weight: 500;
+	line-height: 0.9;
+	letter-spacing: -0.02em;
+}
+.nano-section-head__title a { color: inherit; text-decoration: none; }
+.nano-section-head__title a:hover { text-decoration: underline; }
+/* Large "view all" arrow: horizontal shaft + 45° arrowhead, sitting on the
+   News underline's level with the arrowhead's tip on the container's right
+   margin. */
+.nano-arrow {
+	flex: 0 0 auto;
+	position: relative;
+	align-self: flex-end; /* sit on the line beneath "News" */
+	width: clamp(110px, 12vw, 220px);
+	height: auto;
+	/* padding enlarges the clickable target around the thin line; the negative
+	   margin keeps the line itself on the "News" underline. */
+	padding: 1.1rem 0;
+	margin: 0 0 -1.1rem;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+}
+.nano-arrow::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 50%;
+	height: 1px;
+	background: var(--wp--preset--color--contrast);
+	transform: translateY(-50%);
+}
+.nano-arrow__head {
+	position: absolute;
+	/* the rotated square's point reaches ~7px past the box — pull it back so
+	   the tip lands exactly on the container's right margin */
+	right: 6px;
+	top: 50%;
+	width: 26px;
+	height: 26px;
+	border-top: 1px solid var(--wp--preset--color--contrast);
+	border-right: 1px solid var(--wp--preset--color--contrast);
+	transform: translateY(-50%) rotate(45deg);
+}
+
+.nano-label {
+	margin: 0 0 var(--wp--preset--spacing--30);
+	font-size: var(--wp--preset--font-size--lead);
+	font-weight: inherit; /* section headings use <h2>; keep the body weight, not bold */
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--muted);
+}
+
+/* ---------------------------------------------------------------------------
+ * Hero — full-bleed video band, tagline below with a dot.
+ * ------------------------------------------------------------------------- */
+.nano-hero { margin-top: 0; }
+.nano-hero__media {
+	position: relative;
+	width: 100%;
+	height: 100vh;
+	height: 100svh;
+	min-height: 480px;
+	overflow: hidden;
+	background: var(--wp--preset--color--surface);
+}
+.nano-hero__media .nano-media--video {
+	position: absolute;
+	inset: 0;
+}
+/* Dark scrim at the top so the overlaid white header stays readable over
+   bright video footage (the cleanroom clip is light). */
+.nano-hero__media::after {
+	content: "";
+	position: absolute;
+	inset: 0 0 auto 0;
+	height: 240px;
+	background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+	pointer-events: none;
+}
+/* Tagline as an editorial bracket: a thin vertical line at the screen centre,
+   the text to its right, a horizontal line under the text, and the purple dot
+   joined by a diagonal tail to the top of the vertical line. */
+.nano-hero__tagline {
+	position: relative;
+	margin-top: 0;
+	/* video -> wave-crest gap = ~3.15rem (70% of the unified 4.5rem divider
+	   air; the Asset-14 wave crests ~3.3rem above the frame's peak at desktop
+	   size). */
+	padding-top: 6.45rem;
+	padding-bottom: 0;
+}
+.nano-hero__frame {
+	position: relative;
+	box-sizing: border-box;
+	/* right-anchored: the text's right edge lines up with the 1320px content
+	   container's right margin (News / Initiatives) at every width */
+	margin-left: auto;
+	margin-right: max(2rem, (100vw - 1320px) / 2);
+	width: max-content; /* hug the text; explicit <br>s set the line wrap */
+	max-width: 58vw;
+	padding: 3.2rem 0 2.5rem 2.5rem; /* text->bottom-line ink gap == text->vertical-line ink gap (2.5rem padding + descender ~= 2.5rem + side bearing) */
+	/* the bracket lines are drawn by .nano-hero__lines (svg), not borders —
+	   see hero.php: svg strokes rasterize like the wave, so the join is exact */
+}
+.nano-hero__lines,
+.nano-mission__lines,
+.nano-about__lines,
+.nano-head__lines,
+.nano-initiative__lines,
+.nano-card__lines {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	color: var(--wp--preset--color--contrast);
+	overflow: visible;
+	pointer-events: none;
+}
+.nano-hero__text {
+	margin: 0;
+	font-size: clamp(1.7rem, 3vw, 3.2rem);
+	font-weight: 500;
+	line-height: 1.16;
+	letter-spacing: -0.01em;
+}
+/* Designer's wave + dot (Asset 14, two humps) drawn INSIDE the frame-lines
+   svg, coordinates rebased so its join with the vertical line is the group
+   origin at the frame's top-left corner. Scale maps the art's 72.77-unit box
+   to the design width (~47% of the frame height, the wave/vline ratio of the
+   designer's mark). One svg = one raster pass, so the seam can't drift on
+   iOS. Strokes are non-scaling (1px) to match the frame lines. */
+.nano-waveg {
+	transform-box: view-box;
+	transform: scale(calc(clamp(5.2rem, 2.2rem + 6.6vw, 9.2rem) / 72.77px));
+}
+
+/* ---------------------------------------------------------------------------
+ * News cards.
+ * ------------------------------------------------------------------------- */
+/* News slider: 2 cards visible, the arrow slides to reveal the rest. */
+.nano-news__viewport {
+	overflow-x: auto;
+	/* overflow-x:auto alone computes overflow-y to auto too; the caption curls
+	   hang ~1.6rem below the cards, and any vertical overflow makes the slider
+	   swallow vertical wheel/trackpad gestures (page won't scroll over it).
+	   Explicit hidden + enough bottom padding for the curls prevents that. */
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+	padding-bottom: 1.9rem;
+}
+.nano-news__viewport::-webkit-scrollbar { display: none; }
+.nano-news__grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	gap: var(--wp--preset--spacing--40);
+}
+.nano-card {
+	display: flex;
+	flex-direction: column;
+	flex: 0 0 calc(50% - var(--wp--preset--spacing--40) / 2);
+	scroll-snap-align: start;
+}
+
+/* News archive: the same cards, but a paginated 2-up vertical grid (no slider). */
+.nano-news--grid .nano-news__grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	column-gap: var(--wp--preset--spacing--40);
+	row-gap: var(--wp--preset--spacing--60);
+}
+.nano-news--grid .nano-card {
+	flex: none;
+	scroll-snap-align: none;
+}
+/* Archive title is a plain "News" — no bracket lines or dot. */
+.nano-news--grid .nano-newshead {
+	width: auto;
+	min-width: 0;
+	padding-bottom: 0;
+}
+.nano-news--grid .nano-newshead__tail,
+.nano-news--grid .nano-head__lines,
+.nano-news--grid .nano-head__curlg { display: none; }
+.nano-news__pagination {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+	margin-top: var(--wp--preset--spacing--60);
+}
+.nano-news__pagination .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2.4rem;
+	height: 2.4rem;
+	padding: 0 0.5rem;
+	border: 1px solid var(--wp--preset--color--line);
+	color: var(--wp--preset--color--contrast);
+	text-decoration: none;
+}
+.nano-news__pagination a.page-numbers:hover { border-color: var(--wp--preset--color--contrast); }
+.nano-news__pagination .page-numbers.current {
+	background: var(--wp--preset--color--contrast);
+	border-color: var(--wp--preset--color--contrast);
+	color: var(--wp--preset--color--base);
+}
+@media (max-width: 781px) {
+	.nano-news--grid .nano-news__grid {
+		grid-template-columns: 1fr;
+		row-gap: var(--wp--preset--spacing--50);
+	}
+}
+.nano-card__media {
+	display: block;
+	aspect-ratio: 16 / 10;
+	overflow: hidden;
+	background: var(--wp--preset--color--surface);
+}
+.nano-card__caption {
+	position: relative;
+	margin-top: var(--wp--preset--spacing--30);
+	/* indent the caption (and its bracket) in from the image edge by the same
+	   gap used between the two cards / at the content edge. */
+	margin-left: var(--wp--preset--spacing--40);
+}
+.nano-card__meta {
+	display: flex;
+	align-items: center; /* line the type sticker up with the initiative + date */
+	gap: 2.5rem;
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--muted);
+}
+
+/* ---------------------------------------------------------------------------
+ * News-card line brackets — same geometry as the matching Initiative
+ * (Encounters = pos1, Resonances = pos2, Pedagogies = pos3, Correlations =
+ * pos4). Initiative categories draw svg bracket lines + the designer's corner
+ * curl (Assets 7/12/9/10, see news-card.php); General keeps CSS borders and
+ * the 45° tail.
+ * ------------------------------------------------------------------------- */
+.nano-card--encounters .nano-card__caption,
+.nano-card--resonances .nano-card__caption,
+.nano-card--pedagogies .nano-card__caption,
+.nano-card--correlations .nano-card__caption,
+.nano-card--general .nano-card__caption {
+	box-sizing: border-box;
+	max-width: 30rem;
+	/* image -> caption line gap = the horizontal gap between the two images */
+	margin-top: var(--wp--preset--spacing--40);
+}
+.nano-card--encounters .nano-card__caption,
+.nano-card--pedagogies .nano-card__caption,
+.nano-card--general .nano-card__caption { /* top + left */
+	padding: 1.4rem 1.4rem 1.6rem 1.6rem;
+}
+.nano-card--resonances .nano-card__caption,
+.nano-card--correlations .nano-card__caption { /* top + right */
+	padding: 1.4rem 1.6rem 1.6rem 1.4rem;
+}
+/* Corner curls on the caption bracket — 30% smaller than the initiative-row
+   scale (x0.63 of the row clamps). Each curl is a group INSIDE the bracket
+   lines' svg, coordinates rebased so the join with the line is the group
+   origin; the % translate shares the lines' viewport reference and scale maps
+   the art box (28.11/28.10/19.83 units) to the design width. One svg = one
+   raster pass, so the seams can't drift on iOS. */
+.nano-card__curlg,
+.nano-initiative__curlg,
+.nano-grouphead__curlg {
+	transform-box: view-box;
+}
+.nano-card--encounters .nano-card__curlg { /* Asset 7 */
+	transform: translate(0, 100%) scale(calc(clamp(1.3rem, 0.53rem + 1.65vw, 2.28rem) / 28.11px));
+}
+.nano-card--resonances .nano-card__curlg { /* Asset 12 */
+	transform: translate(100%, 0) scale(calc(clamp(1.3rem, 0.53rem + 1.65vw, 2.28rem) / 28.10px));
+}
+.nano-card--pedagogies .nano-card__curlg { /* Asset 9 */
+	transform: translate(100%, 0) scale(calc(clamp(0.91rem, 0.38rem + 1.16vw, 1.6rem) / 19.83px));
+}
+.nano-card--correlations .nano-card__curlg { /* Asset 10 */
+	transform: translate(100%, 100%) scale(calc(clamp(1.3rem, 0.53rem + 1.65vw, 2.28rem) / 28.11px));
+}
+.nano-card--general .nano-card__curlg { /* Asset 17 */
+	transform: scale(calc(clamp(1.3rem, 0.53rem + 1.65vw, 2.28rem) / 28.11px));
+}
+.nano-card--encounters .nano-card__meta,
+.nano-card--resonances .nano-card__meta,
+.nano-card--pedagogies .nano-card__meta,
+.nano-card--correlations .nano-card__meta,
+.nano-card--general .nano-card__meta {
+	justify-content: flex-start; /* date sits close after the category name */
+	gap: 2.5rem;
+}
+
+/* Tail (dot + 45° connector) — legacy; only rendered for cards with no
+   category, and hidden there. All categories use the svg curls above. */
+.nano-card__tail { display: none; position: absolute; width: 0; height: 0; }
+.nano-card__cat { font-weight: 500; color: var(--wp--preset--color--contrast); }
+/* Class cards show the instructor in place of a date — same muted meta slot. */
+.nano-card__by { color: var(--wp--preset--color--muted); }
+.nano-card__title {
+	margin: 0.5rem 0 0;
+	font-size: var(--wp--preset--font-size--large);
+	font-weight: 500;
+	line-height: 1.15;
+}
+.nano-card__excerpt {
+	margin: 0.5rem 0 0;
+	color: var(--wp--preset--color--muted);
+	font-size: var(--wp--preset--font-size--medium);
+}
+
+/* ---------------------------------------------------------------------------
+ * Single initiative page — title (like the News archive) + lead paragraph +
+ * the same image/caption grid as News.
+ * ------------------------------------------------------------------------- */
+.nano-initiative-page__intro,
+.nano-project-page__intro {
+	max-width: 58rem;
+	margin: -1.5rem 0 var(--wp--preset--spacing--60); /* pull up under the heading's dot clearance */
+	font-size: var(--wp--preset--font-size--lead); /* matches the Newsletter intro on the homepage */
+	line-height: 1.45;
+}
+.nano-initiative-page__intro p,
+.nano-project-page__intro p { margin: 0; }
+.nano-initiative-page__intro p + p,
+.nano-project-page__intro p + p { margin-top: 1em; }
+/* Gallery captions use the same style as the News card titles (no override). */
+
+/* Single News: one feature image (the large "L" size — same as the Events
+   feature image on Initiative pages), then the article body. */
+.nano-project-page__feature {
+	max-width: var(--nano-img-l);
+	aspect-ratio: 16 / 10;
+	overflow: hidden;
+	background: var(--wp--preset--color--surface);
+}
+.nano-project-page__feature .nano-media { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nano-project-page__body {
+	max-width: 52rem;
+	margin-top: var(--wp--preset--spacing--50);
+	font-size: var(--wp--preset--font-size--lead); /* match the Initiative-page description */
+	line-height: 1.6;
+}
+.nano-project-page__body p { margin: 0 0 1em; }
+/* Project title sits a step smaller than the News / initiative headings. */
+.nano-project-page .nano-section-head__title {
+	font-size: clamp(2.1rem, 4.2vw, 4.3rem);
+}
+/* Initiative page title: uppercase and a touch smaller than the News heading. */
+.nano-initiative-page .nano-section-head__title {
+	text-transform: uppercase;
+	font-size: clamp(2.3rem, 4.6vw, 4.7rem);
+}
+
+/* Resources placeholder pages: News-style title + left-aligned body copy at the
+   same lead size as the initiative/project pages. */
+.nano-page-heading .nano-section-head { margin-bottom: var(--wp--preset--spacing--40); }
+.nano-main > .nano-page-heading + .nano-page-body { margin-top: 0; }
+.nano-page-body > * { max-width: 58rem; margin-left: 0; margin-right: 0; }
+.nano-page-body p { font-size: var(--wp--preset--font-size--lead); line-height: 1.45; }
+
+/* Participants: a clickable directory of people — name + title per row, each
+   linking to that person's page. */
+.nano-participants {
+	list-style: none;
+	margin: var(--wp--preset--spacing--60) 0 0;
+	padding: 0;
+}
+.nano-participant { border-top: 1px solid var(--wp--preset--color--contrast); }
+.nano-participant:last-child { border-bottom: 1px solid var(--wp--preset--color--contrast); }
+.nano-participant__link {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.4rem 1.6rem;
+	padding: 1.4rem 0;
+	color: inherit;
+	text-decoration: none;
+}
+.nano-participant__name {
+	margin: 0;
+	font-size: var(--wp--preset--font-size--large);
+	font-weight: 500;
+	line-height: 1.1;
+}
+.nano-participant__link:hover .nano-participant__name { text-decoration: underline; }
+.nano-participant__role {
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--muted);
+}
+/* Person page: the "Related" content this person took part in. */
+.nano-person-related { margin-top: var(--wp--preset--spacing--60); }
+@media (max-width: 781px) {
+	.nano-participant__link { gap: 0.2rem 1rem; }
+}
+
+/* ---------------------------------------------------------------------------
+ * Clickable media hover: corners ease from sharp to slightly rounded and back.
+ * Default stays sharp so the editorial look is unchanged at rest. The radius
+ * is set on BOTH the overflow:hidden frame and the img/video inside it, so
+ * the image itself rounds even where a frame doesn't clip.
+ * ------------------------------------------------------------------------- */
+a.nano-card__media,
+a.nano-initiative__media,
+.nano-facility__link .nano-facility__media,
+.nano-person__link .nano-person__photo,
+a.nano-card__media .nano-media,
+a.nano-initiative__media .nano-media,
+.nano-facility__link .nano-media,
+.nano-person__link .nano-media {
+	border-radius: 0;
+	transition: border-radius 0.25s ease, transform 0.25s ease;
+}
+a.nano-card__media,
+a.nano-initiative__media,
+.nano-facility__link { cursor: pointer; }
+/* Radius matches the bracket line dots (r = 5.12 units ~ 0.65rem at full
+   size); the frame also shrinks a touch. */
+a.nano-card__media:hover,
+a.nano-initiative__media:hover,
+.nano-facility__link:hover .nano-facility__media,
+.nano-person__link:hover .nano-person__photo,
+a.nano-card__media:hover .nano-media,
+a.nano-initiative__media:hover .nano-media,
+.nano-facility__link:hover .nano-media,
+.nano-person__link:hover .nano-media {
+	border-radius: 0.65rem;
+}
+a.nano-card__media:hover,
+a.nano-initiative__media:hover,
+.nano-facility__link:hover .nano-facility__media,
+.nano-person__link:hover .nano-person__photo {
+	transform: scale(0.98);
+}
+/* Reduced motion: no animated rounding/shrink — hover state applies instantly
+   without the scale, so nothing moves. */
+@media (prefers-reduced-motion: reduce) {
+	a.nano-card__media,
+	a.nano-initiative__media,
+	.nano-facility__link .nano-facility__media,
+	.nano-person__link .nano-person__photo,
+	a.nano-card__media .nano-media,
+	a.nano-initiative__media .nano-media,
+	.nano-facility__link .nano-media,
+	.nano-person__link .nano-media {
+		transition: none;
+	}
+	a.nano-card__media:hover,
+	a.nano-initiative__media:hover,
+	.nano-facility__link:hover .nano-facility__media,
+	.nano-person__link:hover .nano-person__photo {
+		transform: none;
+	}
+}
+
+/* Facilities: two columns filled top-to-bottom — MIT.nano's three spaces on
+   the left, the ACT-side spaces on the right. Tiles are links. */
+.nano-facilities {
+	list-style: none;
+	/* description -> first row: 75% of the old 5.5rem */
+	margin: 4.125rem 0 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-template-rows: repeat(3, auto);
+	grid-auto-flow: column; /* items 1-3 fill the left column, 4-6 the right */
+	column-gap: var(--wp--preset--spacing--40);
+	/* caption -> next image: 75% of the old 5.5rem */
+	row-gap: 4.125rem;
+}
+.nano-facility__link { display: block; color: inherit; text-decoration: none; }
+.nano-facility__link:hover .nano-facility__caption { text-decoration: underline; }
+.nano-facility__media {
+	display: block;
+	aspect-ratio: 8 / 3; /* half the previous 4:3 height */
+	overflow: hidden;
+	background: var(--wp--preset--color--surface);
+}
+.nano-facility__media .nano-media { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nano-facility__caption {
+	display: block;
+	margin-top: 1rem;
+	font-size: var(--wp--preset--font-size--large);
+	line-height: 1.2;
+	color: var(--wp--preset--color--contrast);
+}
+@media (max-width: 600px) {
+	.nano-facilities { grid-template-columns: 1fr; }
+}
+
+/* Sponsors: CMS-driven logo wall at the foot of the Support-us page. Four to a
+ * row on desktop (so eight logos read as two rows); logos are scaled to a shared
+ * height and contained, so mixed aspect ratios sit on one baseline. */
+/* padding, not margin: the constrained layout zeroes children's margin-block-end. */
+.nano-sponsors { margin-top: var(--wp--preset--spacing--70); padding-bottom: var(--wp--preset--spacing--70); }
+.nano-sponsors__label { margin-bottom: var(--wp--preset--spacing--50); }
+.nano-sponsors__grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	column-gap: var(--wp--preset--spacing--50);
+	row-gap: var(--wp--preset--spacing--60);
+	align-items: center;
+}
+.nano-sponsor {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 4.5rem;
+}
+.nano-sponsor__link { display: flex; align-items: center; justify-content: center; width: 100%; }
+.nano-sponsor .nano-media--image {
+	width: auto;
+	max-width: 100%;
+	max-height: 4.5rem;
+	height: auto;
+	object-fit: contain;
+}
+@media (max-width: 781px) {
+	.nano-sponsors__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---------------------------------------------------------------------------
+ * About page — Mission / History / People, each a small uppercase label on the
+ * left with content on the right, banner images above Mission and History.
+ * ------------------------------------------------------------------------- */
+.nano-about > * + * { margin-top: var(--wp--preset--spacing--60); }
+/* Tighten the title → first image gap, and keep the text box equidistant from
+   the image above it and the image below it. */
+/* Room for the intro bracket's wave, which crests ~2.1rem above its frame:
+   title -> crest air matches the below-divider rhythm (~3.6rem ink). */
+.nano-main > .nano-page-heading + .nano-about { margin-top: 4.68rem; }
+.nano-about__image + .nano-about__row,
+.nano-about__row + .nano-about__image { margin-top: var(--wp--preset--spacing--50); }
+/* Lead sentence under the title, above the first image — treated like the
+   homepage hero tagline: offset to the right with the identical three-line
+   bracket (vertical line, bottom line, 45° diagonal down-left to the dot). */
+.nano-about__frame {
+	position: relative;
+	box-sizing: border-box;
+	/* vertical line aligns with the Mission/History body column (grid: label
+	   1fr of 4 + a 2rem gap = 25% + 1.5rem). */
+	margin-left: calc(25% + 1.5rem);
+	/* fit-content = the bracket hugs a short statement, and stretches to the right
+	   image margin (the block edge) for a longer one, wrapping the text there. */
+	width: fit-content;
+	max-width: none;
+	padding: 3.2rem 0 2.5rem 2.5rem; /* equal ink gaps, like the hero motto */
+	/* bracket lines are drawn by .nano-about__lines (svg strokes) */
+}
+.nano-about__intro {
+	margin: 0;
+	font-size: clamp(1.4rem, 1.05rem + 1.15vw, 1.9rem);
+	font-weight: 500;
+	line-height: 1.25;
+	letter-spacing: -0.01em;
+}
+/* Smaller wave than the hero's — proportional to this frame's shorter
+   vertical (same 47% wave/vline ratio). */
+.nano-about__lines .nano-waveg { transform: scale(calc(clamp(3.2rem, 1.4rem + 4vw, 5.6rem) / 72.77px)); }
+.nano-about__frame + .nano-about__image { margin-top: var(--wp--preset--spacing--50); }
+@media (max-width: 900px) {
+	/* Rows stack here, so the lead loses its offset and shrinks the bracket. */
+	.nano-about__frame { margin-left: 5.6rem; max-width: calc(100vw - 7.6rem); padding-left: 1.53rem; padding-bottom: 1.1rem; /* ~25px ink gaps, matching the homepage paragraphs */ }
+	.nano-about__lines .nano-waveg { transform: scale(calc(3.6rem / 72.77px)); } /* dot lands on the 2rem offset */
+}
+.nano-about__image {
+	margin: 0;
+	aspect-ratio: 5 / 2;
+	overflow: hidden;
+	background: var(--wp--preset--color--surface);
+}
+.nano-about__row {
+	display: grid;
+	grid-template-columns: minmax(8rem, 1fr) 3fr; /* small label | content */
+	gap: var(--wp--preset--spacing--40);
+	align-items: start;
+}
+.nano-about__row .nano-label { margin: 0.35rem 0 0; } /* sit the label with the first line */
+.nano-about__body { max-width: 52rem; }
+/* Prose size for Mission / History only — direct body paragraphs, so it doesn't
+   leak onto nested card excerpts (Events section) or People cards. */
+.nano-about__row:not(.nano-about__row--people) .nano-about__body > p { margin: 0; font-size: var(--wp--preset--font-size--lead); line-height: 1.5; }
+.nano-about__row:not(.nano-about__row--people) .nano-about__body > p + p { margin-top: 1em; }
+/* People row: the right column holds the grouped grids at full width. */
+.nano-about__row--people .nano-about__body { max-width: none; }
+
+.nano-people__group + .nano-people__group { margin-top: var(--wp--preset--spacing--60); }
+/* Group heading with the same bracket + accent dot as the homepage titles:
+   underline + vertical riser, a 45° diagonal up to a coloured dot. */
+.nano-grouphead {
+	position: relative;
+	box-sizing: border-box;
+	/* Short underline — the same length as the News / Initiatives brackets on the
+	   home page, rather than running the full width of the people column. */
+	width: calc((min(1320px, 100vw - 4rem) - 2rem) / 2.25);
+	min-width: 14rem;
+	max-width: 100%;
+	margin-bottom: 1.8rem;
+	padding-bottom: 0.18em;
+	/* underline drawn by .nano-head__lines; curl scales with the title (em) */
+	font-size: var(--wp--preset--font-size--large);
+}
+.nano-people__group-title {
+	margin: 0;
+	font-size: 1em;
+	line-height: 0.9; /* tight, like the homepage section titles */
+	letter-spacing: -0.01em;
+	font-weight: 500;
+}
+/* Same bracket geometry as the homepage titles, expressed relative to the title
+   size (em) so it scales identically to a smaller heading. Homepage ratios:
+   diagonal 1.03em, dot offset 0.73em, dot 0.3em of the title's font-size. */
+/* Asset-13 S-curl at the underline's right end, em-sized to the title —
+   drawn inside the underline's svg (see .nano-head__curlg for why). */
+.nano-grouphead__curlg {
+	transform: translate(100%, 100%) scale(calc(0.75em / 30.49px));
+}
+.nano-people__grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	column-gap: var(--wp--preset--spacing--40);
+	row-gap: var(--wp--preset--spacing--50);
+}
+.nano-person__link { display: block; color: inherit; text-decoration: none; }
+.nano-person__link:hover .nano-person__name { text-decoration: underline; }
+.nano-person__photo {
+	display: block;
+	aspect-ratio: 4 / 5;
+	overflow: hidden;
+	background: var(--wp--preset--color--surface);
+}
+.nano-person__name {
+	margin: 0.9rem 0 0;
+	font-size: var(--wp--preset--font-size--lead);
+	font-weight: 500;
+	line-height: 1.15;
+}
+.nano-person__role {
+	margin: 0.3rem 0 0;
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--muted);
+}
+.nano-person__bio {
+	margin: 0.6rem 0 0;
+	font-size: var(--wp--preset--font-size--small); /* same as the event captions */
+	color: var(--wp--preset--color--contrast);
+}
+@media (max-width: 900px) {
+	.nano-about__row { grid-template-columns: 1fr; gap: 1.25rem; } /* label -> content, same as the initiative-page sections */
+	.nano-about__row .nano-label { margin: 0; }
+}
+@media (max-width: 781px) {
+	.nano-people__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+	.nano-people__grid { grid-template-columns: 1fr; }
+}
+
+/* ---------------------------------------------------------------------------
+ * Shared card grid + scaled-down (--sm) variant — Initiative pages & Related.
+ * ------------------------------------------------------------------------- */
+.nano-cards {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+	gap: var(--wp--preset--spacing--40) var(--wp--preset--spacing--30);
+}
+.nano-cards--sm .nano-card { flex: none; }
+.nano-cards--sm .nano-card__media { aspect-ratio: 16 / 10; }
+/* Drop the category bracket + indent at small size — just media + meta + title. */
+.nano-cards--sm .nano-card__caption {
+	margin: 0.6rem 0 0 !important;
+	max-width: none !important;
+	border: 0 !important;
+	padding: 0 !important;
+}
+.nano-cards--sm .nano-card__tail,
+.nano-cards--sm .nano-card__lines,
+.nano-cards--sm .nano-card__curlg { display: none !important; }
+.nano-cards--sm .nano-card__meta { flex-wrap: wrap; gap: 0.4rem 0.9rem; font-size: 0.72rem; }
+.nano-cards--sm .nano-card__title {
+	margin-top: 0.35rem;
+	font-size: var(--wp--preset--font-size--small);
+	line-height: 1.2;
+}
+.nano-cards--sm .nano-card__excerpt { display: none; }
+
+/* Two-up variant (Initiative pages): full homepage card — the bracketed caption
+   with the per-category line + black dot, two to a row. */
+.nano-cards--2col {
+	grid-template-columns: repeat(2, 1fr);
+	column-gap: var(--wp--preset--spacing--40);
+	row-gap: var(--wp--preset--spacing--50);
+}
+.nano-cards--2col .nano-card { flex: none; }
+/* News grid: caption is just category + date + title — no descriptive sentence.
+   (The Events grid — .nano-cards--feature — keeps its description sentence.) */
+.nano-cards--2col:not(.nano-cards--feature) .nano-card__excerpt { display: none; }
+/* Classes grid: two-up like News, but keeps the one-sentence description below
+   the title (as the Events cards do). */
+.nano-cards--2col.nano-cards--desc .nano-card__excerpt { display: block; }
+/* Events section: the most recent (first) event runs full width — two images
+   wide — with the rest flowing two-up beneath it. */
+.nano-cards--feature > .nano-card:first-child { grid-column: 1 / -1; }
+/* On that wide card the caption bracket extends to the right (vertical line on
+   the image's right edge) while keeping the same slight left offset as the
+   smaller cards below. */
+.nano-cards--feature > .nano-card:first-child .nano-card__caption {
+	max-width: none;
+}
+@media (max-width: 600px) {
+	.nano-cards--2col { grid-template-columns: 1fr; }
+}
+
+/* Initiative page EVENTS / NEWS: About-style label/offset, full-width card body. */
+.nano-initiative-page__section { margin-top: var(--wp--preset--spacing--60); }
+/* Extra breathing room between the Events grid and the News grid. */
+.nano-initiative-page__section + .nano-initiative-page__section { margin-top: var(--wp--preset--spacing--70); }
+.nano-initiative-page__section .nano-about__body { max-width: none; }
+
+/* "View all" link at the bottom of each section, aligned right → Archive. The
+   underline runs on past the text to the image's right edge. */
+.nano-viewall {
+	display: block;
+	width: fit-content;
+	margin: var(--wp--preset--spacing--50) 0 0 auto; /* clear the dot; push right */
+	padding: 0 2.6em 0.55em 0;                       /* prolong the underline right */
+	border-bottom: 1px solid var(--wp--preset--color--contrast);
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	font-weight: 500;
+	line-height: 1;
+	color: var(--wp--preset--color--contrast);
+	text-decoration: none;
+}
+.nano-viewall:hover { color: var(--wp--preset--color--muted); }
+
+/* ---------------------------------------------------------------------------
+ * Event page — description + two-column poster gallery (video = click-to-play).
+ * ------------------------------------------------------------------------- */
+.nano-event-page__date {
+	margin: -1.6rem 0 0;
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--muted);
+}
+.nano-event-page__body {
+	max-width: 52rem;
+	margin-top: var(--wp--preset--spacing--40);
+	font-size: var(--wp--preset--font-size--lead); /* match the Initiative-page description */
+	line-height: 1.55;
+}
+.nano-event-page__body p { margin: 0 0 1em; }
+.nano-gallery {
+	list-style: none;
+	margin: var(--wp--preset--spacing--60) 0 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--wp--preset--spacing--40);
+}
+.nano-gallery__item { margin: 0; }
+.nano-gallery__figure { margin: 0; display: flex; flex-direction: column; }
+.nano-gallery__media {
+	position: relative;
+	display: block;
+	aspect-ratio: 16 / 10;
+	overflow: hidden;
+	background: var(--wp--preset--color--surface);
+}
+.nano-gallery__media .nano-media { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Optional one-sentence caption beneath a gallery image or video. */
+.nano-gallery__caption {
+	margin: 0.7rem 0 0;
+	font-size: var(--wp--preset--font-size--small);
+	line-height: 1.35;
+	color: var(--wp--preset--color--muted);
+}
+.nano-gallery__play {
+	display: block;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	cursor: pointer;
+}
+.nano-gallery__playicon {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 4rem;
+	height: 4rem;
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.55);
+	transition: background 0.15s ease;
+}
+.nano-gallery__playicon::before {
+	content: "";
+	position: absolute;
+	left: 54%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	border-style: solid;
+	border-width: 0.66rem 0 0.66rem 1.1rem;
+	border-color: transparent transparent transparent #fff;
+}
+.nano-gallery__play:hover .nano-gallery__playicon,
+.nano-gallery__play:focus-visible .nano-gallery__playicon { background: rgba(0, 0, 0, 0.78); }
+.nano-gallery__play:focus-visible { outline: 2px solid var(--wp--preset--color--contrast); outline-offset: 2px; }
+@media (max-width: 600px) {
+	.nano-gallery { grid-template-columns: 1fr; }
+}
+
+/* ---------------------------------------------------------------------------
+ * Related section (single News + single Event) + People links.
+ * ------------------------------------------------------------------------- */
+.nano-related { margin-top: var(--wp--preset--spacing--70); }
+.nano-related__row + .nano-related__row { margin-top: var(--wp--preset--spacing--60); }
+.nano-related__row .nano-about__body { max-width: none; }
+.nano-people-links {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+	gap: var(--wp--preset--spacing--40);
+}
+.nano-people-links__link {
+	display: flex;
+	align-items: center;
+	gap: 0.9rem;
+	text-decoration: none;
+	color: inherit;
+}
+.nano-people-links__photo {
+	flex: 0 0 auto;
+	width: 3.4rem;
+	height: 3.4rem;
+	border-radius: 50%;
+	overflow: hidden;
+	background: var(--wp--preset--color--surface);
+}
+.nano-people-links__photo .nano-media { width: 100%; height: 100%; object-fit: cover; }
+.nano-people-links__name { display: block; font-weight: 500; line-height: 1.2; }
+.nano-people-links__role {
+	display: block;
+	margin-top: 0.15rem;
+	font-size: var(--wp--preset--font-size--small);
+	color: var(--wp--preset--color--muted);
+}
+.nano-people-links__link:hover .nano-people-links__name { text-decoration: underline; }
+
+/* ---------------------------------------------------------------------------
+ * Person page — photo + name / role / bio.
+ * ------------------------------------------------------------------------- */
+.nano-person-page {
+	display: grid;
+	grid-template-columns: 20rem 1fr;
+	gap: var(--wp--preset--spacing--50);
+	align-items: start;
+}
+.nano-person-page__photo {
+	aspect-ratio: 4 / 5;
+	overflow: hidden;
+	background: var(--wp--preset--color--surface);
+}
+.nano-person-page__photo .nano-media { width: 100%; height: 100%; object-fit: cover; }
+.nano-person-page__name {
+	margin: 0;
+	font-size: var(--wp--preset--font-size--x-large);
+	font-weight: 500;
+	line-height: 1;
+}
+.nano-person-page__role {
+	margin: 0.6rem 0 0;
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--muted);
+}
+.nano-person-page__bio {
+	margin-top: var(--wp--preset--spacing--40);
+	max-width: 44rem;
+	font-size: var(--wp--preset--font-size--lead);
+	line-height: 1.5;
+}
+.nano-person-page__bio p { margin: 0 0 1em; }
+@media (max-width: 781px) {
+	.nano-person-page { grid-template-columns: 1fr; gap: var(--wp--preset--spacing--40); }
+	.nano-person-page__photo { max-width: 16rem; }
+}
+
+/* ---------------------------------------------------------------------------
+ * Initiatives Archive — Year + Category dropdowns filtering a small static
+ * (poster-still) grid, four projects to a row, grouped by category.
+ * ------------------------------------------------------------------------- */
+/* Trim the gap between the intro text and the filters by a third. */
+.nano-main > .nano-page-body + .nano-archive { margin-top: calc(var(--wp--preset--spacing--70) * 2 / 3); }
+.nano-archive__filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2.5rem;
+	margin: var(--wp--preset--spacing--30) 0 calc(var(--wp--preset--spacing--50) * 2 / 3);
+}
+.nano-archive__filter {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+.nano-archive__filter-label {
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--muted);
+}
+.nano-archive__filter select {
+	min-width: 12rem;
+	padding: 0.6rem 2.2rem 0.6rem 0.9rem;
+	font: inherit;
+	font-size: 1.05rem;
+	color: var(--wp--preset--color--contrast);
+	background: transparent;
+	border: 1px solid var(--wp--preset--color--contrast);
+	border-radius: 0;
+	/* custom caret */
+	appearance: none;
+	-webkit-appearance: none;
+	background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+	background-position: right 1rem center, right 0.72rem center;
+	background-size: 0.28rem 0.28rem, 0.28rem 0.28rem;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+/* Type=Classes constrains the Initiative filter to Pedagogies: it's disabled,
+   greyed, and non-interactive, with a short note explaining why. */
+.nano-archive__filter select:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+	color: var(--wp--preset--color--muted);
+}
+.nano-archive__filter-note {
+	font-size: var(--wp--preset--font-size--small);
+	color: var(--wp--preset--color--muted);
+	font-style: italic;
+}
+.nano-archive__filter-note[hidden] { display: none; }
+
+/* Mixed Events + News grid — four to a row, small static cards. */
+.nano-archive__grid {
+	grid-template-columns: repeat(4, 1fr);
+	column-gap: var(--wp--preset--spacing--40);
+	row-gap: var(--wp--preset--spacing--50);
+}
+.nano-card[hidden] { display: none; }
+.nano-archive__grid .nano-card__meta { flex-wrap: wrap; gap: 0.45rem 0.65rem; }
+/* Type badge (News / Event) so the mixed grid is legible at a glance. */
+.nano-card__type {
+	display: inline-block;
+	padding: 0.2em 0.55em;
+	background: var(--wp--preset--color--base);
+	color: #555; /* type slightly grayed, not full black */
+	border: 1px solid var(--wp--preset--color--contrast);
+	font-weight: 500;
+	letter-spacing: 0.06em;
+}
+.nano-archive__empty {
+	margin-top: var(--wp--preset--spacing--50);
+	color: var(--wp--preset--color--muted);
+}
+@media (max-width: 1024px) {
+	.nano-archive__grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 781px) {
+	.nano-archive__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+	.nano-archive__grid { grid-template-columns: 1fr; }
+}
+
+/* Classes listing — grouped by term (current → past), a course-catalogue read.
+   Each term heading labels a small-card grid. Toggled against the mixed grid by
+   the Type filter; [hidden] must beat the .nano-cards grid display. */
+.nano-archive__grid[hidden],
+.nano-archive__classes[hidden],
+.nano-archive__termgroup[hidden] { display: none; }
+.nano-archive__classes { margin-top: var(--wp--preset--spacing--30); }
+.nano-archive__termgroup + .nano-archive__termgroup { margin-top: var(--wp--preset--spacing--60); }
+.nano-archive__term {
+	margin: 0 0 var(--wp--preset--spacing--30);
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid var(--wp--preset--color--contrast);
+	font-size: var(--wp--preset--font-size--large);
+	font-weight: 500;
+}
+.nano-archive__classes .nano-archive__grid,
+.nano-archive__classes .nano-cards {
+	grid-template-columns: repeat(4, 1fr);
+	column-gap: var(--wp--preset--spacing--40);
+	row-gap: var(--wp--preset--spacing--50);
+}
+@media (max-width: 1024px) {
+	.nano-archive__classes .nano-cards { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 781px) {
+	.nano-archive__classes .nano-cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+	.nano-archive__classes .nano-cards { grid-template-columns: 1fr; }
+}
+
+/* ---------------------------------------------------------------------------
+ * Single class page — structured meta line, instructor/TA links, syllabus.
+ * ------------------------------------------------------------------------- */
+.nano-class-page__facts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem 0;
+	margin: var(--wp--preset--spacing--20) 0 0;
+	font-size: 1.5rem; /* a step above the lead-size description, as a prominent spec line */
+	line-height: 1.3;
+	color: var(--wp--preset--color--muted);
+}
+.nano-class-page__fact + .nano-class-page__fact::before {
+	content: "·";
+	margin: 0 0.7rem;
+	color: var(--wp--preset--color--muted);
+}
+.nano-class-page__people {
+	list-style: none;
+	margin: var(--wp--preset--spacing--30) 0 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem 2.5rem;
+}
+.nano-class-page__role {
+	display: block;
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--muted);
+}
+.nano-class-page__person a {
+	font-size: var(--wp--preset--font-size--lead); /* same size as the description */
+	color: var(--wp--preset--color--contrast);
+	text-underline-offset: 0.2em;
+}
+/* Class image between the instructor line and the description — the large "L"
+   size (same as the Events feature image), 16/10. Full width on narrow screens. */
+.nano-class-page__image {
+	max-width: var(--nano-img-l);
+	margin: var(--wp--preset--spacing--50) 0 var(--wp--preset--spacing--40);
+	aspect-ratio: 16 / 10;
+	overflow: hidden;
+	background: var(--wp--preset--color--surface);
+}
+.nano-class-page__image .nano-media { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nano-class-page__body {
+	max-width: 52rem;
+	margin-top: var(--wp--preset--spacing--50);
+	font-size: var(--wp--preset--font-size--lead); /* match the Initiative-page description */
+	line-height: 1.55;
+}
+.nano-class-page__body p { margin: 0 0 1em; }
+.nano-class-page__syllabus { margin-top: var(--wp--preset--spacing--40); }
+.nano-class-page__syllabus-link {
+	display: inline-block;
+	padding: 0 2.6em 0.55em 0;
+	border-bottom: 1px solid var(--wp--preset--color--contrast);
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	font-weight: 500;
+	line-height: 1;
+	color: var(--wp--preset--color--contrast);
+}
+.nano-class-page__syllabus-link:hover { color: var(--wp--preset--color--muted); }
+
+/* ---------------------------------------------------------------------------
+ * Mission — large statement, offset right on wide screens (per wireframe).
+ * ------------------------------------------------------------------------- */
+.nano-mission { position: relative; }
+.nano-mission .nano-label {
+	/* label on the 1320px container's left margin, like the News/initiative
+	   images; nudged up so its top is level with the wave's crest */
+	margin-left: max(2rem, (100vw - 1320px) / 2);
+	position: relative;
+	top: -0.75rem;
+}
+/* Same editorial bracket as the hero motto: vertical line at 41vw, the
+   designer's Asset-4 wave with a red dot at the top, bottom line under the
+   text. Lines + wave are svg strokes (shared rules with .nano-hero__*). */
+.nano-mission__frame {
+	position: relative;
+	box-sizing: border-box;
+	/* right-anchored to the 1320px container edge, like the hero motto */
+	margin-left: auto;
+	margin-right: max(2rem, (100vw - 1320px) / 2);
+	width: max-content;
+	max-width: 56vw;
+	padding: 3.2rem 0 2.5rem 2.5rem; /* equal ink gaps, like the hero */
+}
+.nano-mission__statement {
+	margin: 0;
+	font-size: clamp(1.7rem, 3vw, 3.2rem);
+	font-weight: 500;
+	line-height: 1.16;
+	letter-spacing: -0.01em;
+}
+
+/* ---------------------------------------------------------------------------
+ * Initiatives — alternating media / text rows.
+ * ------------------------------------------------------------------------- */
+/* Initiatives + Newsletter headings reuse the News bracket exactly:
+   Asset-6 underline whose right end curls up into the section dot. */
+.nano-inithead,
+.nano-newsletterhead {
+	position: relative;
+	box-sizing: border-box;
+	width: calc((min(1320px, 100vw - 4rem) - 2rem) / 2.25);
+	min-width: 12rem;
+	margin-bottom: 4rem;
+	padding-bottom: 0.18em;
+}
+/* Underline -> Encounters top edge matches the 5.4rem inter-row rhythm. */
+.nano-inithead { margin-bottom: 5.4rem; }
+.nano-inithead .nano-section-title,
+.nano-newsletterhead .nano-section-title {
+	font-size: clamp(2.6rem, 5.2vw, 5.4rem);
+	line-height: 0.9;
+	letter-spacing: -0.02em;
+}
+
+.nano-initiatives {
+	display: flex;
+	flex-direction: column;
+	gap: 5.4rem; /* 4.5rem row rhythm + 20% */
+}
+.nano-initiative {
+	display: grid;
+	grid-template-columns: 1.25fr 1fr; /* media wider than the text column */
+	gap: var(--wp--preset--spacing--40);
+	align-items: stretch;
+}
+.nano-initiative--flip { grid-template-columns: 1fr 1.25fr; }
+.nano-initiative--flip .nano-initiative__media { order: 2; }
+.nano-initiative__media {
+	/* same proportions as the screen (set from JS, falls back to 16:9) */
+	display: block; /* it's a link to the initiative page */
+	aspect-ratio: var(--nano-screen-ratio, 16 / 9);
+	overflow: hidden;
+	background: var(--wp--preset--color--surface);
+}
+.nano-initiative__text {
+	position: relative;
+	box-sizing: border-box;
+	/* bracket lines are drawn by .nano-initiative__lines (svg strokes, top +
+	   left/right vertical) so they rasterize identically to the corner curls */
+	padding-top: 1.6rem;
+}
+.nano-initiative:not(.nano-initiative--flip) .nano-initiative__text {
+	padding-left: 2.6rem;
+}
+.nano-initiative--flip .nano-initiative__text {
+	padding-right: 2.6rem;
+}
+.nano-initiative__name {
+	margin: 0;
+	/* A step below x-large (no token sits between large and x-large). */
+	font-size: clamp(1.8rem, 1.15rem + 2.6vw, 2.9rem);
+	font-weight: 500;
+	letter-spacing: 0.01em;
+	text-transform: uppercase;
+}
+.nano-initiative__name a { color: inherit; text-decoration: none; }
+.nano-initiative__name a:hover { text-decoration: underline; }
+.nano-initiative__descriptor {
+	margin: 0.3rem 0 0;
+	font-size: var(--wp--preset--font-size--lead);
+	font-weight: 500;
+	color: var(--wp--preset--color--contrast);
+}
+.nano-initiative__body {
+	margin-top: var(--wp--preset--spacing--40);
+	max-width: 42ch;
+	/* A touch below lead — sits between the Medium token and the Newsletter body. */
+	font-size: 1.15rem;
+	color: var(--wp--preset--color--contrast);
+}
+.nano-initiative__body p { margin: 0; }
+
+/* Designer's corner curls (Assets 7-10), one per row position — groups inside
+   the bracket lines' svg, join point at the group origin (see
+   .nano-card__curlg for why); scale maps each art box to the design width. */
+/* pos1 ENCOUNTERS (Asset 7): curl at the bottom of the left vertical. */
+.nano-initiative--pos1 .nano-initiative__curlg {
+	transform: translate(0, 100%) scale(calc(clamp(2.03rem, 0.84rem + 2.59vw, 3.57rem) / 28.11px));
+}
+/* pos2 RESONANCES (Asset 12): curl on the upper part of the right vertical. */
+.nano-initiative--pos2 .nano-initiative__curlg {
+	transform: translate(100%, 0) scale(calc(clamp(2.03rem, 0.84rem + 2.59vw, 3.57rem) / 28.10px));
+}
+/* pos3 PEDAGOGIES (Asset 9): curl hanging from the top line's right end. */
+.nano-initiative--pos3 .nano-initiative__curlg {
+	transform: translate(100%, 0) scale(calc(clamp(1.43rem, 0.59rem + 1.83vw, 2.52rem) / 19.83px));
+}
+/* pos4 CORRELATIONS (Asset 10): curl at the bottom of the right vertical. */
+.nano-initiative--pos4 .nano-initiative__curlg {
+	transform: translate(100%, 100%) scale(calc(clamp(2.03rem, 0.84rem + 2.59vw, 3.57rem) / 28.11px));
+}
+
+/* ---------------------------------------------------------------------------
+ * Newsletter.
+ * ------------------------------------------------------------------------- */
+.nano-newsletter__title { margin: 0; }
+/* Two columns: intro on the left, the form on the right. */
+.nano-newsletter__body {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--wp--preset--spacing--50) var(--wp--preset--spacing--60);
+	align-items: start;
+}
+.nano-newsletter__intro {
+	margin: 0;
+	max-width: 38ch;
+	font-size: 1.15rem; /* matches the Initiative body text */
+	line-height: 1.35;
+	color: var(--wp--preset--color--contrast);
+}
+.nano-newsletter__form {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--wp--preset--spacing--30);
+	/* right edge of the email field flush with the container's right margin */
+	justify-self: end;
+	width: min(100%, 34rem);
+}
+.nano-newsletter__input {
+	width: 100%;
+	box-sizing: border-box;
+	border: 1px solid var(--wp--preset--color--contrast);
+	border-radius: 6px;
+	background: transparent;
+	padding: 0.9rem 1.1rem;
+	font: inherit;
+	color: inherit;
+}
+.nano-newsletter__input::placeholder { color: var(--wp--preset--color--muted); }
+.nano-newsletter__input:focus { outline: 2px solid var(--wp--preset--color--contrast); outline-offset: 1px; }
+.nano-newsletter__button {
+	border: 1px solid var(--wp--preset--color--contrast);
+	background: var(--wp--preset--color--surface);
+	padding: 0.7rem 1.5rem;
+	font: inherit;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	cursor: pointer;
+	color: var(--wp--preset--color--contrast);
+}
+.nano-newsletter__button:hover { background: var(--wp--preset--color--contrast); color: var(--wp--preset--color--base); }
+.nano-newsletter__consent {
+	display: flex;
+	gap: 0.6rem;
+	align-items: flex-start;
+	font-size: var(--wp--preset--font-size--small);
+	color: var(--wp--preset--color--muted);
+}
+.nano-newsletter__consent input { margin-top: 0.2rem; flex: 0 0 auto; }
+.nano-newsletter__msg { margin-top: var(--wp--preset--spacing--30); font-size: var(--wp--preset--font-size--small); }
+.nano-newsletter__msg--ok { color: var(--wp--preset--color--accent-green); }
+.nano-newsletter__msg--err { color: var(--wp--preset--color--accent-red); }
+
+/* ---------------------------------------------------------------------------
+ * Footer.
+ * ------------------------------------------------------------------------- */
+.nano-footer { margin-top: 4.5rem; } /* match the Correlations-image -> line gap */
+.nano-footer a { color: inherit; }
+/* Logo + columns share a row: logo top-left, columns spread across the right. */
+.nano-footer__top { align-items: flex-start; column-gap: 2rem; }
+
+/* Footer brand: the hero lockup (Asset-15 bracket + type, black on
+   transparent), linked home. Sized so the type matches the old footer
+   wordmark font — clamp(1.9rem, 3vw, 2.9rem) x the lockup's 8.572 canvas/type
+   width factor. */
+.nano-footer__marklink { display: block; margin-top: 1.2rem; }
+.nano-footer__mark {
+	display: block;
+	width: clamp(16.3rem, 25.7vw, 24.9rem);
+	height: auto;
+	/* Inline svg: contrast strokes at non-scaling 1px, like all bracket lines. */
+	color: var(--wp--preset--color--contrast);
+}
+/* Corner placement: pulled left of the centred column, positioned so the
+   lockup's vertical line (26.3% into its canvas) sits exactly over the "M" of
+   MIT.nano below (whose text is inset 32% of the lockup width) — hence the
+   0.0571W shift right of the old dot-at-18px position. The vertical drop puts
+   the lockup's bottom rule level with the four column-heading underlines
+   (cols drop 0.6W-1rem; heading text 1.0625rem x 1.55 + 0.7rem pad above its
+   rule). !important beats WP's flex-layout child margin reset. */
+.nano-footer .nano-footer__top .nano-footer__marklink {
+	margin-top: 1.43rem !important;
+	margin-left: calc(18px - 0.0382 * clamp(16.3rem, 25.7vw, 24.9rem) - max(2rem, (100vw - 1320px) / 2)) !important;
+}
+/* MIT.nano affiliation wordmark, stacked under the site logo. "MIT" heavy,
+   ".nano" light — matching MIT.nano's own text lockup. Dropped down so it sits
+   level with the last Initiatives item (Correlations). Same edge-pull as the
+   logo so its left edge lines up under the wordmark's text. */
+.nano-footer__brand { align-items: flex-start; row-gap: 0; }
+/* Affiliation logos (MIT.nano + MIT ACT), stacked under the lockup. The block
+   was dropped so MIT.nano's bottom met "Correlations"; with the ACT mark now
+   below it, MIT.nano moves up by the ACT block's height so ACT's bottom lands
+   in that zone instead. "MIT" sits under the lockup's type (type ink starts
+   at 32% of the lockup canvas), same edge-pull as before. !important beats
+   WP's flex-layout child margin reset. */
+.nano-footer__affil {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 1.5rem;
+	margin-top: calc(9.35rem - 2.35 * clamp(1.4rem, 2.1vw, 2rem)) !important; /* ACT bottom ink level with Correlations/News/Press */
+	margin-left: calc(18px - 0.0953 * clamp(16.3rem, 25.7vw, 24.9rem) - max(2rem, (100vw - 1320px) / 2)) !important;
+	padding-left: calc(0.32 * clamp(16.3rem, 25.7vw, 24.9rem));
+}
+.nano-footer__mitnano {
+	display: inline-block;
+	/* MIT.nano's own site sets its wordmark in the Helvetica/Arial family. */
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: clamp(1.4rem, 2.1vw, 2rem);
+	line-height: 1;
+	letter-spacing: -0.01em;
+	color: inherit;
+	text-decoration: none;
+	white-space: nowrap;
+}
+.nano-footer__mitnano-mit { font-weight: 700; }
+.nano-footer__mitnano-nano { font-weight: 400; }
+.nano-footer__mitnano:hover { text-decoration: underline; }
+/* MIT ACT wordmark (NEXT Pan Mono Thin outlines, green initials). Sized to
+   match MIT.nano's width; black parts follow the footer text colour. */
+.nano-footer__act { display: block; color: inherit; }
+.nano-footer__act-mark {
+	display: block;
+	width: calc(5.16 * clamp(1.4rem, 2.1vw, 2rem)); /* +20% */
+	height: auto;
+}
+
+/* Columns occupy the right portion, evenly spread, dropped slightly below the top. */
+.nano-footer__cols {
+	flex: 0 1 55rem;
+	max-width: 62%;
+	/* Drop the columns so the heading underlines meet the lockup's bottom rule.
+	   Lockup height = width x 0.6 (715/1190 canvas); the 1.2rem top margin and
+	   ~2.2rem heading-above-rule roughly cancel. */
+	margin-top: calc(0.6 * clamp(16.3rem, 25.7vw, 24.9rem) - 1rem) !important;
+	justify-content: space-between;
+	column-gap: 2rem !important;
+	flex-wrap: wrap;      /* wrap whole columns, never break a word */
+	row-gap: 2.5rem;
+}
+.nano-footer__cols > .wp-block-column {
+	flex: 0 1 12rem !important; /* 12rem when it fits (even intervals); may narrow to
+	                              its content, then columns wrap to a new row */
+	width: 12rem;
+}
+/* Column heading: full-width underline with a small down-right tick. */
+.nano-footer__head {
+	position: relative;
+	margin: 0 0 var(--wp--preset--spacing--40);
+	padding-bottom: 0.7rem;
+	font-size: var(--wp--preset--font-size--medium);
+	letter-spacing: 0.08em;
+	font-weight: 500;
+	text-transform: uppercase;
+	white-space: nowrap;
+	border-bottom: 1px solid var(--wp--preset--color--contrast);
+}
+.nano-footer__list { list-style: none; margin: 0; padding: 0; }
+.nano-footer__list li { margin: 0 0 1.1rem; white-space: nowrap; }
+.nano-footer__list a:hover { text-decoration: underline; }
+/* Copyright line — plain text, no rule above it (per the reference). */
+.nano-footer__copyright {
+	margin-top: var(--wp--preset--spacing--50);
+	font-size: var(--wp--preset--font-size--medium);
+	/* Indent to sit under the logo's "MIT" — the logo's edge-pull + its 1px border
+	   + 0.5em text inset, so the two line up at every width. Padding, not margin:
+	   the constrained layout forces children's margin-inline to auto !important.
+	   border-box keeps the padding inside the content width so the block still
+	   centres correctly above 1320px (else the padding widens it and it drifts). */
+	box-sizing: border-box;
+	padding-left: calc(19px + 2.03 * clamp(1.9rem, 3vw, 2.9rem) - max(2rem, (100vw - 1320px) / 2));
+}
+
+/* ---------------------------------------------------------------------------
+ * Responsive — tablet & mobile.
+ * ------------------------------------------------------------------------- */
+@media (max-width: 781px) {
+	/* One card per view with a peek of the next. min-width:0 stops long
+	   category/date rows from inflating individual cards past the 84% basis
+	   (they were rendering wider than the first card on small phones). */
+	.nano-card { flex-basis: 84%; min-width: 0; }
+	.nano-card__meta { gap: 0.3rem; font-size: 0.72rem; letter-spacing: 0.02em; } /* date hugs the category, clear of the corner curl */
+	/* Facilities: single column, tiles at full content width. */
+	.nano-facilities {
+		grid-template-columns: 1fr;
+		grid-template-rows: none;
+		grid-auto-flow: row;
+	}
+	/* Initiative subpages: section rhythm 25% tighter ("View all" -> next
+	   title, and intro -> Events title), with a bit more air between each
+	   section title and its first card image (was a cramped 8px). */
+	.nano-initiative-page .nano-initiative-page__section { margin-top: 4.125rem; }
+	.nano-initiative-page .nano-initiative-page__section + .nano-initiative-page__section { margin-top: 6rem; }
+	/* the intro's own bottom margin collapses over the section margin */
+	.nano-initiative-page__intro { margin-bottom: 4.125rem; }
+	/* (title -> first card gap now comes from the shared stacked-row rule) */
+	/* Divider air, mobile: gaps above and below each line (and the hero
+	   video -> wave-crest gap) sit 25% tighter than their previous mobile
+	   values — measured to real ink, per-rule because each section's art
+	   overhangs differently. Targets: above ~54/61/54/65px, below ~45px,
+	   hero ~49px. */
+	.nano-main > .nano-rule + .nano-news,
+	.nano-main > .nano-rule + .nano-initiatives-section,
+	.nano-main > .nano-rule + .nano-newsletter { margin-top: 3.84rem; }
+	.nano-main > .nano-rule + .nano-mission { margin-top: 3.39rem; }
+	.nano-main > .nano-hero + .nano-rule,
+	.nano-main > .nano-mission + .nano-rule { margin-top: 3.375rem; }
+	.nano-main > .nano-news + .nano-rule { margin-top: 2.8rem; }
+	.nano-main > .nano-initiatives-section + .nano-rule { margin-top: 5.43rem; }
+	.nano-hero__tagline { padding-top: 3.8rem; } /* video->wave 39px (-20%) */
+	/* About: title -> wave crest matches the homepage MISSION->wave air (30px) */
+	.nano-main > .nano-page-heading + .nano-about { margin-top: 3.24rem; }
+	/* Footer: stack the logo above the columns, columns stack full-width. */
+	.nano-footer__top { flex-direction: column; justify-content: flex-start; row-gap: 2.5rem; }
+	.nano-footer__cols {
+		flex-basis: 100%;
+		max-width: 100%;
+		width: 100%;
+		box-sizing: border-box;
+		/* Indent the stacked columns so their left edge lines up with the
+		   lockup's vertical line (26.3% of its width - the 9.53% dot inset). */
+		padding-left: calc(0.1677 * 15.6rem);
+		margin-top: 0 !important;
+		justify-content: flex-start;
+	}
+	/* The lockup's dot sits on the images' 2rem offset (the brand column
+	   already starts at the footer's 2rem padding, so the margin only
+	   subtracts the dot's 9.53% inset). Slightly narrower than the desktop
+	   clamp so lockup + MIT.nano fit side by side within the 2rem margins.
+	   Everything below aligns with the lockup's vertical line (26.3%). */
+	.nano-footer__mark { width: 15.6rem; }
+	.nano-footer .nano-footer__top .nano-footer__marklink {
+		margin-left: calc(-0.0953 * 15.6rem) !important;
+	}
+	/* The affiliation stack (MIT.nano over ACT) sits below the lockup,
+	   left-aligned with the lockup's vertical line — same edge the columns
+	   and copyright use. */
+	.nano-footer__brand { width: 100%; box-sizing: border-box; gap: 0; }
+	.nano-footer__affil {
+		/* bottom margin tuned so ACT -> INITIATIVES equals the 58px
+		   Correlations -> RESOURCES rhythm inside the columns */
+		margin: 2.25rem 0 1.12rem calc(0.1677 * 15.6rem) !important; /* a touch more air under the lockup */
+		padding-left: 0;
+	}
+	.nano-footer__act-mark { width: calc(1.2 * 5.16 * 1.4rem); } /* +20% */
+	.nano-footer__copyright {
+		padding-left: calc(0.1677 * 15.6rem);
+		margin-top: 2.25rem; /* a beat closer to the columns than the desktop 3.5rem */
+		/* !important: the paragraph carries WP's has-small-font-size preset
+		   (13px !important); 12px keeps one comfortable line on 375px phones
+		   while staying at a readable size. */
+		font-size: 0.75rem !important;
+		white-space: nowrap;
+	}
+	.nano-footer__cols > .wp-block-column { flex: 0 1 100% !important; width: auto; }
+	.nano-initiative { grid-template-columns: 1fr; gap: var(--wp--preset--spacing--40); }
+	.nano-initiative--flip .nano-initiative__media { order: 0; }
+	/* Keep each video's own proportions instead of cropping its sides to the
+	   portrait screen ratio — the panel takes the video's natural (landscape)
+	   shape, full width and shorter. */
+	.nano-initiative__media { aspect-ratio: auto; }
+	.nano-initiative__media .nano-media { height: auto; }
+	.nano-newsletter__body { grid-template-columns: 1fr; gap: var(--wp--preset--spacing--40); }
+	.nano-newsletter__intro { max-width: none; }
+	.nano-newsletter__form { justify-self: stretch; }
+	/* The heading's underline/riser calc collapses narrower than the word on
+	   phones, cutting through it — let the bracket fit the title, plus a little
+	   right padding so the lines extend past the last letter instead of touching. */
+	/* Underlines 30% longer than their desktop-min mobile lengths, pushing the
+	   S-curl + dot to the right. The wider head leaves ~60px for the News
+	   arrow, so cap it below its desktop clamp floor to avoid page overflow. */
+	.nano-inithead { min-width: 15.6rem; margin-bottom: 4rem; /* title->image = News's 64px */ }
+	.nano-initiatives { gap: 4rem; } /* same 64px between initiatives */
+	/* News keeps a shorter underline than the other heads so its S-curl
+	   stays well clear of the arrow. */
+	.nano-newshead { min-width: 12.5rem; }
+	.nano-arrow { width: 3.5rem; }
+	.nano-newsletterhead { width: max-content; max-width: 100%; padding-right: 5.65rem; }
+	/* Mission bracket: same left-shifted treatment as the hero on phones. */
+	.nano-mission .nano-label { margin-left: 2rem; } /* same left offset as the images */
+	/* Bracket dot lands on the 2rem image offset (wave extends ~3.575rem left of
+	   the frame corner at its 3.6rem mobile width); width:auto + the desktop
+	   margin-right puts the text's right edge on the same 2rem offset. The
+	   margin-top adds air between the MISSION label and the wave. */
+	.nano-mission__frame { margin-left: 5.6rem; margin-top: 2.5rem; width: auto; max-width: none; padding-left: 1.53rem; padding-bottom: 1.12rem; /* identical ~25px ink gaps left and bottom */ }
+	.nano-mission__statement { font-size: 1.55rem; }
+
+	/* Hamburger pinned to the top. */
+	.nano-header__inner { align-items: flex-start; }
+
+	/* Motto: drop the desktop-only breaks so the two sentences wrap naturally
+	   into the narrow column (≈6 lines, as in the reference). */
+	.nano-br-d { display: none; }
+	.nano-hero__frame {
+		margin-left: 5.6rem; /* bracket dot on the 2rem offset, like the mission */
+		width: auto;
+		max-width: none; /* width:auto + desktop margin-right -> text right edge at 2rem */
+		padding-left: 1.53rem; /* +50% side ink gap */
+		padding-bottom: 1.13rem; /* +50% bottom ink gap (stays the smaller) */
+	}
+	.nano-hero__text { font-size: 1.55rem; }
+	/* smaller wave so the dot stays on-screen near the left edge
+	   (extends ~99% of its width left of the frame's 3.75rem margin) */
+	.nano-hero__lines .nano-waveg,
+	.nano-mission__lines .nano-waveg { transform: scale(calc(3.6rem / 72.77px)); }
+}
+
+/* Very narrow phones (<=360px, e.g. first-gen SE): let the copyright and card
+   meta wrap rather than overflow the screen. */
+@media (max-width: 360px) {
+	.nano-footer__copyright { white-space: normal; }
+	.nano-card__meta { flex-wrap: wrap; row-gap: 0.2rem; }
+}
+
+/* Reduced-motion is handled in assets/js/nano.js: no clip is loaded or played,
+   so the poster image stands in. (No CSS rule needed — kept as a note.) */
+
+/* ---------------------------------------------------------------------------
+ * LOGO EXPERIMENT (branch logo-experiment) — image lockup over the hero video.
+ * The CSS bracket wordmark is hidden on the homepage only; the PNG (white,
+ * transparent) sits top-left over the video, mirroring the old inset.
+ * ------------------------------------------------------------------------- */
+.home .nano-header .nano-brand { display: none; }
+/* With the logo hidden, space-between would drag the hamburger to the left edge
+   — pin it back to the right. */
+.home .nano-header .nano-nav { margin-left: auto; }
+.nano-hero__logo {
+	position: absolute;
+	top: 1.35rem;
+	left: 1.25rem;
+	/* Type size matches the old CSS wordmark: its font was clamp(2.6rem, 6.1vw,
+	   8rem). The lockup is Asset 3's line bracket + re-set type (equal 16.5-unit
+	   gaps to vline/rule) + a 6-unit pad (297.6 wide): type is 34.7 of 297.6 →
+	   width = font × 8.57. The pad shifts the artwork down/right ~0.87rem at
+	   typical size, compensated in top/left. */
+	width: clamp(22.3rem, 52.3vw, 68.6rem);
+	height: auto;
+	z-index: 2;
+	pointer-events: none;
+	/* Inline svg: white over the video; bracket strokes are non-scaling 1px,
+	   matching every other bracket line on the site. */
+	color: #fff;
+}
+@media (max-width: 781px) {
+	/* +25% (27.9rem) where it fits; capped at 98vw on narrow phones — the type
+	   reaches 98.7% of the canvas, so anything wider clips "Imagination".
+	   left:0 puts the dot's ink at 9.53% of the width; top is set so the wave
+	   crest's ink offset (canvas top pad = 2.02% of width) equals the dot's:
+	   0.0953W - 0.0202W = 0.0751W. */
+	/* 10% smaller than the max-fit size; `left` compensates so the dot's ink
+	   keeps its previous left offset (9.53% of the old width), and `top` keeps
+	   the crest's ink at the same equal offset — so only the right-edge
+	   distance grows. */
+	.nano-hero__logo {
+		width: calc(0.9 * min(27.9rem, 98vw));
+		left: calc(0.00953 * min(27.9rem, 98vw));
+		/* crest ink (canvas top pad = 2.02% of width) level with the bottom of
+		   the hamburger's lower bar (~69px from the top) */
+		top: calc(69px - 0.01818 * min(27.9rem, 98vw));
+	}
+}

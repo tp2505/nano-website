@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nano/about",
+	"version": "0.1.0",
+	"title": "About Page",
+	"category": "nano",
+	"icon": "info",
+	"description": "The About page body: Mission, History and People, each a small uppercase label on the left with content on the right, with a banner image above Mission and History. People auto-groups from the People entries.",
+	"textdomain": "nano",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"render": "file:./render.php"
+}

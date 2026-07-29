@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nano/sponsors",
+	"version": "0.1.0",
+	"title": "Sponsors",
+	"category": "nano",
+	"icon": "awards",
+	"description": "The sponsor / partner logos for the Support-us page, laid out in rows. Logos are edited on the page (Sponsors box).",
+	"textdomain": "nano",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"render": "file:./render.php"
+}

@@ -1,0 +1,20 @@
+/*
+Theme Name: MIT Imagination Hub
+Theme URI: https://example.mit.edu/imagination-hub
+Author: Nano Studio
+Author URI: https://example.com
+Description: Editorial, restrained block theme for the MIT Imagination Hub — large media, generous whitespace, multicolor accent-dot section markers. Derived from Twenty Twenty-Four. Presentation only; content lives in the Nano Imagination Hub Core plugin.
+Requires at least: 6.5
+Tested up to: 6.7
+Requires PHP: 7.4
+Version: 0.1.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: nano
+Tags: editorial, block-theme, full-site-editing, custom-colors, custom-menu, news
+*/
+
+/*
+ * Block styles live in theme.json and assets/css/app.css (enqueued via
+ * functions.php). This file carries only the theme header.
+ */

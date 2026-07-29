@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nano/class-page",
+	"version": "0.1.0",
+	"title": "Class Page",
+	"category": "nano",
+	"icon": "welcome-learn-more",
+	"description": "Single class body: title, a structured meta line (term / department / level / credits), instructor & TA links, description, and a syllabus link. Optional fields render nothing when empty.",
+	"textdomain": "nano",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"render": "file:./render.php"
+}

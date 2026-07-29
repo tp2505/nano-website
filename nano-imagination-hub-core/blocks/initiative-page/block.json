@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nano/initiative-page",
+	"version": "0.1.0",
+	"title": "Initiative Page",
+	"category": "nano",
+	"icon": "screenoptions",
+	"description": "Single initiative: the title, a lead paragraph, and an image/caption grid (mirrors the News archive).",
+	"textdomain": "nano",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"render": "file:./render.php"
+}

@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nano/event-page",
+	"version": "0.1.0",
+	"title": "Event Page",
+	"category": "nano",
+	"icon": "calendar-alt",
+	"description": "Single event body: title, description, and a two-column poster gallery (images show directly; videos play on click).",
+	"textdomain": "nano",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"render": "file:./render.php"
+}

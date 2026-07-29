@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nano/initiatives-archive",
+	"version": "0.1.0",
+	"title": "Initiatives Archive",
+	"category": "nano",
+	"icon": "archive",
+	"description": "Archive of every Initiatives project, filterable by year and category, in a small static 4-up grid grouped by category.",
+	"textdomain": "nano",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"render": "file:./render.php"
+}

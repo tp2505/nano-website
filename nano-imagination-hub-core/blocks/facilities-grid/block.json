@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nano/facilities-grid",
+	"version": "0.1.0",
+	"title": "Facilities Grid",
+	"category": "nano",
+	"icon": "grid-view",
+	"description": "A grid of facility tiles (placeholder images) with captions, three to a row.",
+	"textdomain": "nano",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"render": "file:./render.php"
+}

@@ -1,0 +1,19 @@
+# Local dev / build — never part of the deliverable
+.wp-env.json
+node_modules/
+package.json
+package-lock.json
+
+# Verification screenshots / seed tooling (live in the dev repo, not here).
+# Scoped to the repo root on purpose: real theme/plugin image assets
+# (mit-imagination-hub/assets/…, nano-imagination-hub-core/blocks/…/img/…)
+# must stay tracked.
+/bin/
+/seed/
+/*.png
+*.log
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
