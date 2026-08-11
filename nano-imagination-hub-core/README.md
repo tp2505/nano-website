@@ -21,6 +21,14 @@ access; no super-admin requirements.
 | **Class** | `class` | A course (Pedagogies only) | `nano_term` (**required**, "Fall 2026"), `nano_department`, `nano_instructor`, `nano_ta`, `nano_level`, `nano_credits`, `nano_description`, `nano_syllabus_file` (PDF) / `nano_syllabus_link`, `nano_related`, `nano_people` |
 | **Initiative** | `initiative` | The four strands | `nano_descriptor`, `nano_order`, `nano_intro`, media |
 | **Person** | `person` | Everyone — Hub team **and** participants | `nano_role`, `nano_photo`, `nano_bio`; `people_group` taxonomy (About-page groups) |
+| **Facility** | `facility` | Facilities-page tiles | title = caption, featured image = tile, `nano_url` (link target); ordered by menu order (Page Attributes → Order) |
+
+Two page-bound groups sit alongside the post types: **About page details**
+(`nano_about_intro`, `nano_mission`, `nano_history`, `nano_about_img1/2` — the
+intro statement, section bodies, and banner images the About block renders) and
+**Sponsors** (`nano_sponsors` repeater on the Support-us page). Video
+attachments additionally carry a **Poster (still)** image field (`nano_poster`),
+shown in the media modal and the Event gallery sidebar.
 
 ### Relationships & the reverse-lookups
 
@@ -46,7 +54,8 @@ access; no super-admin requirements.
 `participants-list`, `facilities-grid`, `page-heading`, `related`. Each is a
 `block.json` + `render.php`; they run `WP_Query` against the post types so pages
 are data-driven, never hardcoded. The `related` block is reused by single News,
-Event, and Class pages.
+Event, and Class pages. `facilities-grid` renders one tile per published
+`facility` post (and nothing while none exist — no bundled placeholders).
 
 `assets/editor.js` registers the same blocks with the block editor's JavaScript
 registry (with a live server-side-rendered preview) — without it the editor
