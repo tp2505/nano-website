@@ -4,7 +4,8 @@
  * (nano_sponsors) via get_field when available, and otherwise reconstructs it
  * straight from ACF's repeater meta layout (count + indexed sub-fields) so it
  * renders even where ACF Pro isn't loaded — the same isolation contract the
- * gallery uses (see nano_gallery_rows()).
+ * event gallery uses (see nano_gallery_rows(), which reads the ACF Pro Gallery
+ * field's ID-array meta the same way).
  *
  * @package Nano\ImaginationHubCore
  */

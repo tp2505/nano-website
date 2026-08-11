@@ -40,6 +40,43 @@ function nano_core_register_blocks() {
 add_action( 'init', 'nano_core_register_blocks' );
 
 /**
+ * Editor-side registration for the same blocks.
+ *
+ * register_block_type() above fills the PHP registry, which is what the front
+ * end renders from — but the block editor keeps its own JavaScript registry,
+ * and a block absent from it shows as "Your site doesn't include support for
+ * this block". assets/editor.js registers every nano/* block client-side with
+ * a server-side-rendered preview; the block list is passed in from the PHP
+ * registry so block.json stays the single source of truth.
+ */
+function nano_core_enqueue_editor_assets() {
+	$blocks = array();
+	foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $name => $type ) {
+		if ( 0 === strpos( $name, 'nano/' ) ) {
+			$blocks[] = array(
+				'name'  => $name,
+				'title' => $type->title,
+			);
+		}
+	}
+
+	$file = NANO_CORE_DIR . 'assets/editor.js';
+	wp_enqueue_script(
+		'nano-core-editor',
+		NANO_CORE_URL . 'assets/editor.js',
+		array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-server-side-render' ),
+		file_exists( $file ) ? filemtime( $file ) : NANO_CORE_VERSION,
+		true
+	);
+	wp_add_inline_script(
+		'nano-core-editor',
+		'window.nanoCoreEditor = ' . wp_json_encode( array( 'blocks' => $blocks ) ) . ';',
+		'before'
+	);
+}
+add_action( 'enqueue_block_editor_assets', 'nano_core_enqueue_editor_assets' );
+
+/**
  * Flush rewrite rules on activation so the CPT permalinks work immediately.
  */
 function nano_core_activate() {

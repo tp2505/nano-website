@@ -17,7 +17,7 @@ access; no super-admin requirements.
 | Type | Slug | Purpose | Key fields (ACF, `inc/fields-acf.php`) |
 |---|---|---|---|
 | **News** | `news` | Editorial feed | `nano_date`, media (`nano_media_type`/`nano_image`/`nano_video`/`nano_poster`), `nano_initiative`, `nano_related`, `nano_people`; `news_category` taxonomy |
-| **Event** | `event` | A happening under one Initiative | `nano_date`, `nano_description`, `nano_gallery` (repeater: media + poster + **caption**), `nano_initiative`, `nano_related`, `nano_people` |
+| **Event** | `event` | A happening under one Initiative | `nano_date`, `nano_description`, `nano_gallery` (ACF Pro Gallery: images + videos; caption/alt and the per-video **poster** live on the attachment, edited in the Gallery sidebar), `nano_initiative`, `nano_related`, `nano_people` |
 | **Class** | `class` | A course (Pedagogies only) | `nano_term` (**required**, "Fall 2026"), `nano_department`, `nano_instructor`, `nano_ta`, `nano_level`, `nano_credits`, `nano_description`, `nano_syllabus_file` (PDF) / `nano_syllabus_link`, `nano_related`, `nano_people` |
 | **Initiative** | `initiative` | The four strands | `nano_descriptor`, `nano_order`, `nano_intro`, media |
 | **Person** | `person` | Everyone — Hub team **and** participants | `nano_role`, `nano_photo`, `nano_bio`; `people_group` taxonomy (About-page groups) |
@@ -47,6 +47,12 @@ access; no super-admin requirements.
 `block.json` + `render.php`; they run `WP_Query` against the post types so pages
 are data-driven, never hardcoded. The `related` block is reused by single News,
 Event, and Class pages.
+
+`assets/editor.js` registers the same blocks with the block editor's JavaScript
+registry (with a live server-side-rendered preview) — without it the editor
+reports them as unsupported even though the front end renders them fine. The
+block list is injected from the PHP registry, so `block.json` remains the
+single source of truth and no build step is needed.
 
 ## The Archive filter (`blocks/initiatives-archive` + theme `assets/js/nano.js`)
 
