@@ -17,7 +17,14 @@
 defined( 'ABSPATH' ) || exit;
 
 $count    = isset( $attributes['count'] ) ? (int) $attributes['count'] : 4;
-$view_all = isset( $attributes['viewAllUrl'] ) ? esc_url( $attributes['viewAllUrl'] ) : '#';
+$view_all = isset( $attributes['viewAllUrl'] ) ? (string) $attributes['viewAllUrl'] : '';
+if ( '' !== $view_all && '/' === $view_all[0] ) {
+	// Site-relative values (including the "/news" default) resolve against
+	// home_url(), which carries the subdirectory on installs like
+	// sites.mit.edu/studionano/ — a raw root-relative href would escape it.
+	$view_all = home_url( $view_all );
+}
+$view_all = '' !== $view_all ? esc_url( $view_all ) : '#';
 $layout   = ( isset( $attributes['layout'] ) && 'grid' === $attributes['layout'] ) ? 'grid' : 'slider';
 
 $order = array(
