@@ -545,6 +545,90 @@ function nano_register_acf_fields() {
 		)
 	);
 
+	// About page — the intro statement, the Mission/History bodies, and the two
+	// banner images the nano/about block renders. These were previously written
+	// only by the local seed script (raw post meta, no editor UI); this group
+	// gives wp-admin the fields. Bound to the About page specifically when it
+	// exists, otherwise to any page so the box is reachable before seeding —
+	// same pattern as the Sponsors group above.
+	$about          = get_page_by_path( 'about-us' );
+	$about_location = $about
+		? array(
+			array(
+				array(
+					'param'    => 'page',
+					'operator' => '==',
+					'value'    => (string) $about->ID,
+				),
+			),
+		)
+		: array(
+			array(
+				array(
+					'param'    => 'post_type',
+					'operator' => '==',
+					'value'    => 'page',
+				),
+			),
+		);
+	acf_add_local_field_group(
+		array(
+			'key'        => 'group_nano_about',
+			'title'      => 'About page details',
+			'location'   => $about_location,
+			'menu_order' => 0,
+			'position'   => 'normal',
+			'fields'     => array(
+				array(
+					'key'          => 'field_nano_about_intro',
+					'label'        => 'Intro statement',
+					'name'         => 'nano_about_intro',
+					'type'         => 'textarea',
+					'rows'         => 3,
+					'instructions' => 'The large statement in the bracket frame at the top of the page ("Imagination Hub is a platform merging…"). Plain text; the whole section is hidden while this is empty.',
+				),
+				array(
+					'key'           => 'field_nano_about_img1',
+					'label'         => 'Banner image (above Mission)',
+					'name'          => 'nano_about_img1',
+					'type'          => 'image',
+					'return_format' => 'id',
+					'preview_size'  => 'medium',
+					'library'       => 'all',
+					'instructions'  => 'Wide banner between the intro and the Mission section. Empty shows a plain placeholder box.',
+				),
+				array(
+					'key'          => 'field_nano_about_mission',
+					'label'        => 'Mission',
+					'name'         => 'nano_mission',
+					'type'         => 'wysiwyg',
+					'tabs'         => 'visual',
+					'media_upload' => 0,
+					'instructions' => 'Body of the Mission section.',
+				),
+				array(
+					'key'           => 'field_nano_about_img2',
+					'label'         => 'Banner image (above History)',
+					'name'          => 'nano_about_img2',
+					'type'          => 'image',
+					'return_format' => 'id',
+					'preview_size'  => 'medium',
+					'library'       => 'all',
+					'instructions'  => 'Wide banner between Mission and History. Empty shows a plain placeholder box.',
+				),
+				array(
+					'key'          => 'field_nano_about_history',
+					'label'        => 'History',
+					'name'         => 'nano_history',
+					'type'         => 'wysiwyg',
+					'tabs'         => 'visual',
+					'media_upload' => 0,
+					'instructions' => 'Body of the History section.',
+				),
+			),
+		)
+	);
+
 	// Person. Group is the people_group taxonomy (its own box).
 	acf_add_local_field_group(
 		array(
