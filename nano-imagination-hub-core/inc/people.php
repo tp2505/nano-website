@@ -15,6 +15,44 @@
 
 defined( 'ABSPATH' ) || exit;
 
+if ( ! function_exists( 'nano_sort_people' ) ) {
+	/**
+	 * Order a list of person posts for display: explicit menu_order first
+	 * (ascending), everyone unset (order 0) after them, alphabetically by last
+	 * name. Plain menu_order ASC would put the unset majority BEFORE anyone an
+	 * editor deliberately ordered (0 < 1), which is exactly backwards for
+	 * curated lists — so 0 means "no opinion, sort by name at the end".
+	 *
+	 * @param WP_Post[] $people Person posts (modified in place and returned).
+	 * @return WP_Post[]
+	 */
+	function nano_sort_people( $people ) {
+		$last = function ( $name ) {
+			$parts = preg_split( '/\s+/', trim( $name ) );
+			return end( $parts );
+		};
+		usort(
+			$people,
+			function ( $a, $b ) use ( $last ) {
+				$oa = (int) $a->menu_order;
+				$ob = (int) $b->menu_order;
+				if ( $oa !== $ob ) {
+					if ( 0 === $oa ) {
+						return 1;
+					}
+					if ( 0 === $ob ) {
+						return -1;
+					}
+					return $oa <=> $ob;
+				}
+				$cmp = strcasecmp( $last( $a->post_title ), $last( $b->post_title ) );
+				return 0 !== $cmp ? $cmp : strcasecmp( $a->post_title, $b->post_title );
+			}
+		);
+		return $people;
+	}
+}
+
 if ( ! function_exists( 'nano_content_people_map' ) ) {
 	/**
 	 * Map of every published Event/News/Class to the person ids it references,

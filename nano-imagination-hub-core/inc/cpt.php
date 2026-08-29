@@ -37,7 +37,8 @@ function nano_register_post_types() {
 		)
 	);
 
-	// Initiative (Program) — the four strands. Ordered 1–4, large media block.
+	// Initiative (Program) — the four strands. Ordered by menu_order (the Page
+	// Attributes → Order box, like Facilities and People), large media block.
 	register_post_type(
 		'initiative',
 		array(
@@ -58,7 +59,7 @@ function nano_register_post_types() {
 			'menu_position' => 22,
 			'has_archive'   => true,
 			'rewrite'       => array( 'slug' => 'initiatives' ),
-			'supports'      => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
+			'supports'      => array( 'title', 'editor', 'thumbnail', 'page-attributes', 'custom-fields' ),
 		)
 	);
 
@@ -215,6 +216,42 @@ function nano_register_facility_post_type() {
 }
 add_action( 'init', 'nano_register_facility_post_type' );
 
+
+/**
+ * Manually-ordered types get an Order column in their admin list (sortable), so
+ * an editor can see and check the sequence without opening every post. The
+ * value itself is edited in the post's Page Attributes → Order box.
+ */
+function nano_register_order_columns() {
+	foreach ( array( 'person', 'initiative', 'facility' ) as $nano_pt ) {
+		add_filter(
+			"manage_{$nano_pt}_posts_columns",
+			function ( $columns ) {
+				$columns['nano_menu_order'] = __( 'Order', 'nano' );
+				return $columns;
+			}
+		);
+		add_action(
+			"manage_{$nano_pt}_posts_custom_column",
+			function ( $column, $post_id ) {
+				if ( 'nano_menu_order' === $column ) {
+					$order = (int) get_post_field( 'menu_order', $post_id );
+					echo $order ? (int) $order : '&mdash;';
+				}
+			},
+			10,
+			2
+		);
+		add_filter(
+			"manage_edit-{$nano_pt}_sortable_columns",
+			function ( $columns ) {
+				$columns['nano_menu_order'] = 'menu_order';
+				return $columns;
+			}
+		);
+	}
+}
+add_action( 'admin_init', 'nano_register_order_columns' );
 
 /**
  * Seed the default News category terms once, on admin load, if missing.

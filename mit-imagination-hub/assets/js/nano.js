@@ -132,6 +132,79 @@
 		} );
 	}
 
+	// Vimeo hero: the markup carries only the poster image (instant first paint,
+	// zero video bytes). On desktop — and never under data-saver / reduced-motion
+	// — this builds the chrome-less background player iframe and fades it in over
+	// the poster once the clip actually starts playing (the player announces
+	// events over postMessage; a post-load timeout covers plans/browsers where
+	// those events never arrive).
+	function initVimeoHero() {
+		var wrap = document.querySelector( '[data-nano-vimeo]' );
+		if ( ! wrap || lite || smallScreen ) {
+			return;
+		}
+		var src = wrap.getAttribute( 'data-nano-vimeo' );
+		if ( ! src ) {
+			return;
+		}
+
+		var iframe = document.createElement( 'iframe' );
+		iframe.className = 'nano-hero__vimeo-frame';
+		iframe.src = src;
+		iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+		iframe.setAttribute( 'frameborder', '0' );
+		iframe.setAttribute( 'tabindex', '-1' );
+		iframe.setAttribute( 'aria-hidden', 'true' );
+		iframe.setAttribute( 'title', 'Background video' );
+
+		var revealed = false;
+		function reveal() {
+			if ( ! revealed ) {
+				revealed = true;
+				wrap.classList.add( 'nano-hero__vimeo--playing' );
+			}
+		}
+		function subscribe() {
+			try {
+				iframe.contentWindow.postMessage(
+					JSON.stringify( { method: 'addEventListener', value: 'play' } ),
+					'https://player.vimeo.com'
+				);
+			} catch ( err ) {
+				/* Cross-origin hiccup: the load-timeout fallback reveals instead. */
+			}
+		}
+		window.addEventListener( 'message', function ( e ) {
+			if ( 'https://player.vimeo.com' !== e.origin ) {
+				return;
+			}
+			var data = e.data;
+			if ( typeof data === 'string' ) {
+				try {
+					data = JSON.parse( data );
+				} catch ( err ) {
+					return;
+				}
+			}
+			if ( ! data || ! data.event ) {
+				return;
+			}
+			if ( 'ready' === data.event ) {
+				subscribe();
+			} else if ( 'play' === data.event || 'playing' === data.event ) {
+				reveal();
+			}
+		} );
+		iframe.addEventListener( 'load', function () {
+			subscribe();
+			// Fallback: if no play event ever arrives, fade in anyway — by then
+			// the player has its first frame, so nothing black flashes through.
+			setTimeout( reveal, 2500 );
+		} );
+
+		wrap.appendChild( iframe );
+	}
+
 	// News slider: the arrow advances one page and loops the cards in a circle —
 	// the track is cloned so it keeps moving forward, then resets seamlessly once
 	// it reaches the cloned copy (never scrolling backward).
@@ -496,6 +569,7 @@
 
 	function boot() {
 		setScreenRatio();
+		initVimeoHero();
 		initSliders(); // clone slider cards first…
 		init();        // …then observe lazy videos (originals + clones)
 		initHeaderScroll();

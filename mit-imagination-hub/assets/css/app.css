@@ -447,6 +447,43 @@ body:not(.home) .nano-main { padding-top: 5rem !important; }
 	position: absolute;
 	inset: 0;
 }
+/* Vimeo-hosted background clip. The poster covers the band and is the whole
+   story on phones / data-saver / reduced-motion; on desktop the JS-built player
+   iframe sits over it, sized to COVER the band at the clip's 16:9 ratio (the
+   player letterboxes inside its frame, so the frame must always overshoot the
+   band), and fades in once playback starts. pointer-events:none — nothing to
+   hover, nothing to click, no player chrome can ever surface. */
+.nano-hero__vimeo {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	pointer-events: none;
+}
+.nano-hero__poster {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.nano-hero__vimeo-frame {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	/* 100% tracks the band (100svh wide × min 480px tall); the vw/vh terms keep
+	   16:9 cover when the band is wider/taller than the clip's shape. */
+	width: max(100%, 177.78vh, 853px); /* 853px = 16:9 width of the 480px min-height */
+	width: max(100%, 177.78svh, 853px);
+	height: max(100%, 56.25vw);
+	transform: translate(-50%, -50%);
+	border: 0;
+	opacity: 0;
+	transition: opacity 0.6s ease;
+}
+.nano-hero__vimeo--playing .nano-hero__vimeo-frame { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+	.nano-hero__vimeo-frame { transition: none; }
+}
 /* Dark scrim at the top so the overlaid white header stays readable over
    bright video footage (the cleanroom clip is light). */
 .nano-hero__media::after {
@@ -495,6 +532,17 @@ body:not(.home) .nano-main { padding-top: 5rem !important; }
 	color: var(--wp--preset--color--contrast);
 	overflow: visible;
 	pointer-events: none;
+}
+/* Standard-density screens: the straight bracket runs often land on the pixel
+   grid and rasterize as a crisp, full-ink 1px row, while the curls/waves are
+   anti-aliased across two pixels and read visibly lighter than the same
+   declared width. Compensate by giving the curved strokes a touch more width
+   there — every curve in the bracket system is a <path> with a non-scaling
+   stroke, so this is device pixels and one rule covers them all (straight
+   segments are <line> elements and stay at 1px). High-DPI screens rasterize
+   both the same and keep the declared 1px. */
+@media (-webkit-max-device-pixel-ratio: 1.5), (max-resolution: 1.5dppx) {
+	svg path[vector-effect="non-scaling-stroke"] { stroke-width: 1.35; }
 }
 .nano-hero__text {
 	margin: 0;
@@ -1152,6 +1200,26 @@ a.nano-initiative__media:hover,
 	line-height: 1.55;
 }
 .nano-event-page__body p { margin: 0 0 1em; }
+/* Announcement poster — shown whole, never cropped, in a consistent column.
+   Posters up to Letter-vertical (1 : 1.29) keep their own aspect ratio (no
+   letterboxing for the common shapes); the render adds --tall for anything
+   taller, which is held to the Letter frame and letterboxed on the surface
+   tone so one extreme upload can't stretch the page. */
+.nano-event-page__poster {
+	margin: var(--wp--preset--spacing--50) 0 0;
+	max-width: 40rem;
+	background: var(--wp--preset--color--surface);
+}
+.nano-event-page__poster .nano-media {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+.nano-event-page__poster--tall { aspect-ratio: 100 / 129; }
+.nano-event-page__poster--tall .nano-media {
+	height: 100%;
+	object-fit: contain;
+}
 .nano-gallery {
 	list-style: none;
 	margin: var(--wp--preset--spacing--60) 0 0;
@@ -1169,7 +1237,11 @@ a.nano-initiative__media:hover,
 	overflow: hidden;
 	background: var(--wp--preset--color--surface);
 }
-.nano-gallery__media .nano-media { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Gallery media fits whole inside the fixed 16:10 tile (contain, never
+   cropped); the shape mismatch letterboxes on the surface tone. The tile ratio
+   stays fixed so the two-up grid keeps its rhythm. Cards in listings keep
+   cropping (cover) — fit-not-crop there would make the grids ragged. */
+.nano-gallery__media .nano-media { width: 100%; height: 100%; object-fit: contain; display: block; }
 /* Optional one-sentence caption beneath a gallery image or video. */
 .nano-gallery__caption {
 	margin: 0.7rem 0 0;
@@ -1551,12 +1623,6 @@ a.nano-initiative__media:hover,
 .nano-initiative__media {
 	/* same proportions as the screen (set from JS, falls back to 16:9) */
 	display: block; /* it's a link to the initiative page */
-	/* width must be pinned: a grid item with an aspect-ratio doesn't
-	   auto-stretch in the inline axis, so once align-items: stretch makes a
-	   tall text column set this box's height, the ratio would derive a width
-	   wider than the column and slide the media under the text at mid
-	   viewport widths. Pinned, the ratio only ever sets the height. */
-	width: 100%;
 	aspect-ratio: var(--nano-screen-ratio, 16 / 9);
 	overflow: hidden;
 	background: var(--wp--preset--color--surface);

@@ -104,10 +104,6 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-about' ) );
 							'post_type'      => 'person',
 							'posts_per_page' => -1,
 							'post_status'    => 'publish',
-							'orderby'        => array(
-								'menu_order' => 'ASC',
-								'title'      => 'ASC',
-							),
 							'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 								array(
 									'taxonomy' => 'people_group',
@@ -119,6 +115,11 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-about' ) );
 					);
 					if ( ! $q->have_posts() ) {
 						continue;
+					}
+					// Curated order first (Page Attributes → Order), the rest
+					// alphabetically by last name — see nano_sort_people().
+					if ( function_exists( 'nano_sort_people' ) ) {
+						$q->posts = nano_sort_people( $q->posts );
 					}
 					$dot_class = $nano_dot_colors[ $nano_gi % count( $nano_dot_colors ) ];
 					++$nano_gi;

@@ -16,7 +16,9 @@
  *   nano_video       attachment ID (mp4)   (news, initiative)
  *   nano_poster      attachment ID         (news, initiative)
  *   nano_descriptor  string                (initiative)
- *   nano_order       int                   (initiative)
+ *   nano_announcement_poster  attachment ID  (event)
+ * (Display order is not meta: person / initiative / facility use native
+ * menu_order — the Page Attributes → Order box.)
  *
  * @package Nano\ImaginationHub
  */

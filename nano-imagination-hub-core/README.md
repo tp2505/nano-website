@@ -17,21 +17,41 @@ access; no super-admin requirements.
 | Type | Slug | Purpose | Key fields (ACF, `inc/fields-acf.php`) |
 |---|---|---|---|
 | **News** | `news` | Editorial feed | `nano_date`, media (`nano_media_type`/`nano_image`/`nano_video`/`nano_poster`), `nano_initiative`, `nano_related`, `nano_people`; `news_category` taxonomy |
-| **Event** | `event` | A happening under one Initiative | `nano_date`, `nano_description`, `nano_gallery` (ACF Pro Gallery: images + videos; caption/alt and the per-video **poster** live on the attachment, edited in the Gallery sidebar), `nano_initiative`, `nano_related`, `nano_people` |
+| **Event** | `event` | A happening under one Initiative | `nano_date`, `nano_announcement_poster` (see below), `nano_description`, `nano_gallery` (repeater: media + poster + **caption**), `nano_initiative`, `nano_related`, `nano_people` |
 | **Class** | `class` | A course (Pedagogies only) | `nano_term` (**required**, "Fall 2026"), `nano_department`, `nano_instructor`, `nano_ta`, `nano_level`, `nano_credits`, `nano_description`, `nano_syllabus_file` (PDF) / `nano_syllabus_link`, `nano_related`, `nano_people` |
-| **Initiative** | `initiative` | The four strands | `nano_descriptor`, `nano_order`, `nano_intro`, media |
-| **Person** | `person` | Everyone — Hub team **and** participants | `nano_role`, `nano_photo`, `nano_bio`; `people_group` taxonomy (About-page groups) |
-| **Facility** | `facility` | Facilities-page tiles | title = caption, featured image = tile, `nano_url` (link target); ordered by menu order (Page Attributes → Order) |
+| **Initiative** | `initiative` | The four strands | `nano_descriptor`, `nano_intro`, media; display order via **menu_order** (below) |
+| **Person** | `person` | Everyone — Hub team **and** participants | `nano_role`, `nano_photo`, `nano_bio`; `people_group` taxonomy (About-page groups); display order via **menu_order** (below) |
 
-Two page-bound groups sit alongside the post types: **About page details**
-(`nano_about_intro`, `nano_mission`, `nano_history`, `nano_about_img1/2` — the
-intro statement, section bodies, and banner images the About block renders) and
-**Sponsors** (`nano_sponsors` repeater on the Support-us page). Video
-attachments additionally carry a **Poster (still)** image field (`nano_poster`),
-shown in the media modal and the Event gallery sidebar.
+### The event announcement poster
+
+`nano_announcement_poster` is the event's announcement artwork (typically a
+vertical US-Letter flyer), **separate from the Featured image** — the featured
+image stays the cropped card thumbnail in listings. The single event page shows
+the poster below the date, **whole and never cropped**: shapes up to
+Letter-vertical (1 : 1.29) render at their own ratio, anything taller is held to
+a Letter-proportioned frame and letterboxed on the surface tone. Event gallery
+media gets the same fit-not-crop treatment inside its fixed 16:10 tiles; cards
+in listings keep cropping so grids stay even. Empty = nothing renders.
+
+### Manual display order (person, initiative, facility)
+
+These three types order by WordPress's native **menu_order** — the **Page
+Attributes → Order** box on the edit screen, plus a sortable "Order" column in
+their admin lists (`inc/cpt.php`). People lists (About groups, Participants)
+show explicitly-ordered people first (1, 2, 3…), then everyone left at 0
+alphabetically by last name — so a director can be pinned first without having
+to number the whole roster (`inc/people.php` → `nano_sort_people()`). The
+homepage/archive initiative sequence follows the same box; the old ACF
+`nano_order` field is gone and existing values were migrated by
+`inc/upgrade.php`.
 
 ### Relationships & the reverse-lookups
 
+- **Related content is two-way:** `nano_related` (Events ↔ News ↔ Classes) uses
+  ACF's bidirectional setting — linking A → B also writes B → A, so the Related
+  section works from both sides. Links that predate this were made two-way once
+  by `inc/upgrade.php` (version-gated on `nano_core_upgraded`, runs on the first
+  wp-admin load after update; idempotent).
 - **Content → people:** Events / News / Classes point at the people involved via
   `nano_people` (relationship → `person`).
 - **Person → content (reverse):** a Person page lists everything that references
@@ -39,7 +59,7 @@ shown in the media modal and the Event gallery sidebar.
   computed in PHP (`inc/people.php` → `nano_person_related_content()`,
   `nano_participant_person_ids()`) by reading each item's `nano_people` array —
   not a serialized-meta `LIKE` query — so they're correct whether the value was
-  written by ACF (string IDs) or programmatically (int IDs).
+  written by ACF (string IDs) or the seeder (int IDs).
 - **General news:** a News item with **no** `nano_initiative` is "General" — it
   shows on the homepage and in the Archive but on no Initiative page.
 - **Classes → Pedagogies:** classes carry no initiative field; they belong to
@@ -54,14 +74,7 @@ shown in the media modal and the Event gallery sidebar.
 `participants-list`, `facilities-grid`, `page-heading`, `related`. Each is a
 `block.json` + `render.php`; they run `WP_Query` against the post types so pages
 are data-driven, never hardcoded. The `related` block is reused by single News,
-Event, and Class pages. `facilities-grid` renders one tile per published
-`facility` post (and nothing while none exist — no bundled placeholders).
-
-`assets/editor.js` registers the same blocks with the block editor's JavaScript
-registry (with a live server-side-rendered preview) — without it the editor
-reports them as unsupported even though the front end renders them fine. The
-block list is injected from the PHP registry, so `block.json` remains the
-single source of truth and no build step is needed.
+Event, and Class pages.
 
 ## The Archive filter (`blocks/initiatives-archive` + theme `assets/js/nano.js`)
 
@@ -85,7 +98,7 @@ prevented, not just tolerated. In Classes mode the results render **grouped by
 term, current → past**. Any empty combination shows a real, screen-reader-
 readable empty-state message.
 
-## Seeding
+## Seeding (dev only, not shipped)
 
-Demo content is created by a WP-CLI seeder that lives in the separate
-development repository; it is a dev tool and is **not** part of this plugin.
+`../bin/seed-media/_seed.php` (run via `wp eval-file`) creates demo content. It
+is a development tool and is **not** part of the plugin zip.

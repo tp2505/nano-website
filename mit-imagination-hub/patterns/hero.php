@@ -14,6 +14,7 @@
 $nano_hero = function_exists( 'nano_hero_media' )
 	? nano_hero_media()
 	: array(
+		'vimeo'  => '',
 		'video'  => get_stylesheet_directory_uri() . '/assets/video/hero.mp4',
 		'poster' => get_stylesheet_directory_uri() . '/assets/video/hero-poster.jpg',
 	);
@@ -22,9 +23,16 @@ $nano_hero = function_exists( 'nano_hero_media' )
 <section class="wp-block-group alignfull nano-hero" id="top">
 	<!-- wp:html -->
 	<div class="nano-hero__media">
-		<video class="nano-media nano-media--video" muted loop playsinline preload="none" poster="<?php echo esc_url( $nano_hero['poster'] ); ?>" aria-hidden="true" data-nano-video="hero" data-nano-src="<?php echo esc_url( $nano_hero['video'] ); ?>">
-			<source type="video/mp4">
-		</video>
+		<?php if ( ! empty( $nano_hero['vimeo'] ) ) : ?>
+			<?php // Vimeo-hosted background clip: the poster paints instantly and is all that phones / data-saver / reduced-motion visitors ever get; on desktop, assets/js/nano.js builds the chrome-less player iframe (data-nano-vimeo) and fades it in over the poster once playback starts. ?>
+			<div class="nano-hero__vimeo" data-nano-vimeo="<?php echo esc_url( $nano_hero['vimeo'] ); ?>" aria-hidden="true">
+				<img class="nano-hero__poster" src="<?php echo esc_url( $nano_hero['poster'] ); ?>" alt="" fetchpriority="high" decoding="async" />
+			</div>
+		<?php else : ?>
+			<video class="nano-media nano-media--video" muted loop playsinline preload="none" poster="<?php echo esc_url( $nano_hero['poster'] ); ?>" aria-hidden="true" data-nano-video="hero" data-nano-src="<?php echo esc_url( $nano_hero['video'] ); ?>">
+				<source type="video/mp4">
+			</video>
+		<?php endif; ?>
 		<?php // LOGO EXPERIMENT (branch logo-experiment): inline-svg lockup — Asset-15 line bracket (non-scaling 1px strokes, matching all other bracket lines) + Space Grotesk type as outlined paths. White via CSS color. ?>
 		<svg class="nano-hero__logo" viewBox="0 0 297.58 178.76" aria-hidden="true">
 			<g fill="none" stroke="currentColor" stroke-miterlimit="10" transform="translate(6 6)">

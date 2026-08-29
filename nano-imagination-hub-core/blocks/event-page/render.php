@@ -1,11 +1,9 @@
 <?php
 /**
  * Event page block — the single-event body: title, description, and a two-column
- * poster gallery. Gallery items are attachment IDs in nano_gallery (ACF Pro
- * Gallery field, read via nano_gallery_rows()): images render directly; videos
- * render their poster with a play button and swap to a playing <video> on click
- * (assets/js/nano.js → initGalleryVideos). Captions and video posters come from
- * the attachment itself. All lazy-loaded.
+ * poster gallery. Gallery items are attachment IDs in nano_gallery: images render
+ * directly; videos render their poster with a play button and swap to a playing
+ * <video> on click (assets/js/nano.js → initGalleryVideos). All lazy-loaded.
  *
  * @package Nano\ImaginationHubCore
  *
@@ -55,6 +53,23 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 
 	<?php if ( $date_out ) : ?>
 		<p class="nano-event-page__date"><?php echo esc_html( $date_out ); ?></p>
+	<?php endif; ?>
+
+	<?php
+	// Announcement poster — the event artwork, shown whole (object-fit: contain,
+	// never cropped) in a consistent column. Posters up to Letter-vertical
+	// (1 : 1.29) keep their own ratio with no letterboxing; anything taller is
+	// held to the Letter frame and letterboxed on the surface tone, so one
+	// extreme upload can't stretch the page. Renders nothing when unset.
+	$poster_id = function_exists( 'nano_field' ) ? (int) nano_field( 'nano_announcement_poster', $post_id ) : 0;
+	if ( $poster_id ) :
+		$poster_meta = wp_get_attachment_metadata( $poster_id );
+		$poster_tall = ! empty( $poster_meta['width'] ) && ! empty( $poster_meta['height'] )
+			&& ( $poster_meta['height'] / $poster_meta['width'] ) > 1.29;
+		?>
+		<figure class="nano-event-page__poster<?php echo $poster_tall ? ' nano-event-page__poster--tall' : ''; ?>">
+			<?php echo wp_get_attachment_image( $poster_id, 'large', false, array( 'class' => 'nano-media nano-media--image', 'sizes' => '(max-width: 781px) 100vw, 40rem', 'loading' => 'eager' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+		</figure>
 	<?php endif; ?>
 
 	<?php if ( $description ) : ?>

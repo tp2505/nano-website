@@ -9,65 +9,39 @@
 
 defined( 'ABSPATH' ) || exit;
 
-if ( ! function_exists( 'nano_gallery_poster_id' ) ) {
-	/**
-	 * Poster still for a video gallery item: the editor-chosen attachment field
-	 * (nano_poster on the attachment, set in the Gallery sidebar / media modal),
-	 * else the video's own thumbnail (WP extracts embedded cover art on upload,
-	 * and Edit Media lets an editor set one as the featured image).
-	 *
-	 * @param int $att_id Video attachment ID.
-	 * @return int Poster attachment ID (0 if none).
-	 */
-	function nano_gallery_poster_id( $att_id ) {
-		$att_id = (int) $att_id;
-		$poster = function_exists( 'nano_field' )
-			? (int) nano_field( 'nano_poster', $att_id )
-			: (int) get_post_meta( $att_id, 'nano_poster', true );
-		return $poster ? $poster : (int) get_post_thumbnail_id( $att_id );
-	}
-}
-
 if ( ! function_exists( 'nano_gallery_rows' ) ) {
 	/**
-	 * Event gallery rows as array( array( 'media' => id, 'poster' => id,
-	 * 'caption' => str ), … ).
-	 *
-	 * Reads the raw nano_gallery meta rather than get_field(): ACF Pro's Gallery
-	 * field stores an array of attachment IDs there, while the pre-Pro repeater
-	 * stored a row count at the same key (with nano_gallery_{i}_* sub-rows), and
-	 * the raw value is what disambiguates the two — get_field() would format a
-	 * leftover count as a one-item gallery. Captions and video posters live on
-	 * the attachment itself (caption field / nano_poster), so per-item data
-	 * survives without repeater sub-fields.
+	 * Event gallery rows as array( array( 'media' => id, 'poster' => id ), … ).
+	 * Reads the ACF Pro repeater via get_field when available, and otherwise
+	 * reconstructs it straight from ACF's repeater meta layout (count + indexed
+	 * sub-fields) so it renders even where ACF Pro isn't loaded.
 	 *
 	 * @param int $post_id Event ID.
 	 * @return array
 	 */
 	function nano_gallery_rows( $post_id ) {
 		$post_id = (int) $post_id;
-		$raw     = get_post_meta( $post_id, 'nano_gallery', true );
-		$rows    = array();
 
-		// ACF Pro Gallery format: an ordered array of attachment IDs.
-		if ( is_array( $raw ) ) {
-			foreach ( $raw as $media ) {
-				$media = (int) $media;
-				if ( ! $media ) {
-					continue;
+		if ( function_exists( 'get_field' ) ) {
+			$val = get_field( 'nano_gallery', $post_id );
+			if ( is_array( $val ) && $val && is_array( reset( $val ) ) ) {
+				$rows = array();
+				foreach ( $val as $row ) {
+					$media = isset( $row['media'] ) ? (int) $row['media'] : 0;
+					if ( $media ) {
+						$rows[] = array(
+							'media'   => $media,
+							'poster'  => isset( $row['poster'] ) ? (int) $row['poster'] : 0,
+							'caption' => isset( $row['caption'] ) ? (string) $row['caption'] : '',
+						);
+					}
 				}
-				$is_video = wp_attachment_is( 'video', $media );
-				$rows[]   = array(
-					'media'   => $media,
-					'poster'  => $is_video ? nano_gallery_poster_id( $media ) : 0,
-					'caption' => (string) wp_get_attachment_caption( $media ),
-				);
+				return $rows;
 			}
-			return $rows;
 		}
 
-		// Legacy repeater layout (pre-Pro seeds): count + indexed sub-fields.
-		$count = (int) $raw;
+		$count = (int) get_post_meta( $post_id, 'nano_gallery', true );
+		$rows  = array();
 		for ( $i = 0; $i < $count; $i++ ) {
 			$media = (int) get_post_meta( $post_id, "nano_gallery_{$i}_media", true );
 			if ( ! $media ) {

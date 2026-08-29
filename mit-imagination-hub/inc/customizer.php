@@ -23,27 +23,25 @@ function nano_customize_register( $wp_customize ) {
 		array(
 			'title'       => __( 'Hero', 'nano' ),
 			'priority'    => 30,
-			'description' => __( 'The full-screen video and poster at the top of the home page. Leave either empty to use the bundled default.', 'nano' ),
+			'description' => __( 'The full-screen video and poster at the top of the home page. The video lives on Vimeo (uploads here are capped at 50 MB); leave either field empty to use the bundled default.', 'nano' ),
 		)
 	);
 
 	$wp_customize->add_setting(
-		'nano_hero_video',
+		'nano_hero_vimeo',
 		array(
-			'sanitize_callback' => 'absint',
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
 			'transport'         => 'refresh',
 		)
 	);
 	$wp_customize->add_control(
-		new WP_Customize_Media_Control(
-			$wp_customize,
-			'nano_hero_video',
-			array(
-				'label'       => __( 'Hero video (MP4)', 'nano' ),
-				'description' => __( 'Muted, looping background clip. Shown on desktop; phones and data-saver / reduced-motion visitors see the poster instead. Keep it short and well-compressed.', 'nano' ),
-				'section'     => 'nano_hero',
-				'mime_type'   => 'video',
-			)
+		'nano_hero_vimeo',
+		array(
+			'label'       => __( 'Hero video (Vimeo URL or ID)', 'nano' ),
+			'description' => __( 'Paste the Vimeo link (e.g. https://vimeo.com/123456789) or just the number. Plays muted and looping as a chrome-less background on desktop; phones and data-saver / reduced-motion visitors see the poster instead.', 'nano' ),
+			'section'     => 'nano_hero',
+			'type'        => 'text',
 		)
 	);
 
@@ -60,7 +58,7 @@ function nano_customize_register( $wp_customize ) {
 			'nano_hero_poster',
 			array(
 				'label'       => __( 'Hero poster image', 'nano' ),
-				'description' => __( 'Shown instantly while the video loads, and used on its own on phones. A wide (16:9) image works best.', 'nano' ),
+				'description' => __( 'Shown instantly while the video loads, and used on its own on phones (which never download the video). A wide (16:9) image works best.', 'nano' ),
 				'section'     => 'nano_hero',
 				'mime_type'   => 'image',
 			)
@@ -242,12 +240,63 @@ if ( ! function_exists( 'nano_copy_html' ) ) {
 }
 
 
+if ( ! function_exists( 'nano_vimeo_embed_url' ) ) {
+	/**
+	 * Parse a Vimeo URL or bare ID into a chrome-less background embed URL.
+	 *
+	 * Accepts "123456789", "https://vimeo.com/123456789", an unlisted link
+	 * ("https://vimeo.com/123456789/abcdef123", or a ?h= URL) or a
+	 * player.vimeo.com URL. background=1 hides all player chrome (paid Vimeo
+	 * plans); the controls/title/byline/portrait params are the fallback for
+	 * plans where background isn't honoured. dnt=1 disables Vimeo's tracking.
+	 *
+	 * @param string $raw The Customizer value.
+	 * @return string Embed URL, or '' if it doesn't look like a Vimeo video.
+	 */
+	function nano_vimeo_embed_url( $raw ) {
+		$raw  = trim( (string) $raw );
+		$id   = '';
+		$hash = '';
+		if ( preg_match( '/^\d+$/', $raw ) ) {
+			$id = $raw;
+		} elseif ( preg_match( '#vimeo\.com/(?:video/)?(\d+)(?:/([0-9a-zA-Z]+))?#', $raw, $m ) ) {
+			$id   = $m[1];
+			$hash = isset( $m[2] ) ? $m[2] : '';
+		}
+		if ( '' === $id ) {
+			return '';
+		}
+		if ( '' === $hash && preg_match( '/[?&]h=([0-9a-zA-Z]+)/', $raw, $m ) ) {
+			$hash = $m[1]; // Unlisted-video privacy hash.
+		}
+		$args = array(
+			'background' => '1',
+			'autoplay'   => '1',
+			'loop'       => '1',
+			'muted'      => '1',
+			'autopause'  => '0',
+			'controls'   => '0',
+			'title'      => '0',
+			'byline'     => '0',
+			'portrait'   => '0',
+			'pip'        => '0',
+			'keyboard'   => '0',
+			'dnt'        => '1',
+		);
+		if ( '' !== $hash ) {
+			$args['h'] = $hash;
+		}
+		return add_query_arg( $args, 'https://player.vimeo.com/video/' . $id );
+	}
+}
+
 if ( ! function_exists( 'nano_hero_media' ) ) {
 	/**
-	 * Resolve the hero video + poster URLs — the Customizer picks if set, else the
-	 * bundled theme files.
+	 * Resolve the hero media — the Vimeo background embed + poster when the
+	 * Customizer is set, else the bundled theme files (a self-hosted <video>
+	 * fallback so the theme still works out of the box / in local dev).
 	 *
-	 * @return array{video:string,poster:string}
+	 * @return array{vimeo:string,video:string,poster:string}
 	 */
 	function nano_hero_media() {
 		$uri = get_stylesheet_directory_uri();
@@ -261,10 +310,17 @@ if ( ! function_exists( 'nano_hero_media' ) ) {
 			return file_exists( $path ) ? add_query_arg( 'v', filemtime( $path ), $url ) : $url;
 		};
 
-		$video_id  = (int) get_theme_mod( 'nano_hero_video' );
-		$video_url = $video_id ? wp_get_attachment_url( $video_id ) : '';
-		if ( ! $video_url ) {
-			$video_url = $bundled( '/assets/video/hero.mp4' );
+		$vimeo = nano_vimeo_embed_url( (string) get_theme_mod( 'nano_hero_vimeo', '' ) );
+
+		// No Vimeo set: fall back to a previously-uploaded clip (the pre-Vimeo
+		// Customizer control), else the bundled placeholder.
+		$video_url = '';
+		if ( ! $vimeo ) {
+			$video_id  = (int) get_theme_mod( 'nano_hero_video' );
+			$video_url = $video_id ? ( wp_get_attachment_url( $video_id ) ?: '' ) : '';
+			if ( ! $video_url ) {
+				$video_url = $bundled( '/assets/video/hero.mp4' );
+			}
 		}
 
 		$poster_id  = (int) get_theme_mod( 'nano_hero_poster' );
@@ -274,6 +330,7 @@ if ( ! function_exists( 'nano_hero_media' ) ) {
 		}
 
 		return array(
+			'vimeo'  => $vimeo,
 			'video'  => $video_url,
 			'poster' => $poster_url,
 		);

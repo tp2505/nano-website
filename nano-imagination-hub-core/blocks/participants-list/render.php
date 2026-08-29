@@ -33,19 +33,9 @@ if ( ! $people ) {
 	return;
 }
 
-// Order alphabetically by last name (the final word of the name), with the full
-// name as a tiebreak. Names are a single post_title, so this is done in PHP.
-usort(
-	$people,
-	function ( $a, $b ) {
-		$last = function ( $name ) {
-			$parts = preg_split( '/\s+/', trim( $name ) );
-			return end( $parts );
-		};
-		$cmp = strcasecmp( $last( $a->post_title ), $last( $b->post_title ) );
-		return 0 !== $cmp ? $cmp : strcasecmp( $a->post_title, $b->post_title );
-	}
-);
+// Curated order first (menu_order, ascending), then everyone without an
+// explicit order alphabetically by last name — see nano_sort_people().
+$people = nano_sort_people( $people );
 
 $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-participants' ) );
 ?>

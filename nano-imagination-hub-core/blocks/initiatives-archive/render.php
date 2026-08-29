@@ -84,9 +84,10 @@ $initiatives = get_posts(
 		'post_type'   => 'initiative',
 		'numberposts' => -1,
 		'post_status' => 'publish',
-		'meta_key'    => 'nano_order', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-		'orderby'     => 'meta_value_num',
-		'order'       => 'ASC',
+		'orderby'     => array(
+			'menu_order' => 'ASC',
+			'title'      => 'ASC',
+		),
 	)
 );
 $years = array();

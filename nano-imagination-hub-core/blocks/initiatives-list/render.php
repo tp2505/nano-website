@@ -2,8 +2,9 @@
 /**
  * Initiatives list block — the four strands as alternating media/text rows.
  *
- * Data-driven: a WP_Query against the `initiative` post type ordered by the
- * nano_order field. The media/text columns alternate left/right down the page.
+ * Data-driven: a WP_Query against the `initiative` post type ordered by
+ * menu_order (Page Attributes → Order). The media/text columns alternate
+ * left/right down the page.
  *
  * @package Nano\ImaginationHubCore
  *
@@ -22,10 +23,9 @@ $query = new WP_Query(
 		'post_type'      => 'initiative',
 		'posts_per_page' => $count,
 		'post_status'    => 'publish',
-		'meta_key'       => 'nano_order',
 		'orderby'        => array(
-			'meta_value_num' => 'ASC',
-			'title'          => 'ASC',
+			'menu_order' => 'ASC',
+			'title'      => 'ASC',
 		),
 	)
 );

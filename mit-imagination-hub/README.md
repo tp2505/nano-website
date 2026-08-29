@@ -32,19 +32,29 @@ add "nano" or anything else — and every instance updates; the copyright year i
 automatic. (The one hand-written mention is the Mission statement's sentence,
 left as authored editorial copy.)
 
-## The hero video is editable, and cheap on mobile
+## The hero video lives on Vimeo, is editable, and cheap on mobile
 
-- **Editable:** Appearance → **Customize → Hero** sets the hero video (MP4) and
-  poster image (`inc/customizer.php`, `WP_Customize_Media_Control`). Both fall
-  back to the bundled `assets/video/` files, so the theme works out of the box —
-  no code change / review round needed to swap them.
-- **Poster-first:** the `<source>` ships detached (`data-nano-src`, no `src`) with
-  `preload="none"` and no `autoplay`, so nothing downloads on its own — the
-  optimised poster paints instantly.
-- **Mobile / data-saver / reduced-motion:** `assets/js/nano.js` only attaches and
-  plays the clip on non-phone, non-Save-Data, non-reduced-motion loads. On phones
-  the poster stands in and **zero** video bytes are fetched (kinder on CampusPress
-  bandwidth). All client-side, so it's cache-safe (no server UA sniffing).
+- **Editable:** Appearance → **Customize → Hero** takes a **Vimeo URL or ID**
+  (uploads to CampusPress are capped at 50 MB, so the long hero clip is hosted
+  on Vimeo) plus the poster image. Accepts `https://vimeo.com/123456789`,
+  unlisted links (`…/123456789/abcdef` or `?h=` URLs), or just the number
+  (`inc/customizer.php` → `nano_vimeo_embed_url()`). With no Vimeo set it falls
+  back to a previously-uploaded MP4 or the bundled `assets/video/` files, so
+  the theme still works out of the box.
+- **Background, not a player:** the embed uses `background=1` (plus the
+  `controls=0&title=0&byline=0&portrait=0` fallback params for plans where
+  `background` isn't honoured) and the frame is `pointer-events: none` — no
+  controls, no Vimeo chrome, nothing on hover. Note `background=1` needs the
+  video to sit on a **paid Vimeo plan**; on a free plan the fallback params
+  still hide the title/byline but controls may remain.
+- **Poster-first:** the markup ships only the poster `<img>` (instant first
+  paint). `assets/js/nano.js` builds the player iframe after load and fades it
+  in over the poster once playback actually starts (Vimeo's postMessage `play`
+  event, with a post-load timeout as backstop).
+- **Mobile / data-saver / reduced-motion:** the iframe is only ever created on
+  non-phone, non-Save-Data, non-reduced-motion loads. On phones the poster
+  stands in and **zero** video bytes are fetched. All client-side, so it's
+  cache-safe (no server UA sniffing).
 
 ## Accessibility notes
 
@@ -54,8 +64,7 @@ Decorative accent dots and background video are `aria-hidden`; icon buttons have
 `aria-disabled` + a note; empty states are real text. Images get their `alt` from
 the media library; reduced-motion is respected (no autoplay anywhere).
 
-## Development
+## Development (not shipped)
 
-The local dev workflow (`@wordpress/env`, seeding, verification tooling) lives
-in a separate development repository; this repo contains only the deployable
-theme and plugin.
+`../bin/`, `.wp-env.json`, and `package.json` at the repo root are the local
+`@wordpress/env` dev workflow; they are not part of the theme zip.
