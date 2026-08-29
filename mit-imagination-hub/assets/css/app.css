@@ -1203,12 +1203,12 @@ a.nano-initiative__media:hover,
 /* Announcement poster — shown whole, never cropped, in a consistent column.
    Posters up to Letter-vertical (1 : 1.29) keep their own aspect ratio (no
    letterboxing for the common shapes); the render adds --tall for anything
-   taller, which is held to the Letter frame and letterboxed on the surface
-   tone so one extreme upload can't stretch the page. */
+   taller, which is held to the Letter frame and letterboxed on pure white
+   (the page ground) so one extreme upload can't stretch the page. */
 .nano-event-page__poster {
 	margin: var(--wp--preset--spacing--50) 0 0;
 	max-width: 40rem;
-	background: var(--wp--preset--color--surface);
+	background: var(--wp--preset--color--base); /* #ffffff — letterbox blends into the page */
 }
 .nano-event-page__poster .nano-media {
 	display: block;
@@ -1235,10 +1235,10 @@ a.nano-initiative__media:hover,
 	display: block;
 	aspect-ratio: 16 / 10;
 	overflow: hidden;
-	background: var(--wp--preset--color--surface);
+	background: var(--wp--preset--color--base); /* #ffffff — letterbox blends into the page */
 }
 /* Gallery media fits whole inside the fixed 16:10 tile (contain, never
-   cropped); the shape mismatch letterboxes on the surface tone. The tile ratio
+   cropped); the shape mismatch letterboxes on pure white. The tile ratio
    stays fixed so the two-up grid keeps its rhythm. Cards in listings keep
    cropping (cover) — fit-not-crop there would make the grids ragged. */
 .nano-gallery__media .nano-media { width: 100%; height: 100%; object-fit: contain; display: block; }

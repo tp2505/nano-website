@@ -29,7 +29,7 @@ vertical US-Letter flyer), **separate from the Featured image** — the featured
 image stays the cropped card thumbnail in listings. The single event page shows
 the poster below the date, **whole and never cropped**: shapes up to
 Letter-vertical (1 : 1.29) render at their own ratio, anything taller is held to
-a Letter-proportioned frame and letterboxed on the surface tone. Event gallery
+a Letter-proportioned frame and letterboxed on pure white. Event gallery
 media gets the same fit-not-crop treatment inside its fixed 16:10 tiles; cards
 in listings keep cropping so grids stay even. Empty = nothing renders.
 

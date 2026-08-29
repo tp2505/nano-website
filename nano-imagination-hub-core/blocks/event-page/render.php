@@ -59,8 +59,8 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 	// Announcement poster — the event artwork, shown whole (object-fit: contain,
 	// never cropped) in a consistent column. Posters up to Letter-vertical
 	// (1 : 1.29) keep their own ratio with no letterboxing; anything taller is
-	// held to the Letter frame and letterboxed on the surface tone, so one
-	// extreme upload can't stretch the page. Renders nothing when unset.
+	// held to the Letter frame and letterboxed on pure white, so one extreme
+	// upload can't stretch the page. Renders nothing when unset.
 	$poster_id = function_exists( 'nano_field' ) ? (int) nano_field( 'nano_announcement_poster', $post_id ) : 0;
 	if ( $poster_id ) :
 		$poster_meta = wp_get_attachment_metadata( $poster_id );
