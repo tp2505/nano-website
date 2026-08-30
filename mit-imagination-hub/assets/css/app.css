@@ -1850,7 +1850,7 @@ a.nano-initiative__media:hover,
 	display: inline-block;
 	/* MIT.nano's own site sets its wordmark in the Helvetica/Arial family. */
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: clamp(1.4rem, 2.1vw, 2rem);
+	font-size: calc(1.1 * clamp(1.4rem, 2.1vw, 2rem)); /* +10% */
 	line-height: 1;
 	letter-spacing: -0.01em;
 	color: inherit;
