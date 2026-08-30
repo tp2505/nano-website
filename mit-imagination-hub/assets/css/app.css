@@ -533,16 +533,32 @@ body:not(.home) .nano-main { padding-top: 5rem !important; }
 	overflow: visible;
 	pointer-events: none;
 }
-/* Standard-density screens: the straight bracket runs often land on the pixel
-   grid and rasterize as a crisp, full-ink 1px row, while the curls/waves are
-   anti-aliased across two pixels and read visibly lighter than the same
-   declared width. Compensate by giving the curved strokes a touch more width
-   there — every curve in the bracket system is a <path> with a non-scaling
-   stroke, so this is device pixels and one rule covers them all (straight
-   segments are <line> elements and stay at 1px). High-DPI screens rasterize
-   both the same and keep the declared 1px. */
+/* Standard-density screens: a 1px straight run rasterizes by pixel phase —
+   landed on a pixel centre it's a crisp full-ink row (peak ~0), straddling a
+   boundary it's two ~50% rows (peak ~127) — so straight segments come out
+   heavier OR lighter than the curls, which anti-alias to a consistent middle
+   weight (~72 measured), and the seam where line meets curve shows a weight
+   step. The fix works on the LINES (the curves are the reference): a touch
+   more width lifts the light phase, a sub-pixel blur melts the crisp phase,
+   and together every straight run converges on the curves' weight regardless
+   of where it lands (measured 73/89 vs curve 72, from 17/123 unfixed —
+   headed-Chrome GPU captures, tuned by eye on the rendered seams). Geometry
+   never moves, so the engineered line/curl joins stay exact. High-DPI screens
+   are untouched: at 2dppx every phase of a 2-device-pixel stroke keeps a
+   fully-covered row, lines and curves already match (measured 17/17 vs 19). */
 @media (-webkit-max-device-pixel-ratio: 1.5), (max-resolution: 1.5dppx) {
-	svg path[vector-effect="non-scaling-stroke"] { stroke-width: 1.35; }
+	.nano-hero__lines line,
+	.nano-mission__lines line,
+	.nano-about__lines line,
+	.nano-head__lines line,
+	.nano-initiative__lines line,
+	.nano-card__lines line,
+	.nano-hero__logo line,
+	.nano-footer__mark line,
+	.nano-brand__mark line {
+		stroke-width: 1.6;
+		filter: blur(0.6px);
+	}
 }
 .nano-hero__text {
 	margin: 0;
