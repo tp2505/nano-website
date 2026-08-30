@@ -1865,7 +1865,7 @@ a.nano-initiative__media:hover,
 .nano-footer__act { display: block; color: inherit; }
 .nano-footer__act-mark {
 	display: block;
-	width: calc(5.16 * clamp(1.4rem, 2.1vw, 2rem)); /* +20% */
+	width: calc(1.3 * 5.16 * clamp(1.4rem, 2.1vw, 2rem)); /* +30% over the +20% base */
 	height: auto;
 }
 
@@ -1995,7 +1995,7 @@ a.nano-initiative__media:hover,
 		margin: 2.25rem 0 1.12rem calc(0.1677 * 15.6rem) !important; /* a touch more air under the lockup */
 		padding-left: 0;
 	}
-	.nano-footer__act-mark { width: calc(1.2 * 5.16 * 1.4rem); } /* +20% */
+	.nano-footer__act-mark { width: calc(1.3 * 1.2 * 5.16 * 1.4rem); } /* +30% over the +20% base */
 	.nano-footer__copyright {
 		padding-left: calc(0.1677 * 15.6rem);
 		margin-top: 2.25rem; /* a beat closer to the columns than the desktop 3.5rem */
