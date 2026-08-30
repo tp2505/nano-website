@@ -47,20 +47,29 @@ function nano_register_acf_fields() {
 		return;
 	}
 
-	// Shared media sub-fields (image OR video), reused by both post types.
-	$media_fields = function ( $prefix ) {
-		return array(
+	// Shared media sub-fields — the ONE media rule: every slot takes a still
+	// image OR a short looping clip (uploaded MP4/WebM). The event top slot
+	// additionally takes a Vimeo URL ($vimeo = true) for long-form video that
+	// exceeds the 50 MB upload cap (e.g. lecture recordings).
+	$media_fields = function ( $prefix, $vimeo = false ) {
+		$choices = array(
+			'image' => 'Image',
+			'video' => 'Video',
+		);
+		if ( $vimeo ) {
+			$choices['vimeo'] = 'Vimeo';
+		}
+		$fields = array(
 			array(
 				'key'           => "field_{$prefix}_media_type",
 				'label'         => 'Media type',
 				'name'          => 'nano_media_type',
 				'type'          => 'button_group',
-				'choices'       => array(
-					'image' => 'Image',
-					'video' => 'Video',
-				),
+				'choices'       => $choices,
 				'default_value' => 'image',
-				'instructions'  => 'Tiles can be a still image or a looping muted video.',
+				'instructions'  => $vimeo
+					? 'A still image (e.g. the announcement poster), a short looping clip, or a Vimeo link for long-form video.'
+					: 'Tiles can be a still image or a looping muted video.',
 			),
 			array(
 				'key'               => "field_{$prefix}_image",
@@ -115,6 +124,25 @@ function nano_register_acf_fields() {
 				),
 			),
 		);
+		if ( $vimeo ) {
+			$fields[] = array(
+				'key'               => "field_{$prefix}_vimeo",
+				'label'             => 'Vimeo URL',
+				'name'              => 'nano_vimeo',
+				'type'              => 'text',
+				'instructions'      => 'Paste the Vimeo link (e.g. https://vimeo.com/123456789; unlisted links work too) or just the number. Renders as a clean player with the Vimeo title/branding hidden.',
+				'conditional_logic' => array(
+					array(
+						array(
+							'field'    => "field_{$prefix}_media_type",
+							'operator' => '==',
+							'value'    => 'vimeo',
+						),
+					),
+				),
+			);
+		}
+		return $fields;
 	};
 
 	// Shared reference fields (Initiative link + manual Related + People), reused
@@ -224,16 +252,15 @@ function nano_register_acf_fields() {
 						'first_day'      => 1,
 						'instructions'   => 'Shown on the card; also used to sort.',
 					),
-					array(
-						'key'           => 'field_nano_event_announcement',
-						'label'         => 'Announcement poster',
-						'name'          => 'nano_announcement_poster',
-						'type'          => 'image',
-						'return_format' => 'id',
-						'preview_size'  => 'medium',
-						'library'       => 'all',
-						'instructions'  => 'The announcement artwork (e.g. the Letter-format flyer). Shown whole — never cropped — below the date on the event page. Separate from the Featured image, which stays the card thumbnail in listings. Leave empty to show nothing.',
-					),
+				),
+				// The event's top media slot: the standard image-or-clip rule,
+				// plus Vimeo for long-form video (lecture recordings exceed the
+				// 50 MB upload cap). Shown below the date on the event page —
+				// stills (announcement posters) render whole, never cropped.
+				// Separate from the Featured image, which stays the card
+				// thumbnail in listings. Empty = nothing renders.
+				$media_fields( 'event', true ),
+				array(
 					array(
 						'key'          => 'field_nano_event_description',
 						'label'        => 'Description',
@@ -303,7 +330,8 @@ function nano_register_acf_fields() {
 			),
 			'menu_order' => 0,
 			'position'   => 'normal',
-			'fields'     => array(
+			'fields'     => array_merge(
+				array(
 				array(
 					'key'          => 'field_nano_class_term',
 					'label'        => 'Term',
@@ -374,6 +402,11 @@ function nano_register_acf_fields() {
 					'placeholder'  => '12 units',
 					'instructions' => 'Optional, free text, e.g. “12 units”.',
 				),
+				),
+				// The class banner: the standard image-or-clip media rule.
+				// Falls back to the Featured image when left empty.
+				$media_fields( 'class' ),
+				array(
 				array(
 					'key'          => 'field_nano_class_description',
 					'label'        => 'Description',
@@ -422,6 +455,7 @@ function nano_register_acf_fields() {
 					'return_format' => 'id',
 					'instructions'  => 'Additional linked people for the Related section (beyond instructor / TA).',
 				),
+				)
 			),
 		)
 	);

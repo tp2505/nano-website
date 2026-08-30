@@ -13,6 +13,12 @@
  *     for saves made AFTER the setting exists, so links created before it are
  *     backfilled here: every A → B link gains its B → A twin.
  *
+ * 0.3.0:
+ *   - The short-lived event announcement-poster field is gone — under the one
+ *     media rule a poster is simply a still image in the event's standard top
+ *     media slot. Any stored poster moves into that slot (nano_media_type =
+ *     image + nano_image) unless the slot is already filled.
+ *
  * @package Nano\ImaginationHubCore
  */
 
@@ -28,6 +34,7 @@ function nano_core_upgrade() {
 	}
 	nano_upgrade_initiative_menu_order();
 	nano_upgrade_backfill_related();
+	nano_upgrade_event_poster_to_media();
 	update_option( 'nano_core_upgraded', NANO_CORE_VERSION );
 }
 add_action( 'admin_init', 'nano_core_upgrade' );
@@ -105,5 +112,37 @@ function nano_upgrade_backfill_related() {
 				update_post_meta( $target_id, '_nano_related', $field_keys[ $target_type ] );
 			}
 		}
+	}
+}
+
+/**
+ * Move any stored event announcement poster into the standard top media slot
+ * (nano_media_type = image + nano_image), then drop the old meta. Skipped for
+ * events whose slot is already filled — nothing gets overwritten.
+ */
+function nano_upgrade_event_poster_to_media() {
+	$ids = get_posts(
+		array(
+			'post_type'   => 'event',
+			'numberposts' => -1,
+			'post_status' => 'any',
+			'fields'      => 'ids',
+		)
+	);
+	foreach ( $ids as $event_id ) {
+		$poster = (int) get_post_meta( $event_id, 'nano_announcement_poster', true );
+		if ( $poster ) {
+			$slot_taken = get_post_meta( $event_id, 'nano_media_type', true )
+				|| (int) get_post_meta( $event_id, 'nano_image', true )
+				|| (int) get_post_meta( $event_id, 'nano_video', true );
+			if ( ! $slot_taken ) {
+				update_post_meta( $event_id, 'nano_media_type', 'image' );
+				update_post_meta( $event_id, '_nano_media_type', 'field_event_media_type' );
+				update_post_meta( $event_id, 'nano_image', $poster );
+				update_post_meta( $event_id, '_nano_image', 'field_event_image' );
+			}
+		}
+		delete_post_meta( $event_id, 'nano_announcement_poster' );
+		delete_post_meta( $event_id, '_nano_announcement_poster' );
 	}
 }

@@ -56,19 +56,23 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 	<?php endif; ?>
 
 	<?php
-	// Announcement poster — the event artwork, shown whole (object-fit: contain,
-	// never cropped) in a consistent column. Posters up to Letter-vertical
-	// (1 : 1.29) keep their own ratio with no letterboxing; anything taller is
-	// held to the Letter frame and letterboxed on pure white, so one extreme
-	// upload can't stretch the page. Renders nothing when unset.
-	$poster_id = function_exists( 'nano_field' ) ? (int) nano_field( 'nano_announcement_poster', $post_id ) : 0;
-	if ( $poster_id ) :
-		$poster_meta = wp_get_attachment_metadata( $poster_id );
-		$poster_tall = ! empty( $poster_meta['width'] ) && ! empty( $poster_meta['height'] )
-			&& ( $poster_meta['height'] / $poster_meta['width'] ) > 1.29;
+	// Top media slot — the standard rule: a still (e.g. the announcement
+	// poster, shown whole, never cropped), a short looping clip, or a Vimeo
+	// player for long-form video (lecture recordings exceed the upload cap).
+	// nano_media()'s image branch falls back to the featured image, which is
+	// right for tiles — but here the featured image stays the card thumbnail,
+	// so the slot renders only when explicitly filled.
+	$top_media = array( 'type' => '' );
+	if ( function_exists( 'nano_media' ) && function_exists( 'nano_render_media' ) ) {
+		$top_media = nano_media( $post_id );
+		if ( 'image' === $top_media['type'] && ! (int) nano_field( 'nano_image', $post_id ) ) {
+			$top_media = array( 'type' => '' );
+		}
+	}
+	if ( ! empty( $top_media['type'] ) ) :
 		?>
-		<figure class="nano-event-page__poster<?php echo $poster_tall ? ' nano-event-page__poster--tall' : ''; ?>">
-			<?php echo wp_get_attachment_image( $poster_id, 'large', false, array( 'class' => 'nano-media nano-media--image', 'sizes' => '(max-width: 781px) 100vw, 40rem', 'loading' => 'eager' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+		<figure class="nano-event-page__media">
+			<?php echo nano_render_media( $top_media, array( 'sizes' => '(max-width: 781px) 100vw, 52rem', 'eager' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 		</figure>
 	<?php endif; ?>
 

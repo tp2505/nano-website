@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Nano — Imagination Hub Core
  * Description:        Content model for the MIT Imagination Hub: registers the post types (News, Event, Class, Initiative, Person), the News-category and People-group taxonomies, the ACF field groups, and the server-rendered blocks that present that data (news feed, initiative pages, the filtered Archive, single Event/Class/Person, About, Participants, Related). Kept separate from the presentation theme so content survives theme switches. See README.md.
- * Version:           0.2.0
+ * Version:           0.3.0
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Author:            Nano Studio
@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'NANO_CORE_VERSION', '0.2.0' );
+define( 'NANO_CORE_VERSION', '0.3.0' );
 define( 'NANO_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NANO_CORE_URL', plugin_dir_url( __FILE__ ) );
 

@@ -63,11 +63,14 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 	</header>
 
 	<?php
-	$image_id = (int) get_post_thumbnail_id( $post_id );
-	if ( $image_id ) :
+	// Banner — the standard image-or-clip media slot; nano_media() falls back
+	// to the featured image when the slot is empty. Renders nothing without
+	// either.
+	$banner = function_exists( 'nano_media' ) ? nano_media( $post_id ) : array( 'type' => '' );
+	if ( ! empty( $banner['type'] ) && function_exists( 'nano_render_media' ) ) :
 		?>
 		<figure class="nano-class-page__image">
-			<?php echo wp_get_attachment_image( $image_id, 'large', false, array( 'class' => 'nano-media nano-media--image', 'sizes' => '(max-width: 1024px) 100vw, 1024px', 'loading' => 'lazy' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+			<?php echo nano_render_media( $banner, array( 'sizes' => '(max-width: 1024px) 100vw, 1024px' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 		</figure>
 	<?php endif; ?>
 

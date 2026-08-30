@@ -16,22 +16,35 @@ access; no super-admin requirements.
 
 | Type | Slug | Purpose | Key fields (ACF, `inc/fields-acf.php`) |
 |---|---|---|---|
-| **News** | `news` | Editorial feed | `nano_date`, media (`nano_media_type`/`nano_image`/`nano_video`/`nano_poster`), `nano_initiative`, `nano_related`, `nano_people`; `news_category` taxonomy |
-| **Event** | `event` | A happening under one Initiative | `nano_date`, `nano_announcement_poster` (see below), `nano_description`, `nano_gallery` (repeater: media + poster + **caption**), `nano_initiative`, `nano_related`, `nano_people` |
-| **Class** | `class` | A course (Pedagogies only) | `nano_term` (**required**, "Fall 2026"), `nano_department`, `nano_instructor`, `nano_ta`, `nano_level`, `nano_credits`, `nano_description`, `nano_syllabus_file` (PDF) / `nano_syllabus_link`, `nano_related`, `nano_people` |
-| **Initiative** | `initiative` | The four strands | `nano_descriptor`, `nano_intro`, media; display order via **menu_order** (below) |
+| **News** | `news` | Editorial feed | `nano_date`, the standard media slot (below), `nano_initiative`, `nano_related`, `nano_people`; `news_category` taxonomy |
+| **Event** | `event` | A happening under one Initiative | `nano_date`, the standard media slot **+ Vimeo** (below), `nano_description`, `nano_gallery` (repeater: media + poster + **caption**), `nano_initiative`, `nano_related`, `nano_people` |
+| **Class** | `class` | A course (Pedagogies only) | `nano_term` (**required**, "Fall 2026"), `nano_department`, `nano_instructor`, `nano_ta`, `nano_level`, `nano_credits`, the standard media slot (below), `nano_description`, `nano_syllabus_file` (PDF) / `nano_syllabus_link`, `nano_related`, `nano_people` |
+| **Initiative** | `initiative` | The four strands | `nano_descriptor`, `nano_intro`, the standard media slot (below); display order via **menu_order** (below) |
 | **Person** | `person` | Everyone — Hub team **and** participants | `nano_role`, `nano_photo`, `nano_bio`; `people_group` taxonomy (About-page groups); display order via **menu_order** (below) |
 
-### The event announcement poster
+### One media rule
 
-`nano_announcement_poster` is the event's announcement artwork (typically a
-vertical US-Letter flyer), **separate from the Featured image** — the featured
-image stays the cropped card thumbnail in listings. The single event page shows
-the poster below the date, **whole and never cropped**: shapes up to
-Letter-vertical (1 : 1.29) render at their own ratio, anything taller is held to
-a Letter-proportioned frame and letterboxed on pure white. Event gallery
-media gets the same fit-not-crop treatment inside its fixed 16:10 tiles; cards
-in listings keep cropping so grids stay even. Empty = nothing renders.
+Every media slot takes a **still image or a short looping clip** (uploaded
+MP4/WebM with an optional poster still): `nano_media_type` / `nano_image` /
+`nano_video` / `nano_poster`, read through `nano_media()` and rendered by
+`nano_render_media()` in the theme's `inc/fields.php`, so the markup lives in
+exactly one place. Clips autoplay muted, loop, and are lazy-managed by the
+front-end script; gallery items stay click-to-play behind their poster still.
+
+The one exception: the **event top slot** also accepts a **Vimeo URL**
+(`nano_media_type = vimeo` + `nano_vimeo`) for long-form video — e.g.
+Resonances lecture recordings, which exceed CampusPress's 50 MB upload cap. It
+renders as a watchable 16:9 player with native controls but the Vimeo chrome
+(title/byline/portrait) hidden, `dnt=1`, no autoplay. Unlisted links work.
+
+On the single event page the slot sits below the date, **separate from the
+Featured image** (which stays the cropped card thumbnail in listings), and
+renders only when explicitly filled. Stills — announcement posters are
+landscape — fill the column at their own ratio, never cropped; an unusually
+tall upload is height-capped and letterboxed on pure white. Gallery media gets
+the same fit-not-crop treatment inside its fixed 16:10 tiles; cards and the
+class banner keep cropping (`cover`) so grids and banners stay even. The class
+banner falls back to the featured image when the slot is empty.
 
 ### Manual display order (person, initiative, facility)
 

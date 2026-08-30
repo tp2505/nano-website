@@ -254,20 +254,9 @@ if ( ! function_exists( 'nano_vimeo_embed_url' ) ) {
 	 * @return string Embed URL, or '' if it doesn't look like a Vimeo video.
 	 */
 	function nano_vimeo_embed_url( $raw ) {
-		$raw  = trim( (string) $raw );
-		$id   = '';
-		$hash = '';
-		if ( preg_match( '/^\d+$/', $raw ) ) {
-			$id = $raw;
-		} elseif ( preg_match( '#vimeo\.com/(?:video/)?(\d+)(?:/([0-9a-zA-Z]+))?#', $raw, $m ) ) {
-			$id   = $m[1];
-			$hash = isset( $m[2] ) ? $m[2] : '';
-		}
-		if ( '' === $id ) {
+		$vimeo = function_exists( 'nano_vimeo_parse' ) ? nano_vimeo_parse( $raw ) : null;
+		if ( ! $vimeo ) {
 			return '';
-		}
-		if ( '' === $hash && preg_match( '/[?&]h=([0-9a-zA-Z]+)/', $raw, $m ) ) {
-			$hash = $m[1]; // Unlisted-video privacy hash.
 		}
 		$args = array(
 			'background' => '1',
@@ -283,10 +272,10 @@ if ( ! function_exists( 'nano_vimeo_embed_url' ) ) {
 			'keyboard'   => '0',
 			'dnt'        => '1',
 		);
-		if ( '' !== $hash ) {
-			$args['h'] = $hash;
+		if ( '' !== $vimeo['hash'] ) {
+			$args['h'] = $vimeo['hash'];
 		}
-		return add_query_arg( $args, 'https://player.vimeo.com/video/' . $id );
+		return add_query_arg( $args, 'https://player.vimeo.com/video/' . $vimeo['id'] );
 	}
 }
 
