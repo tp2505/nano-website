@@ -560,6 +560,22 @@ body:not(.home) .nano-main { padding-top: 5rem !important; }
 		filter: blur(0.6px);
 	}
 }
+/* Safari on Retina: WebKit snaps a 1px axis-aligned stroke to two hard,
+   full-ink device rows at every subpixel position (measured 17|17 grey
+   levels, zero fringe), while the non-scaling curve strokes anti-alias to
+   one solid row plus soft fringes — same total ink, but the hard bar reads
+   visibly heavier and the line→curl seam shows a weight step. Softening the
+   lines is not available here (Safari ignores CSS filter on <line>, and SVG
+   blur filters collapse on a zero-height bbox), so equalize from the curve
+   side: 1.3 makes the curls/waves' core two solid rows with light fringes —
+   measured against the lines on the actual display. Gated to WebKit via the
+   Safari-only -webkit-named-image() @supports test; Chrome on Retina already
+   renders both at parity and must not get this. */
+@supports (background: -webkit-named-image(i)) {
+	@media (-webkit-min-device-pixel-ratio: 1.6), (min-resolution: 1.6dppx) {
+		svg path[vector-effect="non-scaling-stroke"] { stroke-width: 1.3; }
+	}
+}
 .nano-hero__text {
 	margin: 0;
 	font-size: clamp(1.7rem, 3vw, 3.2rem);
