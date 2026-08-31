@@ -533,7 +533,8 @@ body:not(.home) .nano-main { padding-top: 5rem !important; }
 	overflow: visible;
 	pointer-events: none;
 }
-/* One bracket weight (1.25), one rasterization path — and NO axis-aligned
+/* One bracket weight (1, the original design weight), one rasterization
+   path — and NO axis-aligned
    strokes anywhere in the motif family. Every "straight" run is drawn as an
    imperceptibly sagged quadratic (0.05px max deviation from the chord, the
    validated magnitude — sags of 0.25px+ cross pixel rows mid-run and bring
@@ -562,7 +563,7 @@ svg path[vector-effect="non-scaling-stroke"],
 .nano-head__lines line,
 .nano-initiative__lines line,
 .nano-card__lines line {
-	stroke-width: 1.25;
+	stroke-width: 1;
 }
 .nano-hero__text {
 	margin: 0;
