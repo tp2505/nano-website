@@ -17,10 +17,16 @@
 
 	<!-- wp:html -->
 	<div class="nano-mission__frame">
-		<?php // LOGO EXPERIMENT: bracket lines + designer's Asset-14 wave (red dot), same construction as the hero tagline — all svg strokes so the joins are exact. ?>
+		<?php // LOGO EXPERIMENT: bracket lines + designer's Asset-14 wave (red dot), same construction as the hero tagline — all svg strokes so the joins are exact. Edges are clipped sagged quadratics, never axis-aligned <line>s (see hero.php and the bracket-weight note in assets/css/app.css). ?>
 		<svg class="nano-mission__lines" aria-hidden="true">
-			<line x1="0" y1="0" x2="0" y2="100%" stroke="currentColor"/>
-			<line x1="0" y1="100%" x2="100%" y2="100%" stroke="currentColor"/>
+			<defs>
+				<path id="nano-mission-vsag" d="M0,0 Q0.1,1500 0,3000"/>
+				<path id="nano-mission-hsag" d="M0,0 Q1500,0.1 3000,0"/>
+				<clipPath id="nano-mission-vclip"><rect x="-5" y="0" width="10" height="100%"/></clipPath>
+				<clipPath id="nano-mission-hclip"><rect x="0" y="-10%" width="100%" height="120%"/></clipPath>
+			</defs>
+			<use href="#nano-mission-vsag" clip-path="url(#nano-mission-vclip)" fill="none" stroke="currentColor"/>
+			<use href="#nano-mission-hsag" y="100%" clip-path="url(#nano-mission-hclip)" fill="none" stroke="currentColor"/>
 			<g class="nano-waveg">
 				<g fill="none" stroke="currentColor">
 					<path vector-effect="non-scaling-stroke" d="M-67.14,-12.27c.22-.45.56-1.12,1-1.93C-63.76,-18.55,-59.29,-26.71,-53.68,-26.68c.24,0,1.18.02,2.27.47,6.05,2.48,6.52,13.94,6.63,16.41.04.99.03,1.78.02,2.18"/>

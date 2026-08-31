@@ -120,7 +120,7 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news' ) );
 			<h2 class="nano-section-head__title"><a href="<?php echo esc_url( $nano_archive ? $nano_archive : $view_all ); ?>"><?php esc_html_e( 'News', 'nano' ); ?></a></h2>
 			<?php // LOGO EXPERIMENT: designer's Asset-13 underline — elastic line (svg, keeps the current length) with the S-curl rising from its right end to the dot. ?>
 			<svg class="nano-head__lines" aria-hidden="true">
-				<line x1="0" y1="100%" x2="100%" y2="100%" stroke="currentColor"/>
+				<?php echo nano_sag_edge( 'bottom' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 			
 				<g class="nano-head__curlg">
 				<g fill="none" stroke="currentColor">

@@ -56,8 +56,8 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-about' ) );
 		<div class="nano-about__frame">
 			<?php // LOGO EXPERIMENT: same construction as the homepage motto — svg bracket lines + the designer's Asset-14 triple wave with a purple dot. ?>
 			<svg class="nano-about__lines" aria-hidden="true">
-				<line x1="0" y1="0" x2="0" y2="100%" stroke="currentColor"/>
-				<line x1="0" y1="100%" x2="100%" y2="100%" stroke="currentColor"/>
+				<?php echo nano_sag_edge( 'left' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+				<?php echo nano_sag_edge( 'bottom' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 				<g class="nano-waveg">
 					<g fill="none" stroke="currentColor">
 						<path vector-effect="non-scaling-stroke" d="M-67.14,-12.27c.22-.45.56-1.12,1-1.93C-63.76,-18.55,-59.29,-26.71,-53.68,-26.68c.24,0,1.18.02,2.27.47,6.05,2.48,6.52,13.94,6.63,16.41.04.99.03,1.78.02,2.18"/>
@@ -129,7 +129,7 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-about' ) );
 							<h3 class="nano-people__group-title"><?php echo esc_html( $group->name ); ?></h3>
 							<?php // LOGO EXPERIMENT: Asset-13 underline + S-curl, scaled to the group title; the dot keeps the group's accent colour. ?>
 							<svg class="nano-head__lines" aria-hidden="true">
-								<line x1="0" y1="100%" x2="100%" y2="100%" stroke="currentColor"/>
+								<?php echo nano_sag_edge( 'bottom' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 								<g class="nano-grouphead__curlg <?php echo esc_attr( $dot_class ); ?>">
 									<g fill="none" stroke="currentColor">
 										<path vector-effect="non-scaling-stroke" d="M3.58,-22.48c-.45-.21-1.14-.53-1.96-.96-4.39-2.28-12.66-6.57-12.75-12.17,0-.24,0-1.18.42-2.28,2.34-6.11,13.79-6.84,16.26-6.99.99-.06,1.77-.07,2.18-.07"/>

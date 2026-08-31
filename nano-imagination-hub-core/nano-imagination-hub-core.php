@@ -18,6 +18,7 @@ define( 'NANO_CORE_VERSION', '0.3.0' );
 define( 'NANO_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NANO_CORE_URL', plugin_dir_url( __FILE__ ) );
 
+require_once NANO_CORE_DIR . 'inc/svg.php';
 require_once NANO_CORE_DIR . 'inc/cpt.php';
 require_once NANO_CORE_DIR . 'inc/fields-acf.php';
 require_once NANO_CORE_DIR . 'inc/news-card.php';

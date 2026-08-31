@@ -36,8 +36,8 @@ $nano_hero = function_exists( 'nano_hero_media' )
 		<?php // LOGO EXPERIMENT (branch logo-experiment): inline-svg lockup — Asset-15 line bracket (non-scaling 1px strokes, matching all other bracket lines) + Space Grotesk type as outlined paths. White via CSS color. ?>
 		<svg class="nano-hero__logo" viewBox="0 0 297.58 178.76" aria-hidden="true">
 			<g fill="none" stroke="currentColor" stroke-miterlimit="10" transform="translate(6 6)">
-				<line vector-effect="non-scaling-stroke" x1="72.27" y1="17.94" x2="72.27" y2="171.66"/>
-				<line vector-effect="non-scaling-stroke" x1="166.63" y1="171.66" x2="72.27" y2="171.66"/>
+				<path vector-effect="non-scaling-stroke" d="M72.27,17.94 Q72.37,94.8 72.27,171.66"/>
+				<path vector-effect="non-scaling-stroke" d="M166.63,171.66 Q119.45,171.76 72.27,171.66"/>
 				<path vector-effect="non-scaling-stroke" d="M49.88,14.97c-.22.45-.56,1.12-1,1.93-2.38,4.34-6.85,12.51-12.45,12.47-.24,0-1.18-.02-2.27-.47-6.05-2.48-6.52-13.94-6.63-16.41-.04-.99-.03-1.78-.02-2.18"/>
 				<path vector-effect="non-scaling-stroke" d="M49.89,14.91c.22-.45.56-1.12,1-1.93,2.38-4.34,6.85-12.51,12.45-12.47.24,0,1.18.02,2.27.47,6.05,2.48,6.52,13.94,6.63,16.41.04.99.03,1.78.02,2.18"/>
 			</g>
@@ -57,9 +57,16 @@ $nano_hero = function_exists( 'nano_hero_media' )
 		<div class="nano-hero__frame">
 			<?php // LOGO EXPERIMENT: the bracket's vertical + bottom lines are SVG strokes (not CSS borders) so they rasterize identically to the wave and the join can't drift by a subpixel. ?>
 			<?php // LOGO EXPERIMENT: designer's Asset-14 wave + dot (two humps, dot at the far left) drawn INSIDE the same svg as the bracket lines, coordinates rebased so its join with the vertical line is the group origin at the frame's top-left corner (see .nano-waveg). One svg = one raster pass, so the seam can't drift on iOS. ?>
+			<?php // The bracket edges are imperceptibly sagged quadratics (0.05px max deviation), never axis-aligned <line>s: axis-aligned strokes take a snapped fast rasterization path in some engines while curves anti-alias, so a straight run could read a different weight than the wave it joins. Percentages can't go in a path, so each edge is a long fixed sagged path clipped to the box by a percentage clip rect; the bottom edge is placed with use y="100%". Each edge starts exactly on its anchor corner (the wave joins the vertical at the origin, exactly); at clipped ends the sag leaves the join short by at most ~0.03px, an order below the anti-aliasing itself. See the bracket-weight note in assets/css/app.css. ?>
 			<svg class="nano-hero__lines" aria-hidden="true">
-				<line x1="0" y1="0" x2="0" y2="100%" stroke="currentColor"/>
-				<line x1="0" y1="100%" x2="100%" y2="100%" stroke="currentColor"/>
+				<defs>
+					<path id="nano-hero-vsag" d="M0,0 Q0.1,1500 0,3000"/>
+					<path id="nano-hero-hsag" d="M0,0 Q1500,0.1 3000,0"/>
+					<clipPath id="nano-hero-vclip"><rect x="-5" y="0" width="10" height="100%"/></clipPath>
+					<clipPath id="nano-hero-hclip"><rect x="0" y="-10%" width="100%" height="120%"/></clipPath>
+				</defs>
+				<use href="#nano-hero-vsag" clip-path="url(#nano-hero-vclip)" fill="none" stroke="currentColor"/>
+				<use href="#nano-hero-hsag" y="100%" clip-path="url(#nano-hero-hclip)" fill="none" stroke="currentColor"/>
 				<g class="nano-waveg">
 					<g fill="none" stroke="currentColor">
 						<path vector-effect="non-scaling-stroke" d="M-67.14,-12.27c.22-.45.56-1.12,1-1.93C-63.76,-18.55,-59.29,-26.71,-53.68,-26.68c.24,0,1.18.02,2.27.47,6.05,2.48,6.52,13.94,6.63,16.41.04.99.03,1.78.02,2.18"/>

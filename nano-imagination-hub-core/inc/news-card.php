@@ -254,11 +254,11 @@ if ( ! function_exists( 'nano_render_card' ) ) {
 				<?php if ( isset( $nano_card_curls[ $cat_slug ] ) ) : ?>
 					<?php $nano_curl = $nano_card_curls[ $cat_slug ]; ?>
 					<svg class="nano-card__lines" aria-hidden="true">
-						<line x1="0" y1="0" x2="100%" y2="0" stroke="currentColor"/>
+						<?php echo nano_sag_edge( 'top' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 						<?php if ( 'right' === $nano_curl['side'] ) : ?>
-							<line x1="100%" y1="0" x2="100%" y2="100%" stroke="currentColor"/>
+							<?php echo nano_sag_edge( 'right' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 						<?php else : ?>
-							<line x1="0" y1="0" x2="0" y2="100%" stroke="currentColor"/>
+							<?php echo nano_sag_edge( 'left' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 						<?php endif; ?>
 						<g class="nano-card__curlg">
 							<path d="<?php echo esc_attr( $nano_curl['d'] ); ?>" fill="none" stroke="currentColor" vector-effect="non-scaling-stroke"/>

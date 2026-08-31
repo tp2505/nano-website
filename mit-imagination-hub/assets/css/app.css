@@ -533,47 +533,36 @@ body:not(.home) .nano-main { padding-top: 5rem !important; }
 	overflow: visible;
 	pointer-events: none;
 }
-/* One bracket weight: 1.25. At 1px the strokes sat exactly on the
-   pixel-phase boundary — a straight run rendered crisp or straddled-soft by
-   subpixel luck, curves anti-aliased to a middle weight, and the two engines
-   disagreed (Safari hard-snaps axis-aligned strokes). At 1.25 every phase
-   keeps a two-device-pixel solid core on Retina, so lines, curves, and the
-   line→curl seams carry one weight in Safari AND Chrome with no per-browser
-   rules — verified on real screen captures of both. Covers the straight
-   <line> runs and every non-scaling curve path (curls, waves, logo). */
+/* One bracket weight (1.25), one rasterization path — and NO axis-aligned
+   strokes anywhere in the motif family. Every "straight" run is drawn as an
+   imperceptibly sagged quadratic (0.05px max deviation from the chord, the
+   validated magnitude — sags of 0.25px+ cross pixel rows mid-run and bring
+   the phase lottery back): axis-aligned strokes take a snapped fast
+   rasterization path in some engines (headed Chrome at standard density,
+   most visibly) while curves anti-alias, so a straight run could read crisp
+   or heavy by subpixel luck and never quite match the curls it joins. Sagged,
+   straights and curves share one anti-aliasing pipeline in every engine at
+   every density, so there are deliberately NO per-browser or per-density
+   stroke rules here, and no runtime JS. The elastic frame edges are long
+   fixed sagged paths clipped to the box by percentage clip rects and placed
+   with <use> (y="100%" for the bottom edge) — see hero.php. The <line>
+   selectors below remain ONLY for motif copies stored in page content
+   (About, initiatives, news cards) that haven't been migrated to sagged
+   paths yet; new markup must never use <line>. */
 svg path[vector-effect="non-scaling-stroke"],
+.nano-hero__lines use,
+.nano-mission__lines use,
+.nano-about__lines use,
+.nano-head__lines use,
+.nano-initiative__lines use,
+.nano-card__lines use,
 .nano-hero__lines line,
 .nano-mission__lines line,
 .nano-about__lines line,
 .nano-head__lines line,
 .nano-initiative__lines line,
-.nano-card__lines line,
-.nano-hero__logo line,
-.nano-footer__mark line,
-.nano-brand__mark line {
+.nano-card__lines line {
 	stroke-width: 1.25;
-}
-/* Standard density is the one place thicker strokes don't fully heal the
-   phase lottery: at one device pixel per CSS pixel a 1.25 line still lands
-   crisp (peak ~17) or straddled (~98) while the curves settle at ~38. Width
-   2.0 gives a line a fully-covered row at ANY phase (kills the variance:
-   measured 34 vs 31 on the two same-bracket lines) and blur(0.45px) melts
-   the hard edges onto the curves' weight. Lines only — the curves are the
-   reference; geometry never moves so the line/curl joins stay exact. Tuned
-   on headed-Chrome GPU captures at DSF 1. */
-@media (-webkit-max-device-pixel-ratio: 1.5), (max-resolution: 1.5dppx) {
-	.nano-hero__lines line,
-	.nano-mission__lines line,
-	.nano-about__lines line,
-	.nano-head__lines line,
-	.nano-initiative__lines line,
-	.nano-card__lines line,
-	.nano-hero__logo line,
-	.nano-footer__mark line,
-	.nano-brand__mark line {
-		stroke-width: 2;
-		filter: blur(0.45px);
-	}
 }
 .nano-hero__text {
 	margin: 0;

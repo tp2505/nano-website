@@ -41,7 +41,7 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 			<h1 class="nano-section-head__title"><?php the_title(); ?></h1>
 			<?php // LOGO EXPERIMENT: designer's Asset-6 underline — elastic line (svg, keeps the current length) whose right end curls up into the dot. ?>
 			<svg class="nano-head__lines" aria-hidden="true">
-				<line x1="0" y1="100%" x2="100%" y2="100%" stroke="currentColor"/>
+				<?php echo nano_sag_edge( 'bottom' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 			
 				<g class="nano-head__curlg nano-head__curlg--sm">
 				<path d="M-2.49,-22.37c.45.22,1.12.56,1.93,1,4.34,2.38,12.51,6.85,12.47,12.45,0,.24-.02,1.18-.47,2.27-2.48,6.05-13.94,6.52-16.41,6.63-.99.04-1.78.03-2.18.02" fill="none" stroke="currentColor" vector-effect="non-scaling-stroke"/>

@@ -17,10 +17,14 @@ $nano_action = esc_url( admin_url( 'admin-post.php' ) );
 	<!-- wp:html -->
 	<div class="nano-newsletterhead">
 		<h2 class="nano-section-title nano-newsletter__title">Newsletter</h2>
-		<?php // LOGO EXPERIMENT: designer's Asset-13 underline — elastic line (svg, keeps the current length) with the S-curl rising from its right end to the dot. ?>
+		<?php // LOGO EXPERIMENT: designer's Asset-13 underline — elastic line (svg, keeps the current length) with the S-curl rising from its right end to the dot. The underline is a clipped sagged quadratic, never an axis-aligned <line> (see hero.php and the bracket-weight note in assets/css/app.css). ?>
 		<svg class="nano-head__lines" aria-hidden="true">
-			<line x1="0" y1="100%" x2="100%" y2="100%" stroke="currentColor"/>
-		
+			<defs>
+				<path id="nano-news-hsag" d="M0,0 Q1500,0.1 3000,0"/>
+				<clipPath id="nano-news-hclip"><rect x="0" y="-10%" width="100%" height="120%"/></clipPath>
+			</defs>
+			<use href="#nano-news-hsag" y="100%" clip-path="url(#nano-news-hclip)" fill="none" stroke="currentColor"/>
+
 			<g class="nano-head__curlg">
 			<g fill="none" stroke="currentColor">
 				<path vector-effect="non-scaling-stroke" d="M3.58,-22.48c-.45-.21-1.14-.53-1.96-.96-4.39-2.28-12.66-6.57-12.75-12.17,0-.24,0-1.18.42-2.28,2.34-6.11,13.79-6.84,16.26-6.99.99-.06,1.77-.07,2.18-.07"/>
