@@ -34,8 +34,14 @@
 
 	// Detach a video's source so the browser drops its decoder + decoded frames
 	// (a page full of muted videos otherwise keeps them ALL decoded at once, which
-	// can exhaust GPU memory and crash the tab). The poster stays visible.
+	// can exhaust GPU memory and crash the tab). The poster stays visible — which
+	// is why a video WITHOUT a poster is never detached: an empty <video> renders
+	// as a blank box, and a paused clip holding its last frame is the acceptable
+	// resting state there (at the cost of keeping that one decoder alive).
 	function releaseVideo( video ) {
+		if ( ! video.getAttribute( 'poster' ) ) {
+			return;
+		}
 		var source = video.querySelector( 'source' );
 		if ( source && source.getAttribute( 'src' ) ) {
 			video.setAttribute( 'data-nano-src', source.getAttribute( 'src' ) );
@@ -57,11 +63,16 @@
 		}
 	}
 
-	// Hard cap on how many clips may be DECODED at once. Many simultaneous video
+	// Soft cap on how many clips may be DECODED at once. Many simultaneous video
 	// decoders exhaust the GPU and crash the tab on modest hardware, so we keep a
-	// tiny most-recently-seen pool and release everything else (poster shows).
-	var MAX_ACTIVE_VIDEOS = 2;
+	// most-recently-seen pool and release the rest (poster shows). 4 covers the
+	// realistic worst case in view at once (two initiative rows + news tiles).
+	var MAX_ACTIVE_VIDEOS = 4;
 	var activeVideos = [];
+	// Videos currently intersecting the (padded) viewport — eviction must never
+	// take a clip that is still on screen, or a visible tile goes to its poster
+	// (or worse) mid-view. Kept up to date by the IntersectionObserver.
+	var visibleVideos = [];
 
 	function activateVideo( video ) {
 		var i = activeVideos.indexOf( video );
@@ -71,11 +82,16 @@
 		activeVideos.unshift( video ); // most-recent at the front
 		restoreVideo( video );
 		tryPlay( video );
-		// Evict the least-recently-seen beyond the cap.
-		while ( activeVideos.length > MAX_ACTIVE_VIDEOS ) {
-			var evicted = activeVideos.pop();
-			evicted.pause();
-			releaseVideo( evicted );
+		// Evict beyond the cap, least-recently-seen first — but only clips that
+		// are off screen. If everything active is still visible, exceed the cap
+		// rather than blank a tile the visitor is looking at.
+		for ( var j = activeVideos.length - 1; j >= 0 && activeVideos.length > MAX_ACTIVE_VIDEOS; j-- ) {
+			var candidate = activeVideos[ j ];
+			if ( visibleVideos.indexOf( candidate ) === -1 ) {
+				activeVideos.splice( j, 1 );
+				candidate.pause();
+				releaseVideo( candidate );
+			}
 		}
 	}
 
@@ -114,17 +130,33 @@
 			return;
 		}
 
+		// Asymmetric thresholds (hysteresis): a clip starts once it's 35%
+		// visible, but is only deactivated when it has left the padded viewport
+		// COMPLETELY — deactivating at the same 35% line released tiles that
+		// were still largely on screen, so stopping a scroll left visible boxes
+		// on their poster (or blank, before releaseVideo learned to keep
+		// posterless clips). The 15% rootMargin adds a buffer beyond the edge.
 		var observer = new IntersectionObserver(
 			function ( entries ) {
 				entries.forEach( function ( entry ) {
+					var video = entry.target;
+					var vi    = visibleVideos.indexOf( video );
 					if ( entry.isIntersecting ) {
-						activateVideo( entry.target );
+						if ( vi === -1 ) {
+							visibleVideos.push( video );
+						}
+						if ( entry.intersectionRatio >= 0.35 ) {
+							activateVideo( video );
+						}
 					} else {
-						deactivateVideo( entry.target );
+						if ( vi !== -1 ) {
+							visibleVideos.splice( vi, 1 );
+						}
+						deactivateVideo( video );
 					}
 				} );
 			},
-			{ rootMargin: '0px', threshold: 0.35 }
+			{ rootMargin: '15% 0px 15% 0px', threshold: [ 0, 0.35 ] }
 		);
 
 		managed.forEach( function ( video ) {
