@@ -39,6 +39,8 @@ function nano_register_post_types() {
 
 	// Initiative (Program) — the four strands. Ordered by menu_order (the Page
 	// Attributes → Order box, like Facilities and People), large media block.
+	// The content editor holds the LONG description (single page only);
+	// nano_intro is the short description (homepage row + top of the page).
 	register_post_type(
 		'initiative',
 		array(

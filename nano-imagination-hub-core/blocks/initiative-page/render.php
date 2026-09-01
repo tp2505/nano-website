@@ -110,6 +110,19 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 		</div>
 	<?php endif; ?>
 
+	<?php
+	// Long-form description — the post content editor (the initiative CPT has
+	// editor support). Renders below the short description (nano_intro) on the
+	// single page only; empty content renders nothing. The homepage row keeps
+	// showing just the short description.
+	$nano_long = trim( (string) get_post_field( 'post_content', $post_id ) );
+	if ( '' !== $nano_long ) :
+		?>
+		<div class="nano-initiative-page__body">
+			<?php echo apply_filters( 'the_content', $nano_long ); // phpcs:ignore WordPress.Security.EscapeOutput -- core content pipeline ?>
+		</div>
+	<?php endif; ?>
+
 	<?php if ( $is_pedagogies && $current_classes ) : ?>
 		<div class="nano-about__row nano-initiative-page__section">
 			<h2 class="nano-label">Classes</h2>

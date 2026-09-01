@@ -509,11 +509,11 @@ function nano_register_acf_fields() {
 				array(
 						array(
 							'key'          => 'field_nano_init_intro',
-							'label'        => 'Intro text',
+							'label'        => 'Short description',
 							'name'         => 'nano_intro',
 							'type'         => 'textarea',
 							'rows'         => 6,
-							'instructions' => 'Lead paragraph shown on the initiative page, beneath the title.',
+							'instructions' => 'Short paragraph shown in the homepage Initiatives row and at the top of the initiative page. The long-form description lives in the main content editor and appears only on the initiative page, below this.',
 						),
 					),
 					$media_fields( 'init' )

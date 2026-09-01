@@ -72,6 +72,11 @@ $nano_curls = array(
 		$query->the_post();
 		$post_id    = get_the_ID();
 		$descriptor = function_exists( 'nano_field' ) ? nano_field( 'nano_descriptor', $post_id ) : '';
+		// Short description (nano_intro) — shared with the top of the single
+		// initiative page. The post content editor is the LONG description and
+		// renders only there; fall back to it here just for initiatives whose
+		// short description hasn't been filled in yet.
+		$short = function_exists( 'nano_field' ) ? trim( (string) nano_field( 'nano_intro', $post_id ) ) : '';
 		$flip       = ( 0 === $i % 2 ) ? '' : ' nano-initiative--flip';
 		$pos        = ' nano-initiative--pos' . ( $i + 1 );
 		++$i;
@@ -103,7 +108,13 @@ $nano_curls = array(
 					<p class="nano-initiative__descriptor"><?php echo esc_html( $descriptor ); ?></p>
 				<?php endif; ?>
 				<div class="nano-initiative__body">
-					<?php the_content(); ?>
+					<?php
+					if ( '' !== $short ) {
+						echo wp_kses_post( wpautop( $short ) );
+					} else {
+						the_content();
+					}
+					?>
 				</div>
 			</div>
 		</article>

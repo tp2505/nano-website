@@ -780,6 +780,19 @@ svg path[vector-effect="non-scaling-stroke"],
 .nano-project-page__intro p { margin: 0; }
 .nano-initiative-page__intro p + p,
 .nano-project-page__intro p + p { margin-top: 1em; }
+/* Long-form description (the post content editor) below the lead — body
+   sizing like the Event description; absent entirely when content is empty. */
+.nano-initiative-page__body {
+	max-width: 52rem;
+	margin: -1.5rem 0 var(--wp--preset--spacing--60);
+	line-height: 1.6;
+}
+.nano-initiative-page__intro + .nano-initiative-page__body {
+	/* tuck up under the lead: the intro's own bottom margin already provides
+	   the air, minus a beat so lead and body read as one description */
+	margin-top: -2.75rem;
+}
+.nano-initiative-page__body p { margin: 0 0 1em; }
 /* Gallery captions use the same style as the News card titles (no override). */
 
 /* Single News: one feature image (the large "L" size — same as the Events
