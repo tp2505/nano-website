@@ -1,9 +1,11 @@
 <?php
 /**
  * Event page block — the single-event body: title, description, and a two-column
- * poster gallery. Gallery items are attachment IDs in nano_gallery: images render
- * directly; videos render their poster with a play button and swap to a playing
- * <video> on click (assets/js/nano.js → initGalleryVideos). All lazy-loaded.
+ * poster gallery. Gallery items are attachment IDs in nano_gallery (ACF Pro
+ * Gallery field, read via nano_gallery_rows()): images render directly; videos
+ * render their poster with a play button and swap to a playing <video> on click
+ * (assets/js/nano.js → initGalleryVideos). Captions and video posters come from
+ * the attachment itself. All lazy-loaded.
  *
  * @package Nano\ImaginationHubCore
  *

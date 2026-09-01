@@ -271,44 +271,60 @@ function nano_register_acf_fields() {
 						'instructions' => 'Body of the event page.',
 					),
 					array(
-						'key'          => 'field_nano_event_gallery',
-						'label'        => 'Gallery',
-						'name'         => 'nano_gallery',
-						'type'         => 'repeater',
-						'layout'       => 'block',
-						'button_label' => 'Add media',
-						'instructions' => 'Photos and videos, shown two-up. Videos play on click.',
-						'sub_fields'   => array(
-							array(
-								'key'           => 'field_nano_gallery_media',
-								'label'         => 'Image or video',
-								'name'          => 'media',
-								'type'          => 'file',
-								'return_format' => 'id',
-								'mime_types'    => 'jpg,jpeg,png,gif,webp,mp4,webm',
-								'required'      => 1,
-								'instructions'  => 'Upload an image or an MP4 / WebM video.',
-							),
-							array(
-								'key'           => 'field_nano_gallery_poster',
-								'label'         => 'Video poster (still)',
-								'name'          => 'poster',
-								'type'          => 'image',
-								'return_format' => 'id',
-								'preview_size'  => 'medium',
-								'instructions'  => 'For videos: the still shown before playback. Leave empty for images.',
-							),
-							array(
-								'key'          => 'field_nano_gallery_caption',
-								'label'        => 'Caption',
-								'name'         => 'caption',
-								'type'         => 'text',
-								'instructions' => 'Optional one-sentence caption shown beneath this image or video.',
-							),
-						),
+						'key'           => 'field_nano_event_gallery',
+						'label'         => 'Gallery',
+						'name'          => 'nano_gallery',
+						'type'          => 'gallery',
+						'return_format' => 'id',
+						'preview_size'  => 'medium',
+						'insert'        => 'append',
+						'library'       => 'all',
+						'mime_types'    => 'jpg,jpeg,png,gif,webp,mp4,webm',
+						'instructions'  => 'Photos and videos, shown two-up in the order set here (drag to reorder). Videos play on click. Click an item to edit its caption and alt text in the sidebar; for a video, the sidebar also has a “Poster (still)” field for the image shown before playback.',
 					),
 				),
 				$ref_fields( 'event_ref' )
+			),
+		)
+	);
+
+	// Video attachments — the editor-chosen poster still. Attachment field
+	// groups render inside the media modal AND in the Gallery field's edit
+	// sidebar, which is what gives the Event gallery its per-video poster
+	// picker. Stored as plain attachment meta (nano_poster on the attachment),
+	// so nano_gallery_rows() can read it with or without ACF loaded. Location
+	// rules list the two allowed video mimes explicitly (OR between groups).
+	acf_add_local_field_group(
+		array(
+			'key'      => 'group_nano_video_poster',
+			'title'    => 'Video poster',
+			'location' => array(
+				array(
+					array(
+						'param'    => 'attachment',
+						'operator' => '==',
+						'value'    => 'video/mp4',
+					),
+				),
+				array(
+					array(
+						'param'    => 'attachment',
+						'operator' => '==',
+						'value'    => 'video/webm',
+					),
+				),
+			),
+			'fields'   => array(
+				array(
+					'key'           => 'field_nano_attachment_poster',
+					'label'         => 'Poster (still)',
+					'name'          => 'nano_poster',
+					'type'          => 'image',
+					'return_format' => 'id',
+					'preview_size'  => 'medium',
+					'library'       => 'all',
+					'instructions'  => 'The image shown before this video plays (galleries and cards). If empty, the video\'s own thumbnail is used when it has one.',
+				),
 			),
 		)
 	);
@@ -571,6 +587,90 @@ function nano_register_acf_fields() {
 							'instructions'  => 'Optional — makes the logo link out.',
 						),
 					),
+				),
+			),
+		)
+	);
+
+	// About page — the intro statement, the Mission/History bodies, and the two
+	// banner images the nano/about block renders. These were previously written
+	// only by the local seed script (raw post meta, no editor UI); this group
+	// gives wp-admin the fields. Bound to the About page specifically when it
+	// exists, otherwise to any page so the box is reachable before seeding —
+	// same pattern as the Sponsors group above.
+	$about          = get_page_by_path( 'about-us' );
+	$about_location = $about
+		? array(
+			array(
+				array(
+					'param'    => 'page',
+					'operator' => '==',
+					'value'    => (string) $about->ID,
+				),
+			),
+		)
+		: array(
+			array(
+				array(
+					'param'    => 'post_type',
+					'operator' => '==',
+					'value'    => 'page',
+				),
+			),
+		);
+	acf_add_local_field_group(
+		array(
+			'key'        => 'group_nano_about',
+			'title'      => 'About page details',
+			'location'   => $about_location,
+			'menu_order' => 0,
+			'position'   => 'normal',
+			'fields'     => array(
+				array(
+					'key'          => 'field_nano_about_intro',
+					'label'        => 'Intro statement',
+					'name'         => 'nano_about_intro',
+					'type'         => 'textarea',
+					'rows'         => 3,
+					'instructions' => 'The large statement in the bracket frame at the top of the page ("Imagination Hub is a platform merging…"). Plain text; the whole section is hidden while this is empty.',
+				),
+				array(
+					'key'           => 'field_nano_about_img1',
+					'label'         => 'Banner image (above Mission)',
+					'name'          => 'nano_about_img1',
+					'type'          => 'image',
+					'return_format' => 'id',
+					'preview_size'  => 'medium',
+					'library'       => 'all',
+					'instructions'  => 'Wide banner between the intro and the Mission section. Empty shows a plain placeholder box.',
+				),
+				array(
+					'key'          => 'field_nano_about_mission',
+					'label'        => 'Mission',
+					'name'         => 'nano_mission',
+					'type'         => 'wysiwyg',
+					'tabs'         => 'visual',
+					'media_upload' => 0,
+					'instructions' => 'Body of the Mission section.',
+				),
+				array(
+					'key'           => 'field_nano_about_img2',
+					'label'         => 'Banner image (above History)',
+					'name'          => 'nano_about_img2',
+					'type'          => 'image',
+					'return_format' => 'id',
+					'preview_size'  => 'medium',
+					'library'       => 'all',
+					'instructions'  => 'Wide banner between Mission and History. Empty shows a plain placeholder box.',
+				),
+				array(
+					'key'          => 'field_nano_about_history',
+					'label'        => 'History',
+					'name'         => 'nano_history',
+					'type'         => 'wysiwyg',
+					'tabs'         => 'visual',
+					'media_upload' => 0,
+					'instructions' => 'Body of the History section.',
 				),
 			),
 		)

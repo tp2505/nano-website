@@ -55,6 +55,53 @@ function nano_theme_supports() {
 add_action( 'after_setup_theme', 'nano_theme_supports' );
 
 /**
+ * Internal-link helpers for the header / footer / 404 patterns.
+ *
+ * The site lives at different roots per environment (domain root locally,
+ * /studionano/ on sites.mit.edu, later studionano.mit.edu), so nothing may
+ * hardcode a root-relative path. These resolve the real object's permalink
+ * where one exists and otherwise build the conventional path off home_url(),
+ * which carries the subdirectory in every environment.
+ */
+if ( ! function_exists( 'nano_page_url' ) ) {
+	/**
+	 * Permalink for a page by its path/slug (e.g. 'about-us').
+	 *
+	 * @param string $path Page path, no leading slash.
+	 * @return string
+	 */
+	function nano_page_url( $path ) {
+		$page = get_page_by_path( $path );
+		return $page ? get_permalink( $page ) : home_url( user_trailingslashit( '/' . ltrim( $path, '/' ) ) );
+	}
+}
+
+if ( ! function_exists( 'nano_initiative_url' ) ) {
+	/**
+	 * Permalink for an Initiative by slug (e.g. 'encounters').
+	 *
+	 * @param string $slug Initiative post slug.
+	 * @return string
+	 */
+	function nano_initiative_url( $slug ) {
+		$post = get_page_by_path( $slug, OBJECT, 'initiative' );
+		return $post ? get_permalink( $post ) : home_url( user_trailingslashit( '/initiatives/' . $slug ) );
+	}
+}
+
+if ( ! function_exists( 'nano_news_url' ) ) {
+	/**
+	 * The News archive.
+	 *
+	 * @return string
+	 */
+	function nano_news_url() {
+		$link = get_post_type_archive_link( 'news' );
+		return $link ? $link : home_url( user_trailingslashit( '/news' ) );
+	}
+}
+
+/**
  * Pattern category so the homepage sections group together in the inserter.
  */
 function nano_register_pattern_category() {

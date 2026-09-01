@@ -1661,6 +1661,12 @@ a.nano-initiative__media:hover,
 .nano-initiative__media {
 	/* same proportions as the screen (set from JS, falls back to 16:9) */
 	display: block; /* it's a link to the initiative page */
+	/* width must be pinned: a grid item with an aspect-ratio doesn't
+	   auto-stretch in the inline axis, so once align-items: stretch makes a
+	   tall text column set this box's height, the ratio would derive a width
+	   wider than the column and slide the media under the text at mid
+	   viewport widths. Pinned, the ratio only ever sets the height. */
+	width: 100%;
 	aspect-ratio: var(--nano-screen-ratio, 16 / 9);
 	overflow: hidden;
 	background: var(--wp--preset--color--surface);
