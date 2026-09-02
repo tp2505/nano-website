@@ -10,7 +10,7 @@
 
 $nano_home = home_url( '/' );
 ?>
-<!-- wp:group {"tagName":"footer","className":"nano-footer","backgroundColor":"footer","textColor":"contrast","layout":{"type":"constrained","contentSize":"1320px"},"style":{"spacing":{"padding":{"top":"var:preset|spacing|60","bottom":"var:preset|spacing|40","left":"var:preset|spacing|40","right":"var:preset|spacing|40"}}}} -->
+<!-- wp:group {"tagName":"footer","className":"nano-footer","backgroundColor":"footer","textColor":"contrast","layout":{"type":"constrained","contentSize":"1320px"}} -->
 <footer class="wp-block-group nano-footer has-contrast-color has-footer-background-color has-text-color has-background">
 
 	<!-- wp:group {"className":"nano-footer__top","layout":{"type":"flex","flexWrap":"wrap","justifyContent":"space-between","verticalAlignment":"top"}} -->
