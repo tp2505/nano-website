@@ -159,7 +159,10 @@ if ( ! function_exists( 'nano_render_card' ) ) {
 			$category      = function_exists( 'nano_field' ) ? (string) nano_field( 'nano_term', $post_id ) : '';
 			$cat_slug      = 'pedagogies'; // Classes ride under Pedagogies — same bracket family.
 			$cat_label     = $category;
-			$instructor_id = function_exists( 'nano_field' ) ? (int) nano_field( 'nano_instructor', $post_id ) : 0;
+			// The field is multiple (co-teaching); the compact card meta line
+			// shows the first instructor — the class page lists them all.
+			$instructor_raw = function_exists( 'nano_field' ) ? nano_field( 'nano_instructor', $post_id ) : 0;
+			$instructor_id  = (int) ( is_array( $instructor_raw ) ? reset( $instructor_raw ) : $instructor_raw );
 			$instructor    = $instructor_id ? get_the_title( $instructor_id ) : '';
 		} else {
 			if ( 'event' === $type ) {

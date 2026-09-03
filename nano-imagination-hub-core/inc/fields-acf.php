@@ -376,14 +376,19 @@ function nano_register_acf_fields() {
 				),
 				array(
 					'key'           => 'field_nano_class_instructor',
-					'label'         => 'Instructor',
+					'label'         => 'Instructor(s)',
 					'name'          => 'nano_instructor',
 					'type'          => 'post_object',
 					'post_type'     => array( 'person' ),
 					'return_format' => 'id',
 					'ui'            => 1,
 					'allow_null'    => 1,
-					'instructions'  => 'Optional. Links to the instructor’s People page.',
+					// Multiple: a class can have co-instructors. Legacy single
+					// values (a scalar ID in meta) keep working — ACF wraps
+					// them into an array, and the readers normalize both
+					// shapes — so no migration is needed.
+					'multiple'      => 1,
+					'instructions'  => 'Optional. One or more instructors; each links to their People page.',
 				),
 				array(
 					'key'           => 'field_nano_class_ta',

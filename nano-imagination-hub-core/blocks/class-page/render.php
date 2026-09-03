@@ -32,10 +32,19 @@ $credits    = trim( (string) $field( 'nano_credits' ) );
 // The structured meta line — only the facts that are filled.
 $facts = array_values( array_filter( array( $term, $department, $level, $credits ), 'strlen' ) );
 
-$instructor_id = (int) $field( 'nano_instructor' );
-$ta_id         = (int) $field( 'nano_ta' );
-$instructor_id = ( $instructor_id && 'publish' === get_post_status( $instructor_id ) ) ? $instructor_id : 0;
-$ta_id         = ( $ta_id && 'publish' === get_post_status( $ta_id ) ) ? $ta_id : 0;
+// Instructors — the field is multiple (co-teaching), but legacy values are a
+// single scalar ID: normalize either shape to an array of published people.
+$instructor_raw = $field( 'nano_instructor' );
+$instructor_ids = array_values(
+	array_filter(
+		array_map( 'intval', is_array( $instructor_raw ) ? $instructor_raw : array( $instructor_raw ) ),
+		function ( $id ) {
+			return $id && 'publish' === get_post_status( $id );
+		}
+	)
+);
+$ta_id = (int) $field( 'nano_ta' );
+$ta_id = ( $ta_id && 'publish' === get_post_status( $ta_id ) ) ? $ta_id : 0;
 
 $description = $field( 'nano_description' );
 
@@ -85,12 +94,22 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 		</p>
 	<?php endif; ?>
 
-	<?php if ( $instructor_id || $ta_id ) : ?>
+	<?php if ( $instructor_ids || $ta_id ) : ?>
 		<ul class="nano-class-page__people" role="list">
-			<?php if ( $instructor_id ) : ?>
+			<?php if ( $instructor_ids ) : ?>
 				<li class="nano-class-page__person">
-					<span class="nano-class-page__role"><?php esc_html_e( 'Instructor', 'nano' ); ?></span>
-					<a href="<?php echo esc_url( get_permalink( $instructor_id ) ); ?>"><?php echo esc_html( get_the_title( $instructor_id ) ); ?></a>
+					<span class="nano-class-page__role"><?php echo esc_html( _n( 'Instructor', 'Instructors', count( $instructor_ids ), 'nano' ) ); ?></span>
+					<?php
+					// Comma-separated links — a single instructor renders
+					// exactly as before (one link, no separators).
+					$nano_links = array_map(
+						function ( $id ) {
+							return '<a href="' . esc_url( get_permalink( $id ) ) . '">' . esc_html( get_the_title( $id ) ) . '</a>';
+						},
+						$instructor_ids
+					);
+					echo implode( ', ', $nano_links ); // phpcs:ignore WordPress.Security.EscapeOutput -- built escaped above
+					?>
 				</li>
 			<?php endif; ?>
 			<?php if ( $ta_id ) : ?>
