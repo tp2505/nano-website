@@ -1,0 +1,20 @@
+/*
+ * Block-editor chrome fixes for the Meta Boxes pane (where ACF groups dock).
+ *
+ * The editor keeps the pane's open height as a persisted preference and
+ * applies it as an inline height. Dragged (or corrupted) to near zero, the
+ * pane then reopens to nothing on every visit — with long post content the
+ * fields become effectively unreachable, and the only recovery is catching
+ * the 1px resize handle. min-height clamps the inline height whenever the
+ * pane is actually expanded, so it always opens to a usable size; the liner
+ * keeps its own scrollbar, independent of the content canvas. The collapsed
+ * "Meta Boxes" strip is untouched (that state is deliberate and clickable),
+ * and on WP versions without this pane markup the rules are inert.
+ */
+.edit-post-meta-boxes-main:has(.edit-post-meta-boxes-main__presenter button[aria-expanded="true"]) {
+	min-height: min(320px, 50vh);
+	max-height: 85vh;
+}
+.edit-post-meta-boxes-main__liner {
+	overscroll-behavior: contain;
+}

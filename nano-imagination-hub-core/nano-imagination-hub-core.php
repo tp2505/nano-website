@@ -75,6 +75,16 @@ function nano_core_enqueue_editor_assets() {
 		'window.nanoCoreEditor = ' . wp_json_encode( array( 'blocks' => $blocks ) ) . ';',
 		'before'
 	);
+
+	// Meta Boxes pane fixes — keep the ACF groups reachable regardless of
+	// content length (see assets/editor.css).
+	$css = NANO_CORE_DIR . 'assets/editor.css';
+	wp_enqueue_style(
+		'nano-core-editor',
+		NANO_CORE_URL . 'assets/editor.css',
+		array(),
+		file_exists( $css ) ? filemtime( $css ) : NANO_CORE_VERSION
+	);
 }
 add_action( 'enqueue_block_editor_assets', 'nano_core_enqueue_editor_assets' );
 
