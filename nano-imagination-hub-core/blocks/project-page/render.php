@@ -20,11 +20,13 @@ if ( ! $post_id ) {
 
 $media = function_exists( 'nano_media' ) ? nano_media( $post_id ) : array();
 
-// Description: the post body, falling back to the excerpt.
-$desc = get_the_content();
-if ( '' === trim( wp_strip_all_tags( $desc ) ) ) {
-	$desc = get_the_excerpt();
-}
+// Article body: the post content, rendered through the core content pipeline
+// (blocks/formatting/embeds work — same treatment as class/event/initiative
+// long-form). Falls back to the plain-text excerpt (the card lead) only when
+// the body is empty; nothing is ever discarded — news has no description
+// field to shadow the content.
+$body    = trim( (string) get_post_field( 'post_content', $post_id ) );
+$excerpt = '' === $body ? get_the_excerpt() : '';
 
 $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news--grid nano-project-page' ) );
 ?>
@@ -50,9 +52,13 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 		</div>
 	<?php endif; ?>
 
-	<?php if ( $desc ) : ?>
+	<?php if ( '' !== $body ) : ?>
 		<div class="nano-project-page__body">
-			<?php echo wp_kses_post( wpautop( $desc ) ); ?>
+			<?php echo apply_filters( 'the_content', $body ); // phpcs:ignore WordPress.Security.EscapeOutput -- core content pipeline ?>
+		</div>
+	<?php elseif ( $excerpt ) : ?>
+		<div class="nano-project-page__body">
+			<?php echo wp_kses_post( wpautop( $excerpt ) ); ?>
 		</div>
 	<?php endif; ?>
 </section>
