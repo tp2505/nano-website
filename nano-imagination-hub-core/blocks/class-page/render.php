@@ -38,9 +38,12 @@ $instructor_id = ( $instructor_id && 'publish' === get_post_status( $instructor_
 $ta_id         = ( $ta_id && 'publish' === get_post_status( $ta_id ) ) ? $ta_id : 0;
 
 $description = $field( 'nano_description' );
-if ( '' === trim( (string) $description ) ) {
-	$description = get_the_content();
-}
+
+// Long-form body — the post content editor, rendered below the description
+// through the core content pipeline (blocks/formatting work). Optional;
+// empty renders nothing. No longer doubles as the description fallback, so
+// it can never render twice.
+$long_form = trim( (string) get_post_field( 'post_content', $post_id ) );
 
 $syllabus = function_exists( 'nano_class_syllabus' ) ? nano_class_syllabus( $post_id ) : null;
 
@@ -102,6 +105,12 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 	<?php if ( $description ) : ?>
 		<div class="nano-class-page__body">
 			<?php echo wp_kses_post( wpautop( $description ) ); ?>
+		</div>
+	<?php endif; ?>
+
+	<?php if ( '' !== $long_form ) : ?>
+		<div class="nano-class-page__content">
+			<?php echo apply_filters( 'the_content', $long_form ); // phpcs:ignore WordPress.Security.EscapeOutput -- core content pipeline ?>
 		</div>
 	<?php endif; ?>
 

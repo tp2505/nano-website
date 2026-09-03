@@ -1589,6 +1589,16 @@ a.nano-initiative__media:hover,
 	line-height: 1.55;
 }
 .nano-class-page__body p { margin: 0 0 1em; }
+/* Long-form body (the post content editor) below the lead-size description —
+   body sizing like the Initiative page's long-form; absent when empty. */
+.nano-class-page__content,
+.nano-event-page__content {
+	max-width: 52rem;
+	margin-top: var(--wp--preset--spacing--40);
+	line-height: 1.6;
+}
+.nano-class-page__content p,
+.nano-event-page__content p { margin: 0 0 1em; }
 .nano-class-page__syllabus { margin-top: var(--wp--preset--spacing--40); }
 .nano-class-page__syllabus-link {
 	display: inline-block;
