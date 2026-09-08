@@ -20,6 +20,34 @@ if ( ! $post_id ) {
 
 $media = function_exists( 'nano_media' ) ? nano_media( $post_id ) : array();
 
+// Linked event — its date, venue, and people render here, pulled live from
+// the event record (never duplicated onto the news item). The news item
+// keeps its own headline, body, and image; nothing renders when no event is
+// linked or the event is unpublished.
+$event_id = function_exists( 'nano_field' ) ? (int) nano_field( 'nano_event', $post_id ) : 0;
+if ( $event_id && ( 'event' !== get_post_type( $event_id ) || 'publish' !== get_post_status( $event_id ) ) ) {
+	$event_id = 0;
+}
+$event_facts  = '';
+$event_people = array();
+if ( $event_id ) {
+	$facts    = array();
+	$date_raw = (string) nano_field( 'nano_date', $event_id );
+	if ( $date_raw ) {
+		$dt      = DateTime::createFromFormat( 'Ymd', $date_raw );
+		$facts[] = $dt ? $dt->format( 'F j, Y' ) : $date_raw;
+	}
+	$venue = trim( (string) nano_field( 'nano_venue', $event_id ) );
+	if ( '' !== $venue ) {
+		$facts[] = $venue;
+	}
+	$event_facts = implode( ' · ', $facts );
+
+	// The event's people render in the shared People row of the Related
+	// section (nano/related merges them in) — same position and component
+	// as on the event page itself.
+}
+
 // Article body: the post content, rendered through the core content pipeline
 // (blocks/formatting/embeds work — same treatment as class/event/initiative
 // long-form). Falls back to the plain-text excerpt (the card lead) only when
@@ -46,6 +74,13 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 		</div>
 	</header>
 
+	<?php if ( '' !== $event_facts ) : ?>
+		<?php // Same muted-caps line as the event page's own date, linking to the event. ?>
+		<p class="nano-event-page__date nano-project-page__eventfacts">
+			<a href="<?php echo esc_url( get_permalink( $event_id ) ); ?>"><?php echo esc_html( $event_facts ); ?></a>
+		</p>
+	<?php endif; ?>
+
 	<?php if ( ! empty( $media['type'] ) && ! empty( $media['url'] ) ) : ?>
 		<div class="nano-project-page__feature">
 			<?php echo nano_render_media( $media, array( 'sizes' => '(max-width: 781px) 100vw, 66vw' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
@@ -61,5 +96,6 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 			<?php echo wp_kses_post( wpautop( $excerpt ) ); ?>
 		</div>
 	<?php endif; ?>
+
 </section>
 <?php

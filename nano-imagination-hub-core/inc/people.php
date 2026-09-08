@@ -53,6 +53,60 @@ if ( ! function_exists( 'nano_sort_people' ) ) {
 	}
 }
 
+if ( ! function_exists( 'nano_render_people_links' ) ) {
+	/**
+	 * Echo the shared people-links list (small photo + name + role, each
+	 * linking to the person's page) — the component the Related section uses
+	 * on Event/News/Class pages, and the news page uses for a linked event's
+	 * people, so people render identically everywhere.
+	 *
+	 * @param int[] $people_ids Person post IDs (published ones render).
+	 */
+	function nano_render_people_links( $people_ids ) {
+		$people_ids = array_values(
+			array_filter(
+				array_map( 'intval', (array) $people_ids ),
+				function ( $id ) {
+					return $id && 'publish' === get_post_status( $id );
+				}
+			)
+		);
+		if ( ! $people_ids ) {
+			return;
+		}
+		?>
+		<ul class="nano-people-links" role="list">
+			<?php
+			foreach ( $people_ids as $pid ) :
+				$photo = (int) get_post_thumbnail_id( $pid );
+				if ( ! $photo && function_exists( 'nano_field' ) ) {
+					$photo = (int) nano_field( 'nano_photo', $pid );
+				}
+				$role = function_exists( 'nano_field' ) ? nano_field( 'nano_role', $pid ) : '';
+				?>
+				<li class="nano-people-links__item">
+					<a class="nano-people-links__link" href="<?php echo esc_url( get_permalink( $pid ) ); ?>">
+						<span class="nano-people-links__photo">
+							<?php
+							if ( $photo ) {
+								echo wp_get_attachment_image( $photo, 'thumbnail', false, array( 'class' => 'nano-media nano-media--image', 'loading' => 'lazy' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
+							}
+							?>
+						</span>
+						<span class="nano-people-links__text">
+							<span class="nano-people-links__name"><?php echo esc_html( get_the_title( $pid ) ); ?></span>
+							<?php if ( $role ) : ?>
+								<span class="nano-people-links__role"><?php echo esc_html( $role ); ?></span>
+							<?php endif; ?>
+						</span>
+					</a>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+		<?php
+	}
+}
+
 if ( ! function_exists( 'nano_content_people_map' ) ) {
 	/**
 	 * Map of every published Event/News/Class to the person ids it references,

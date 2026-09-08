@@ -776,6 +776,11 @@ svg path[vector-effect="non-scaling-stroke"],
 	font-size: var(--wp--preset--font-size--lead); /* matches the Newsletter intro on the homepage */
 	line-height: 1.45;
 }
+/* Linked-event facts on a news page: same muted-caps line as the event page's
+   date; the whole line links to the event without reading like a link. (The
+   event's people render inside the Related section's People row.) */
+.nano-project-page__eventfacts a { color: inherit; text-decoration: none; }
+.nano-project-page__eventfacts a:hover { text-decoration: underline; }
 .nano-initiative-page__intro p,
 .nano-project-page__intro p { margin: 0; }
 .nano-initiative-page__intro p + p,

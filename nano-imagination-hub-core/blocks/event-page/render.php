@@ -37,6 +37,10 @@ if ( $date_raw ) {
 	$dt       = DateTime::createFromFormat( 'Ymd', (string) $date_raw );
 	$date_out = $dt ? $dt->format( 'F j, Y' ) : (string) $date_raw;
 }
+// Venue joins the date line ("May 28, 2026 · ACT Cube"); either part renders
+// alone when the other is unset.
+$venue = function_exists( 'nano_field' ) ? trim( (string) nano_field( 'nano_venue', $post_id ) ) : '';
+$date_out = implode( ' · ', array_filter( array( $date_out, $venue ) ) );
 
 $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news--grid nano-event-page' ) );
 ?>

@@ -23,6 +23,18 @@ $people  = function_exists( 'nano_field' ) ? nano_field( 'nano_people', $post_id
 $related = is_array( $related ) ? array_filter( array_map( 'intval', $related ) ) : array();
 $people  = is_array( $people ) ? array_filter( array_map( 'intval', $people ) ) : array();
 
+// News with a linked event: the event's people join this People row (event's
+// first, deduped) — pulled live from the event record, same position and
+// component as on the event page itself, never duplicated onto the news item.
+if ( 'news' === get_post_type( $post_id ) && function_exists( 'nano_field' ) ) {
+	$nano_event_id = (int) nano_field( 'nano_event', $post_id );
+	if ( $nano_event_id && 'event' === get_post_type( $nano_event_id ) && 'publish' === get_post_status( $nano_event_id ) ) {
+		$nano_event_people = nano_field( 'nano_people', $nano_event_id );
+		$nano_event_people = is_array( $nano_event_people ) ? array_filter( array_map( 'intval', $nano_event_people ) ) : array();
+		$people            = array_values( array_unique( array_merge( $nano_event_people, $people ) ) );
+	}
+}
+
 // Keep only published items.
 $related = array_values(
 	array_filter(
@@ -63,38 +75,11 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-related' ) );
 		</div>
 	<?php endif; ?>
 
-	<?php if ( $people ) : ?>
+	<?php if ( $people && function_exists( 'nano_render_people_links' ) ) : ?>
 		<div class="nano-about__row nano-related__row">
 			<h2 class="nano-label">People</h2>
 			<div class="nano-about__body">
-				<ul class="nano-people-links" role="list">
-					<?php
-					foreach ( $people as $pid ) :
-						$photo = (int) get_post_thumbnail_id( $pid );
-						if ( ! $photo && function_exists( 'nano_field' ) ) {
-							$photo = (int) nano_field( 'nano_photo', $pid );
-						}
-						$role = function_exists( 'nano_field' ) ? nano_field( 'nano_role', $pid ) : '';
-						?>
-						<li class="nano-people-links__item">
-							<a class="nano-people-links__link" href="<?php echo esc_url( get_permalink( $pid ) ); ?>">
-								<span class="nano-people-links__photo">
-									<?php
-									if ( $photo ) {
-										echo wp_get_attachment_image( $photo, 'thumbnail', false, array( 'class' => 'nano-media nano-media--image', 'loading' => 'lazy' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
-									}
-									?>
-								</span>
-								<span class="nano-people-links__text">
-									<span class="nano-people-links__name"><?php echo esc_html( get_the_title( $pid ) ); ?></span>
-									<?php if ( $role ) : ?>
-										<span class="nano-people-links__role"><?php echo esc_html( $role ); ?></span>
-									<?php endif; ?>
-								</span>
-							</a>
-						</li>
-					<?php endforeach; ?>
-				</ul>
+				<?php nano_render_people_links( $people ); ?>
 			</div>
 		</div>
 	<?php endif; ?>
