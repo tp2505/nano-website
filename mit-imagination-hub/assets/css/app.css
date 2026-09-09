@@ -1227,6 +1227,9 @@ a.nano-initiative__media:hover,
 	text-transform: uppercase;
 	color: var(--wp--preset--color--muted);
 }
+/* Venue stacks beneath the date in the same meta style; standing alone (no
+   date) it takes the date's position via the shared class above. */
+.nano-event-page__date + .nano-event-page__venue { margin-top: 0.35rem; }
 .nano-event-page__body {
 	max-width: 52rem;
 	margin-top: var(--wp--preset--spacing--40);
