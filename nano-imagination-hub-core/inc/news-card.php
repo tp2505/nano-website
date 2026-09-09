@@ -154,16 +154,14 @@ if ( ! function_exists( 'nano_render_card' ) ) {
 		// Category name drives the corner bracket. News → its category term;
 		// Event → the Initiative it belongs to (same four names); Class → belongs
 		// to Pedagogies, and shows its term in place of a category.
-		$instructor = '';
+		$department = '';
 		if ( 'class' === $type ) {
-			$category      = function_exists( 'nano_field' ) ? (string) nano_field( 'nano_term', $post_id ) : '';
-			$cat_slug      = 'pedagogies'; // Classes ride under Pedagogies — same bracket family.
-			$cat_label     = $category;
-			// The field is multiple (co-teaching); the compact card meta line
-			// shows the first instructor — the class page lists them all.
-			$instructor_raw = function_exists( 'nano_field' ) ? nano_field( 'nano_instructor', $post_id ) : 0;
-			$instructor_id  = (int) ( is_array( $instructor_raw ) ? reset( $instructor_raw ) : $instructor_raw );
-			$instructor    = $instructor_id ? get_the_title( $instructor_id ) : '';
+			$category   = function_exists( 'nano_field' ) ? (string) nano_field( 'nano_term', $post_id ) : '';
+			$cat_slug   = 'pedagogies'; // Classes ride under Pedagogies — same bracket family.
+			$cat_label  = $category;
+			// The card meta line shows the department ("FALL 2026 · ART,
+			// CULTURE & TECHNOLOGY"); instructors appear on the class page.
+			$department = function_exists( 'nano_field' ) ? trim( (string) nano_field( 'nano_department', $post_id ) ) : '';
 		} else {
 			if ( 'event' === $type ) {
 				$init_id  = function_exists( 'nano_field' ) ? (int) nano_field( 'nano_initiative', $post_id ) : 0;
@@ -229,8 +227,8 @@ if ( ! function_exists( 'nano_render_card' ) ) {
 					<?php if ( $date_out ) : ?>
 						<time class="nano-card__date"><?php echo esc_html( $date_out ); ?></time>
 					<?php endif; ?>
-					<?php if ( 'class' === $type && $instructor ) : ?>
-						<span class="nano-card__by"><?php echo esc_html( $instructor ); ?></span>
+					<?php if ( 'class' === $type && '' !== $department ) : ?>
+						<span class="nano-card__by"><?php echo esc_html( $department ); ?></span>
 					<?php endif; ?>
 				</div>
 				<h3 class="nano-card__title">
