@@ -38,13 +38,14 @@ renders as a watchable 16:9 player with native controls but the Vimeo chrome
 (title/byline/portrait) hidden, `dnt=1`, no autoplay. Unlisted links work.
 
 On the single event page the slot sits below the date, **separate from the
-Featured image** (which stays the cropped card thumbnail in listings), and
-renders only when explicitly filled. Stills — announcement posters are
-landscape — fill the column at their own ratio, never cropped; an unusually
-tall upload is height-capped and letterboxed on pure white. Gallery media gets
-the same fit-not-crop treatment inside its fixed 16:10 tiles; cards and the
-class banner keep cropping (`cover`) so grids and banners stay even. The class
-banner falls back to the featured image when the slot is empty.
+Featured image** (which stays the card thumbnail in listings), and renders
+only when explicitly filled. Every editorial image container sitewide — the
+event slot, gallery tiles, cards, the class banner, the news feature,
+facility and initiative tiles — is a **fixed 16:9 frame with the media
+filling it (`object-fit: cover`)**, so layouts stay stable regardless of
+what's uploaded. Person photos (4:5) and the About banners are the deliberate
+exceptions. The class banner falls back to the featured image when the slot
+is empty.
 
 ### Manual display order (person, initiative, facility)
 

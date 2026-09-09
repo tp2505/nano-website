@@ -665,7 +665,7 @@ svg path[vector-effect="non-scaling-stroke"],
 }
 .nano-card__media {
 	display: block;
-	aspect-ratio: 16 / 10;
+	aspect-ratio: 16 / 9;
 	overflow: hidden;
 	background: var(--wp--preset--color--surface);
 }
@@ -804,7 +804,7 @@ svg path[vector-effect="non-scaling-stroke"],
    feature image on Initiative pages), then the article body. */
 .nano-project-page__feature {
 	max-width: var(--nano-img-l);
-	aspect-ratio: 16 / 10;
+	aspect-ratio: 16 / 9;
 	overflow: hidden;
 	background: var(--wp--preset--color--surface);
 }
@@ -948,7 +948,7 @@ a.nano-initiative__media:hover,
 .nano-facility__link:hover .nano-facility__caption { text-decoration: underline; }
 .nano-facility__media {
 	display: block;
-	aspect-ratio: 8 / 3; /* half the previous 4:3 height */
+	aspect-ratio: 16 / 9; /* the sitewide editorial frame */
 	overflow: hidden;
 	background: var(--wp--preset--color--surface);
 }
@@ -1152,7 +1152,7 @@ a.nano-initiative__media:hover,
 	gap: var(--wp--preset--spacing--40) var(--wp--preset--spacing--30);
 }
 .nano-cards--sm .nano-card { flex: none; }
-.nano-cards--sm .nano-card__media { aspect-ratio: 16 / 10; }
+.nano-cards--sm .nano-card__media { aspect-ratio: 16 / 9; }
 /* Drop the category bracket + indent at small size — just media + meta + title. */
 .nano-cards--sm .nano-card__caption {
 	margin: 0.6rem 0 0 !important;
@@ -1241,26 +1241,21 @@ a.nano-initiative__media:hover,
 .nano-event-page__body p { margin: 0 0 1em; }
 /* Event top media slot — a still (announcement poster), a short looping clip,
    or a long-form Vimeo player, below the date in a consistent column (same
-   width as the body text). Stills render whole, never cropped: landscape fills
-   the column at its own ratio; an unusually tall upload is height-capped and
-   letterboxed on pure white so it can't stretch the page. Clips and Vimeo sit
-   in a 16:9 frame. */
+   width as the body text). One fixed 16:9 frame like every editorial image
+   container on the site, media filling it (cover) — layouts stay stable
+   regardless of what's uploaded. */
 .nano-event-page__media {
 	margin: var(--wp--preset--spacing--50) 0 0;
 	max-width: 52rem;
-	background: var(--wp--preset--color--base); /* #ffffff — letterbox blends into the page */
+	aspect-ratio: 16 / 9;
+	overflow: hidden;
+	background: var(--wp--preset--color--surface);
 }
 .nano-event-page__media .nano-media {
 	display: block;
 	width: 100%;
-	height: auto;
-	max-height: 40rem;
-	object-fit: contain; /* only bites when the max-height cap does */
-}
-.nano-event-page__media .nano-media--video {
-	aspect-ratio: 16 / 9;
-	max-height: none;
-	height: auto;
+	height: 100%;
+	object-fit: cover;
 }
 /* Long-form Vimeo: a watchable player (native controls), Vimeo chrome hidden
    via the embed params (title/byline/portrait). 16:9 like the clips. */
@@ -1289,15 +1284,13 @@ a.nano-initiative__media:hover,
 .nano-gallery__media {
 	position: relative;
 	display: block;
-	aspect-ratio: 16 / 10;
+	aspect-ratio: 16 / 9;
 	overflow: hidden;
-	background: var(--wp--preset--color--base); /* #ffffff — letterbox blends into the page */
+	background: var(--wp--preset--color--surface);
 }
-/* Gallery media fits whole inside the fixed 16:10 tile (contain, never
-   cropped); the shape mismatch letterboxes on pure white. The tile ratio
-   stays fixed so the two-up grid keeps its rhythm. Cards in listings keep
-   cropping (cover) — fit-not-crop there would make the grids ragged. */
-.nano-gallery__media .nano-media { width: 100%; height: 100%; object-fit: contain; display: block; }
+/* Gallery media fills the fixed 16:9 tile (cover) — the sitewide editorial
+   frame, so the two-up grid keeps its rhythm regardless of what's uploaded. */
+.nano-gallery__media .nano-media { width: 100%; height: 100%; object-fit: cover; display: block; }
 /* Optional one-sentence caption beneath a gallery image or video. */
 .nano-gallery__caption {
 	margin: 0.7rem 0 0;
@@ -1582,7 +1575,7 @@ a.nano-initiative__media:hover,
 .nano-class-page__image {
 	max-width: var(--nano-img-l);
 	margin: var(--wp--preset--spacing--50) 0 var(--wp--preset--spacing--40);
-	aspect-ratio: 16 / 10;
+	aspect-ratio: 16 / 9;
 	overflow: hidden;
 	background: var(--wp--preset--color--surface);
 }
@@ -1687,7 +1680,7 @@ a.nano-initiative__media:hover,
 .nano-initiative--flip { grid-template-columns: 1fr 1.25fr; }
 .nano-initiative--flip .nano-initiative__media { order: 2; }
 .nano-initiative__media {
-	/* same proportions as the screen (set from JS, falls back to 16:9) */
+	/* the sitewide 16:9 editorial frame (was: matched to the screen ratio) */
 	display: block; /* it's a link to the initiative page */
 	/* width must be pinned: a grid item with an aspect-ratio doesn't
 	   auto-stretch in the inline axis, so once align-items: stretch makes a
@@ -1695,7 +1688,7 @@ a.nano-initiative__media:hover,
 	   wider than the column and slide the media under the text at mid
 	   viewport widths. Pinned, the ratio only ever sets the height. */
 	width: 100%;
-	aspect-ratio: var(--nano-screen-ratio, 16 / 9);
+	aspect-ratio: 16 / 9;
 	overflow: hidden;
 	background: var(--wp--preset--color--surface);
 }
@@ -2032,11 +2025,7 @@ a.nano-initiative__media:hover,
 	.nano-footer__cols > .wp-block-column { flex: 0 1 100% !important; width: auto; }
 	.nano-initiative { grid-template-columns: 1fr; gap: var(--wp--preset--spacing--40); }
 	.nano-initiative--flip .nano-initiative__media { order: 0; }
-	/* Keep each video's own proportions instead of cropping its sides to the
-	   portrait screen ratio — the panel takes the video's natural (landscape)
-	   shape, full width and shorter. */
-	.nano-initiative__media { aspect-ratio: auto; }
-	.nano-initiative__media .nano-media { height: auto; }
+	/* (initiative tiles keep the fixed 16:9 editorial frame on phones too) */
 	.nano-newsletter__body { grid-template-columns: 1fr; gap: var(--wp--preset--spacing--40); }
 	.nano-newsletter__intro { max-width: none; }
 	.nano-newsletter__form { justify-self: stretch; }

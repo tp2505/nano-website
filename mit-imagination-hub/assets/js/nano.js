@@ -321,15 +321,6 @@
 		);
 	}
 
-	// Expose the screen's aspect ratio so the initiative media panels can match
-	// the proportions of the screen (kept current on resize / orientation).
-	function setScreenRatio() {
-		document.documentElement.style.setProperty(
-			'--nano-screen-ratio',
-			window.innerWidth + ' / ' + window.innerHeight
-		);
-	}
-
 	// Secondary pages: the compact wordmark fades out as the page scrolls down and
 	// drifts up slower than the scroll (a light parallax), while the hamburger stays
 	// fixed. Tied to scrollY, so scrolling back up restores it. Home is untouched.
@@ -600,7 +591,6 @@
 	}
 
 	function boot() {
-		setScreenRatio();
 		initVimeoHero();
 		initSliders(); // clone slider cards first…
 		init();        // …then observe lazy videos (originals + clones)
@@ -608,7 +598,6 @@
 		initMenuHover();
 		initArchive();
 		initGalleryVideos();
-		window.addEventListener( 'resize', setScreenRatio );
 	}
 
 	if ( document.readyState === 'loading' ) {
