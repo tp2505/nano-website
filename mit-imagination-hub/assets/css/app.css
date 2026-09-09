@@ -1338,7 +1338,8 @@ a.nano-initiative__media:hover,
  * Related section (single News + single Event) + People links.
  * ------------------------------------------------------------------------- */
 .nano-related { margin-top: var(--wp--preset--spacing--70); }
-.nano-related__row + .nano-related__row { margin-top: var(--wp--preset--spacing--60); }
+/* People and Related read as distinct sections, not a continuous run. */
+.nano-related__row + .nano-related__row { margin-top: var(--wp--preset--spacing--70); }
 .nano-related__row .nano-about__body { max-width: none; }
 .nano-people-links {
 	list-style: none;

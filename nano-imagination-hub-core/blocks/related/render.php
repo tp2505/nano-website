@@ -60,6 +60,18 @@ if ( empty( $related ) && empty( $people ) ) {
 $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-related' ) );
 ?>
 <section <?php echo $wrapper; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+	<?php // People first — directly beneath the page's own content, where they
+	// read as belonging to it; Related content last as the most peripheral
+	// element. Each row still renders nothing when empty. ?>
+	<?php if ( $people && function_exists( 'nano_render_people_links' ) ) : ?>
+		<div class="nano-about__row nano-related__row">
+			<h2 class="nano-label">People</h2>
+			<div class="nano-about__body">
+				<?php nano_render_people_links( $people ); ?>
+			</div>
+		</div>
+	<?php endif; ?>
+
 	<?php if ( $related ) : ?>
 		<div class="nano-about__row nano-related__row">
 			<h2 class="nano-label">Related</h2>
@@ -71,15 +83,6 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-related' ) );
 					}
 					?>
 				</ul>
-			</div>
-		</div>
-	<?php endif; ?>
-
-	<?php if ( $people && function_exists( 'nano_render_people_links' ) ) : ?>
-		<div class="nano-about__row nano-related__row">
-			<h2 class="nano-label">People</h2>
-			<div class="nano-about__body">
-				<?php nano_render_people_links( $people ); ?>
 			</div>
 		</div>
 	<?php endif; ?>
