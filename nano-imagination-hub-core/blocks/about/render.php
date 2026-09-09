@@ -144,7 +144,6 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-about' ) );
 							while ( $q->have_posts() ) :
 								$q->the_post();
 								$role     = function_exists( 'nano_field' ) ? nano_field( 'nano_role' ) : '';
-								$bio      = function_exists( 'nano_field' ) ? nano_field( 'nano_bio' ) : '';
 								$photo_id = function_exists( 'nano_field' ) ? (int) nano_field( 'nano_photo' ) : 0;
 								if ( ! $photo_id ) {
 									$photo_id = (int) get_post_thumbnail_id();
@@ -165,9 +164,7 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-about' ) );
 											<p class="nano-person__role"><?php echo esc_html( $role ); ?></p>
 										<?php endif; ?>
 									</a>
-									<?php if ( $bio ) : ?>
-										<p class="nano-person__bio"><?php echo esc_html( $bio ); ?></p>
-									<?php endif; ?>
+									<?php // Bio deliberately not listed — the full bio lives on the person's own page. ?>
 								</li>
 							<?php endwhile; ?>
 						</ul>

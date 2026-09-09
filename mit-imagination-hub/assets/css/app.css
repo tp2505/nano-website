@@ -1124,11 +1124,6 @@ a.nano-initiative__media:hover,
 	text-transform: uppercase;
 	color: var(--wp--preset--color--muted);
 }
-.nano-person__bio {
-	margin: 0.6rem 0 0;
-	font-size: var(--wp--preset--font-size--small); /* same as the event captions */
-	color: var(--wp--preset--color--contrast);
-}
 @media (max-width: 900px) {
 	.nano-about__row { grid-template-columns: 1fr; gap: 1.25rem; } /* label -> content, same as the initiative-page sections */
 	.nano-about__row .nano-label { margin: 0; }
