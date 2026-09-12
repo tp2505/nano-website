@@ -23,11 +23,11 @@ if ( ! $post_id ) {
 
 $description = function_exists( 'nano_field' ) ? nano_field( 'nano_description', $post_id ) : '';
 
-// Long-form body — the post content editor, rendered below the description
-// through the core content pipeline (blocks/formatting work). Optional;
-// empty renders nothing. No longer doubles as the description fallback, so
-// it can never render twice.
-$long_form = trim( (string) get_post_field( 'post_content', $post_id ) );
+// Subtitle — the post content editor, rendered directly below the title
+// through the core content pipeline (italics/links work). Typically a one-
+// or two-line participant listing ("Nomeda & Gediminas Urbonas, in
+// collaboration with…"). Optional; empty renders nothing at all.
+$subtitle = trim( (string) get_post_field( 'post_content', $post_id ) );
 
 $gallery = function_exists( 'nano_gallery_rows' ) ? nano_gallery_rows( $post_id ) : array();
 
@@ -59,6 +59,11 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 		</div>
 	</header>
 
+	<?php if ( '' !== $subtitle ) : ?>
+		<div class="nano-event-page__subtitle">
+			<?php echo apply_filters( 'the_content', $subtitle ); // phpcs:ignore WordPress.Security.EscapeOutput -- core content pipeline ?>
+		</div>
+	<?php endif; ?>
 	<?php if ( $date_out ) : ?>
 		<p class="nano-event-page__date"><?php echo esc_html( $date_out ); ?></p>
 	<?php endif; ?>
@@ -93,11 +98,6 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 		</div>
 	<?php endif; ?>
 
-	<?php if ( '' !== $long_form ) : ?>
-		<div class="nano-event-page__content">
-			<?php echo apply_filters( 'the_content', $long_form ); // phpcs:ignore WordPress.Security.EscapeOutput -- core content pipeline ?>
-		</div>
-	<?php endif; ?>
 
 	<?php if ( $gallery ) : ?>
 		<ul class="nano-gallery" role="list">
