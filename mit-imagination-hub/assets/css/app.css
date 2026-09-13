@@ -785,12 +785,14 @@ svg path[vector-effect="non-scaling-stroke"],
 .nano-project-page__intro p { margin: 0; }
 .nano-initiative-page__intro p + p,
 .nano-project-page__intro p + p { margin-top: 1em; }
-/* Long-form description (the post content editor) below the lead — body
-   sizing like the Event description; absent entirely when content is empty. */
+/* Long-form description (the post content editor) below the lead — same
+   size, leading, and measure as the nano_intro lead above it, so the two
+   read as one continuous text; absent entirely when content is empty. */
 .nano-initiative-page__body {
-	max-width: 52rem;
+	max-width: 58rem;
 	margin: -1.5rem 0 var(--wp--preset--spacing--60);
-	line-height: 1.6;
+	font-size: var(--wp--preset--font-size--lead);
+	line-height: 1.45;
 }
 .nano-initiative-page__intro + .nano-initiative-page__body {
 	/* tuck up under the lead: the intro's own bottom margin already provides
@@ -1169,7 +1171,10 @@ a.nano-initiative__media:hover,
 /* Two-up variant (Initiative pages): full homepage card — the bracketed caption
    with the per-category line + black dot, two to a row. */
 .nano-cards--2col {
-	grid-template-columns: repeat(2, 1fr);
+	/* minmax(0, 1fr), not bare 1fr: 1fr means minmax(auto, 1fr), so one
+	   card's unbreakable content (a long no-wrap meta line) can force its
+	   column wider and every thumbnail in the other column smaller. */
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	column-gap: var(--wp--preset--spacing--40);
 	row-gap: var(--wp--preset--spacing--50);
 }
