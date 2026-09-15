@@ -183,11 +183,18 @@ if ( ! function_exists( 'nano_render_card' ) ) {
 			}
 		}
 
-		$date_raw = function_exists( 'nano_field' ) ? nano_field( 'nano_date', $post_id ) : '';
+		// One US date treatment on every card: written month-first ("May 28,
+		// 2026"), matching the single pages. Events use the shared formatter,
+		// which collapses ranges ("May 28 – 30, 2026"); times stay off cards.
 		$date_out = '';
-		if ( $date_raw ) {
-			$dt       = DateTime::createFromFormat( 'Ymd', (string) $date_raw );
-			$date_out = $dt ? $dt->format( 'm/d/Y' ) : (string) $date_raw;
+		if ( 'event' === $type && function_exists( 'nano_event_when' ) ) {
+			$date_out = nano_event_when( $post_id, false );
+		} else {
+			$date_raw = function_exists( 'nano_field' ) ? nano_field( 'nano_date', $post_id ) : '';
+			if ( $date_raw ) {
+				$dt       = DateTime::createFromFormat( 'Ymd', (string) $date_raw );
+				$date_out = $dt ? $dt->format( 'F j, Y' ) : (string) $date_raw;
+			}
 		}
 
 		// Description sentence — Events and Classes use their description field,

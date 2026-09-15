@@ -19,6 +19,13 @@
  *     media slot. Any stored poster moves into that slot (nano_media_type =
  *     image + nano_image) unless the slot is already filled.
  *
+ * 0.4.0:
+ *   - Events gain a dedicated Page image (nano_page_image, free ratio at the
+ *     top of the single page); the media slot's image type becomes purely the
+ *     card / listing thumbnail and no longer renders on the page. Events whose
+ *     slot holds an image (including the posters 0.3.0 moved there) get it
+ *     copied into nano_page_image so their page display is preserved.
+ *
  * @package Nano\ImaginationHubCore
  */
 
@@ -35,6 +42,7 @@ function nano_core_upgrade() {
 	nano_upgrade_initiative_menu_order();
 	nano_upgrade_backfill_related();
 	nano_upgrade_event_poster_to_media();
+	nano_upgrade_event_page_image();
 	update_option( 'nano_core_upgraded', NANO_CORE_VERSION );
 }
 add_action( 'admin_init', 'nano_core_upgrade' );
@@ -144,5 +152,33 @@ function nano_upgrade_event_poster_to_media() {
 		}
 		delete_post_meta( $event_id, 'nano_announcement_poster' );
 		delete_post_meta( $event_id, '_nano_announcement_poster' );
+	}
+}
+
+/**
+ * Copy each event's media-slot image into the new Page image field (where the
+ * page image isn't already set), so events keep their page-top image now that
+ * the slot's image type renders only in listings.
+ */
+function nano_upgrade_event_page_image() {
+	$ids = get_posts(
+		array(
+			'post_type'   => 'event',
+			'numberposts' => -1,
+			'post_status' => 'any',
+			'fields'      => 'ids',
+		)
+	);
+	foreach ( $ids as $event_id ) {
+		if ( (int) get_post_meta( $event_id, 'nano_page_image', true ) ) {
+			continue; // Already set — don't overwrite.
+		}
+		$slot_image = ( 'image' === get_post_meta( $event_id, 'nano_media_type', true ) )
+			? (int) get_post_meta( $event_id, 'nano_image', true )
+			: 0;
+		if ( $slot_image ) {
+			update_post_meta( $event_id, 'nano_page_image', $slot_image );
+			update_post_meta( $event_id, '_nano_page_image', 'field_nano_event_page_image' );
+		}
 	}
 }

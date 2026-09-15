@@ -31,11 +31,10 @@ if ( $event_id && ( 'event' !== get_post_type( $event_id ) || 'publish' !== get_
 $event_facts  = '';
 $event_people = array();
 if ( $event_id ) {
-	$facts    = array();
-	$date_raw = (string) nano_field( 'nano_date', $event_id );
-	if ( $date_raw ) {
-		$dt      = DateTime::createFromFormat( 'Ymd', $date_raw );
-		$facts[] = $dt ? $dt->format( 'F j, Y' ) : $date_raw;
+	$facts = array();
+	$when  = function_exists( 'nano_event_when' ) ? nano_event_when( $event_id, false ) : '';
+	if ( '' !== $when ) {
+		$facts[] = $when; // Dates only (ranges collapse); times stay off the compact line.
 	}
 	$venue = trim( (string) nano_field( 'nano_venue', $event_id ) );
 	if ( '' !== $venue ) {

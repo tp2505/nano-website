@@ -1593,12 +1593,14 @@ a.nano-initiative__media:hover,
 .nano-class-page__body p { margin: 0 0 1em; }
 /* Long-form body (the post content editor) below the lead-size description —
    body sizing like the Initiative page's long-form; absent when empty. */
-.nano-class-page__content {
+.nano-class-page__content,
+.nano-event-page__content {
 	max-width: 52rem;
 	margin-top: var(--wp--preset--spacing--40);
 	line-height: 1.6;
 }
-.nano-class-page__content p { margin: 0 0 1em; }
+.nano-class-page__content p,
+.nano-event-page__content p { margin: 0 0 1em; }
 /* Event subtitle (the post content editor) directly beneath the title —
    typically a one/two-line participant listing. One step above the lead-size
    description on the type scale; absent entirely when the content is empty. */
@@ -1610,11 +1612,39 @@ a.nano-initiative__media:hover,
 	line-height: 1.25;
 	letter-spacing: -0.01em;
 }
-.nano-event-page__subtitle p { margin: 0; }
-.nano-event-page__subtitle p + p { margin-top: 0.4em; }
+/* Participant credit beneath the subtitle — the event's linked people as
+   names (linked), so who's involved reads immediately; the People section
+   further down carries the photo treatment. */
+.nano-event-page__participants {
+	max-width: 58rem;
+	margin: -1.6rem 0 0; /* pull-up for when it sits directly under the title */
+	font-size: var(--wp--preset--font-size--lead);
+	line-height: 1.45;
+}
+.nano-event-page__participants a { color: inherit; text-decoration: none; }
+.nano-event-page__participants a:hover { text-decoration: underline; }
+.nano-event-page__subtitle + .nano-event-page__participants { margin-top: 0.8rem; }
 /* The date's own pull-up is for sitting directly under the title; after a
-   subtitle it needs normal air instead. */
-.nano-event-page__subtitle + .nano-event-page__date { margin-top: 1.4rem; }
+   subtitle or the participant credit it needs normal air instead. */
+.nano-event-page__subtitle + .nano-event-page__date,
+.nano-event-page__participants + .nano-event-page__date { margin-top: 1.4rem; }
+/* Page image — free ratio at the body-text width: the natural proportions of
+   whatever was uploaded (often a vertical announcement poster), height
+   following the width. Deliberately NOT the 16:9 editorial frame — that
+   standardisation is for LISTINGS (the card image keeps grids uniform); the
+   page-top image is a different job. Do not "correct" this to 16:9. */
+.nano-event-page__pageimage {
+	max-width: 52rem;
+	margin: var(--wp--preset--spacing--50) 0 0;
+}
+.nano-event-page__pageimage .nano-media {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+/* Sponsors on an event page sit tighter than the Support-us band (which has
+   its own page-bottom padding). */
+.nano-event-page .nano-sponsors { margin-top: var(--wp--preset--spacing--60); padding-bottom: 0; }
 .nano-class-page__syllabus { margin-top: var(--wp--preset--spacing--40); }
 .nano-class-page__syllabus-link {
 	display: inline-block;

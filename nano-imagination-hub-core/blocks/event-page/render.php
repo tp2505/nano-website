@@ -23,23 +23,42 @@ if ( ! $post_id ) {
 
 $description = function_exists( 'nano_field' ) ? nano_field( 'nano_description', $post_id ) : '';
 
-// Subtitle — the post content editor, rendered directly below the title
-// through the core content pipeline (italics/links work). Typically a one-
-// or two-line participant listing ("Nomeda & Gediminas Urbonas, in
-// collaboration with…"). Optional; empty renders nothing at all.
-$subtitle = trim( (string) get_post_field( 'post_content', $post_id ) );
+// Subtitle — its own field (headline group, after the title in the editor).
+// Optional; empty renders nothing at all.
+$subtitle = function_exists( 'nano_field' ) ? trim( (string) nano_field( 'nano_subtitle', $post_id ) ) : '';
+
+// Participants credited beneath the subtitle — the SAME people linked on the
+// event (nano_people), shown as names so a reader sees who's involved
+// immediately; the People section further down lists them with photos.
+$participants = function_exists( 'nano_field' ) ? nano_field( 'nano_people', $post_id ) : array();
+$participants = array_values(
+	array_filter(
+		array_map( 'intval', is_array( $participants ) ? $participants : array() ),
+		function ( $id ) {
+			return $id && 'publish' === get_post_status( $id );
+		}
+	)
+);
+
+// Long-form body — the post content editor, rendered below the description
+// through the core content pipeline. Optional; empty renders nothing.
+$long_form = trim( (string) get_post_field( 'post_content', $post_id ) );
 
 $gallery = function_exists( 'nano_gallery_rows' ) ? nano_gallery_rows( $post_id ) : array();
 
-$date_raw = function_exists( 'nano_field' ) ? nano_field( 'nano_date', $post_id ) : '';
-$date_out = '';
-if ( $date_raw ) {
-	$dt       = DateTime::createFromFormat( 'Ymd', (string) $date_raw );
-	$date_out = $dt ? $dt->format( 'F j, Y' ) : (string) $date_raw;
-}
+// Date(s) and times — start date, optional end date and daily times, in US
+// format with redundant parts collapsed ("May 28 – 30, 2026, 9:00 am – 5:00 pm").
+$date_out = function_exists( 'nano_event_when' ) ? nano_event_when( $post_id ) : '';
 // Venue renders on its own meta line beneath the date; either renders alone
 // when the other is unset, nothing when both are empty.
 $venue = function_exists( 'nano_field' ) ? trim( (string) nano_field( 'nano_venue', $post_id ) ) : '';
+
+// Page image — free ratio at the body-text width, deliberately NOT the 16:9
+// listing frame: the card image (featured image / media slot) keeps grids
+// uniform, while the page-top image takes whatever shape the artwork has
+// (often a vertical announcement poster). No fallback to the card image —
+// the two stay clearly separate; empty renders nothing.
+$page_image = function_exists( 'nano_field' ) ? (int) nano_field( 'nano_page_image', $post_id ) : 0;
 
 $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news--grid nano-event-page' ) );
 ?>
@@ -60,9 +79,20 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 	</header>
 
 	<?php if ( '' !== $subtitle ) : ?>
-		<div class="nano-event-page__subtitle">
-			<?php echo apply_filters( 'the_content', $subtitle ); // phpcs:ignore WordPress.Security.EscapeOutput -- core content pipeline ?>
-		</div>
+		<p class="nano-event-page__subtitle"><?php echo esc_html( $subtitle ); ?></p>
+	<?php endif; ?>
+	<?php if ( $participants ) : ?>
+		<p class="nano-event-page__participants">
+			<?php
+			$nano_names = array_map(
+				function ( $id ) {
+					return '<a href="' . esc_url( get_permalink( $id ) ) . '">' . esc_html( get_the_title( $id ) ) . '</a>';
+				},
+				$participants
+			);
+			echo implode( ', ', $nano_names ); // phpcs:ignore WordPress.Security.EscapeOutput -- built escaped above
+			?>
+		</p>
 	<?php endif; ?>
 	<?php if ( $date_out ) : ?>
 		<p class="nano-event-page__date"><?php echo esc_html( $date_out ); ?></p>
@@ -71,17 +101,21 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 		<p class="nano-event-page__date nano-event-page__venue"><?php echo esc_html( $venue ); ?></p>
 	<?php endif; ?>
 
+	<?php if ( $page_image ) : ?>
+		<figure class="nano-event-page__pageimage">
+			<?php echo wp_get_attachment_image( $page_image, 'large', false, array( 'class' => 'nano-media nano-media--image', 'sizes' => '(max-width: 781px) 100vw, 52rem', 'loading' => 'eager' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+		</figure>
+	<?php endif; ?>
+
 	<?php
-	// Top media slot — the standard rule: a still (e.g. the announcement
-	// poster, shown whole, never cropped), a short looping clip, or a Vimeo
-	// player for long-form video (lecture recordings exceed the upload cap).
-	// nano_media()'s image branch falls back to the featured image, which is
-	// right for tiles — but here the featured image stays the card thumbnail,
-	// so the slot renders only when explicitly filled.
+	// Media slot, video / Vimeo only: a short looping clip or the chrome-
+	// hidden Vimeo player (long-form recordings). The slot's IMAGE type is the
+	// card / listing thumbnail and no longer renders here — the page-top image
+	// is the dedicated Page image field above.
 	$top_media = array( 'type' => '' );
 	if ( function_exists( 'nano_media' ) && function_exists( 'nano_render_media' ) ) {
 		$top_media = nano_media( $post_id );
-		if ( 'image' === $top_media['type'] && ! (int) nano_field( 'nano_image', $post_id ) ) {
+		if ( 'video' !== $top_media['type'] && 'vimeo' !== $top_media['type'] ) {
 			$top_media = array( 'type' => '' );
 		}
 	}
@@ -98,6 +132,17 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 		</div>
 	<?php endif; ?>
 
+	<?php if ( '' !== $long_form ) : ?>
+		<div class="nano-event-page__content">
+			<?php echo apply_filters( 'the_content', $long_form ); // phpcs:ignore WordPress.Security.EscapeOutput -- core content pipeline ?>
+		</div>
+	<?php endif; ?>
+
+	<?php
+	// Sponsors — the same repeater + block the Support-us page uses (the block
+	// reads the current post, here the event). Renders nothing when empty.
+	echo do_blocks( '<!-- wp:nano/sponsors /-->' ); // phpcs:ignore WordPress.Security.EscapeOutput
+	?>
 
 	<?php if ( $gallery ) : ?>
 		<ul class="nano-gallery" role="list">

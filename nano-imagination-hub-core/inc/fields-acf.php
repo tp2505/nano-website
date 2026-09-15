@@ -147,9 +147,11 @@ function nano_register_acf_fields() {
 
 	// Shared reference fields (Initiative link + manual Related + People), reused
 	// by News and Event. Keys are prefixed per group; field names stay identical
-	// so the accessor reads them the same way.
-	$ref_fields = function ( $prefix ) {
-		return array(
+	// so the accessor reads them the same way. Event passes $include_people =
+	// false: its People field lives in the headline group after the title
+	// instead (same key, so stored values carry over).
+	$ref_fields = function ( $prefix, $include_people = true ) {
+		$fields = array(
 			array(
 				'key'           => "field_{$prefix}_initiative",
 				'label'         => 'Initiative',
@@ -186,6 +188,10 @@ function nano_register_acf_fields() {
 				'instructions'  => 'Linked artists / people for the Related section (manual).',
 			),
 		);
+		if ( ! $include_people ) {
+			array_pop( $fields );
+		}
+		return $fields;
 	};
 
 	// News.
@@ -235,6 +241,48 @@ function nano_register_acf_fields() {
 		)
 	);
 
+	// Event — headline fields. Positioned acf_after_title so they sit with the
+	// title on the edit screen, not down in the Meta Boxes panel: subtitle and
+	// the participant credit belong where the editor is already typing. The
+	// People field keeps its original key (field_event_ref_people), so values
+	// saved when it lived in the details group below carry over unchanged.
+	acf_add_local_field_group(
+		array(
+			'key'        => 'group_nano_event_headline',
+			'title'      => 'Headline',
+			'location'   => array(
+				array(
+					array(
+						'param'    => 'post_type',
+						'operator' => '==',
+						'value'    => 'event',
+					),
+				),
+			),
+			'menu_order' => -1,
+			'position'   => 'acf_after_title',
+			'fields'     => array(
+				array(
+					'key'          => 'field_nano_event_subtitle',
+					'label'        => 'Subtitle',
+					'name'         => 'nano_subtitle',
+					'type'         => 'text',
+					'instructions' => 'Optional secondary line directly beneath the title, e.g. the project or series name.',
+				),
+				array(
+					'key'           => 'field_event_ref_people',
+					'label'         => 'Participants',
+					'name'          => 'nano_people',
+					'type'          => 'relationship',
+					'post_type'     => array( 'person' ),
+					'filters'       => array( 'search' ),
+					'return_format' => 'id',
+					'instructions'  => 'The people involved. Credited by name beneath the subtitle, and listed with photos in the People section further down the page.',
+				),
+			),
+		)
+	);
+
 	// Event.
 	acf_add_local_field_group(
 		array(
@@ -255,13 +303,42 @@ function nano_register_acf_fields() {
 				array(
 					array(
 						'key'            => 'field_nano_event_date',
-						'label'          => 'Date',
+						'label'          => 'Start date',
 						'name'           => 'nano_date',
 						'type'           => 'date_picker',
-						'display_format' => 'd.m.Y',
+						'display_format' => 'm/d/Y',
 						'return_format'  => 'Ymd',
 						'first_day'      => 1,
+						'required'       => 1,
 						'instructions'   => 'Shown on the card; also used to sort.',
+					),
+					array(
+						'key'            => 'field_nano_event_date_end',
+						'label'          => 'End date',
+						'name'           => 'nano_date_end',
+						'type'           => 'date_picker',
+						'display_format' => 'm/d/Y',
+						'return_format'  => 'Ymd',
+						'first_day'      => 1,
+						'instructions'   => 'Optional — for multi-day events. Renders as a range, e.g. “May 28 – 30, 2026”.',
+					),
+					array(
+						'key'            => 'field_nano_event_time_start',
+						'label'          => 'Start time',
+						'name'           => 'nano_time_start',
+						'type'           => 'time_picker',
+						'display_format' => 'g:i a',
+						'return_format'  => 'H:i:s',
+						'instructions'   => 'Optional. For a date range, times apply to each day.',
+					),
+					array(
+						'key'            => 'field_nano_event_time_end',
+						'label'          => 'End time',
+						'name'           => 'nano_time_end',
+						'type'           => 'time_picker',
+						'display_format' => 'g:i a',
+						'return_format'  => 'H:i:s',
+						'instructions'   => 'Optional, e.g. renders “6:00–8:00 pm”.',
 					),
 					array(
 						'key'          => 'field_nano_event_venue',
@@ -270,13 +347,22 @@ function nano_register_acf_fields() {
 						'type'         => 'text',
 						'instructions' => 'Optional, e.g. “ACT Cube” or “MIT.nano Immersion Lab”. Shown beside the date on the event page and on any news item linked to this event.',
 					),
+					array(
+						'key'           => 'field_nano_event_page_image',
+						'label'         => 'Page image',
+						'name'          => 'nano_page_image',
+						'type'          => 'image',
+						'return_format' => 'id',
+						'preview_size'  => 'medium',
+						'library'       => 'all',
+						'instructions'  => 'Shown at the top of the event page at its natural proportions — any shape works (vertical poster, square, wide). Separate from the card image: listings always use the Featured image / media slot at 16:9. Empty = no page image.',
+					),
 				),
-				// The event's top media slot: the standard image-or-clip rule,
-				// plus Vimeo for long-form video (lecture recordings exceed the
-				// 50 MB upload cap). Shown below the date on the event page —
-				// stills (announcement posters) render whole, never cropped.
-				// Separate from the Featured image, which stays the card
-				// thumbnail in listings. Empty = nothing renders.
+				// The event's media slot: image = the card / listing thumbnail
+				// (16:9 crop, alongside the Featured image); a short clip or a
+				// Vimeo link (long-form video exceeds the 50 MB upload cap)
+				// additionally plays on the event page. The page-top image is
+				// the separate Page image field above.
 				$media_fields( 'event', true ),
 				array(
 					array(
@@ -301,7 +387,7 @@ function nano_register_acf_fields() {
 						'instructions'  => 'Photos and videos, shown two-up in the order set here (drag to reorder). Videos play on click. Click an item to edit its caption and alt text in the sidebar; for a video, the sidebar also has a “Poster (still)” field for the image shown before playback.',
 					),
 				),
-				$ref_fields( 'event_ref' )
+				$ref_fields( 'event_ref', false )
 			),
 		)
 	);
@@ -568,6 +654,15 @@ function nano_register_acf_fields() {
 				),
 			),
 		);
+	// Events carry the same sponsors repeater (same field name, so the same
+	// nano_sponsor_rows() reader serves both): location groups OR together.
+	$support_location[] = array(
+		array(
+			'param'    => 'post_type',
+			'operator' => '==',
+			'value'    => 'event',
+		),
+	);
 	acf_add_local_field_group(
 		array(
 			'key'        => 'group_nano_sponsors',
