@@ -14,6 +14,12 @@ access; no super-admin requirements.
 
 ## Content types (`inc/cpt.php`)
 
+Event, class, and initiative use the **classic editor** (per-type filter in
+`inc/cpt.php`): their structure lives in ACF groups, and the classic screen
+keeps those groups — including the event Headline group placed directly after
+the title — reachable at any content length. News, pages, and everything else
+keep the block editor.
+
 | Type | Slug | Purpose | Key fields (ACF, `inc/fields-acf.php`) |
 |---|---|---|---|
 | **News** | `news` | Editorial feed | `nano_date`, `nano_event` (linked event: its date · venue render under the title and its people join the People row, pulled live from the event), the standard media slot (below), `nano_initiative`, `nano_related`, `nano_people`; `news_category` taxonomy |
