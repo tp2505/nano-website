@@ -220,6 +220,30 @@ add_action( 'init', 'nano_register_facility_post_type' );
 
 
 /**
+ * The field-heavy types (event, class, initiative) use the CLASSIC editor.
+ *
+ * Their post content is a simple long-form body while the real structure
+ * lives in ACF groups — and the block editor buries every meta box in a
+ * collapsible bottom panel and ignores after-title placement. The classic
+ * screen gives all three the same, predictable shape: title, then any
+ * after-title group (the event Headline: subtitle + participants), then a
+ * fixed-size content editor, then the field groups stacked below — all
+ * reachable regardless of content length. Per-post-type: news, pages, and
+ * everything else keep the block editor.
+ *
+ * @param bool   $use_block_editor Whether to use the block editor.
+ * @param string $post_type        Post type being edited.
+ * @return bool
+ */
+function nano_classic_editor_for_field_types( $use_block_editor, $post_type ) {
+	if ( in_array( $post_type, array( 'event', 'class', 'initiative' ), true ) ) {
+		return false;
+	}
+	return $use_block_editor;
+}
+add_filter( 'use_block_editor_for_post_type', 'nano_classic_editor_for_field_types', 10, 2 );
+
+/**
  * Manually-ordered types get an Order column in their admin list (sortable), so
  * an editor can see and check the sequence without opening every post. The
  * value itself is edited in the post's Page Attributes → Order box.
