@@ -1618,7 +1618,8 @@ a.nano-initiative__media:hover,
 .nano-event-page__participants {
 	max-width: 58rem;
 	margin: -1.6rem 0 0; /* pull-up for when it sits directly under the title */
-	font-size: var(--wp--preset--font-size--lead);
+	/* a step above the lead-size description, below the subtitle */
+	font-size: calc(1.15 * var(--wp--preset--font-size--lead));
 	line-height: 1.45;
 }
 .nano-event-page__participants a { color: inherit; text-decoration: none; }
