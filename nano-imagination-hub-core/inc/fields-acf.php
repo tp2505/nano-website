@@ -614,18 +614,42 @@ function nano_register_acf_fields() {
 					// Order box under Page Attributes), the same mechanism
 					// Facilities and People use. Existing nano_order values are
 					// migrated once by inc/upgrade.php.
+					// The Short description lives in the headline group below
+					// (after the title on the classic edit screen).
 				),
-				array(
-						array(
-							'key'          => 'field_nano_init_intro',
-							'label'        => 'Short description',
-							'name'         => 'nano_intro',
-							'type'         => 'textarea',
-							'rows'         => 6,
-							'instructions' => 'Short paragraph shown in the homepage Initiatives row and at the top of the initiative page. The long-form description lives in the main content editor and appears only on the initiative page, below this.',
-						),
-					),
 					$media_fields( 'init' )
+			),
+		)
+	);
+
+	// Initiative — headline field. After the title on the (classic) edit
+	// screen, like the event Headline group: the short description is the
+	// page's lead and belongs with the title, not down among the details.
+	// Keeps its original key so stored values carry over unchanged.
+	acf_add_local_field_group(
+		array(
+			'key'        => 'group_nano_initiative_headline',
+			'title'      => 'Headline',
+			'location'   => array(
+				array(
+					array(
+						'param'    => 'post_type',
+						'operator' => '==',
+						'value'    => 'initiative',
+					),
+				),
+			),
+			'menu_order' => -1,
+			'position'   => 'acf_after_title',
+			'fields'     => array(
+				array(
+					'key'          => 'field_nano_init_intro',
+					'label'        => 'Short description',
+					'name'         => 'nano_intro',
+					'type'         => 'textarea',
+					'rows'         => 4,
+					'instructions' => 'Short paragraph shown in the homepage Initiatives row and at the top of the initiative page. The long-form description lives in the content editor below and appears only on the initiative page, beneath this.',
+				),
 			),
 		)
 	);
