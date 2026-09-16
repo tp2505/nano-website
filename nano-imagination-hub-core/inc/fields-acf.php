@@ -195,6 +195,50 @@ function nano_register_acf_fields() {
 		return $fields;
 	};
 
+	// PDF attachments — flyers, catalogues, syllabi — shared by event, class,
+	// and news. Thumbnail note: hosts with Imagick + Ghostscript get automatic
+	// first-page previews; the manual thumbnail is the fallback elsewhere.
+	$attachment_fields = function ( $prefix, $note = '' ) {
+		return array(
+			array(
+				'key'          => "field_{$prefix}_attachments",
+				'label'        => 'Documents (PDF)',
+				'name'         => 'nano_attachments',
+				'type'         => 'repeater',
+				'layout'       => 'table',
+				'button_label' => 'Add document',
+				'instructions' => 'Flyers, catalogues, syllabi — shown above the gallery with a first-page thumbnail, label, and file size.' . $note,
+				'sub_fields'   => array(
+					array(
+						'key'           => "field_{$prefix}_attachment_file",
+						'label'         => 'PDF',
+						'name'          => 'file',
+						'type'          => 'file',
+						'return_format' => 'id',
+						'mime_types'    => 'pdf',
+						'required'      => 1,
+					),
+					array(
+						'key'          => "field_{$prefix}_attachment_label",
+						'label'        => 'Label',
+						'name'         => 'label',
+						'type'         => 'text',
+						'instructions' => 'Optional — the file\'s title is used when empty.',
+					),
+					array(
+						'key'           => "field_{$prefix}_attachment_thumb",
+						'label'         => 'Thumbnail',
+						'name'          => 'thumb',
+						'type'          => 'image',
+						'return_format' => 'id',
+						'preview_size'  => 'thumbnail',
+						'instructions'  => 'Optional — only needed if the automatic first-page preview is unavailable on this site.',
+					),
+				),
+			),
+		);
+	};
+
 	// News.
 	acf_add_local_field_group(
 		array(
@@ -282,6 +326,7 @@ function nano_register_acf_fields() {
 					),
 				),
 				$media_fields( 'news' ),
+				$attachment_fields( 'news', ' Leave empty to use the linked event’s documents.' ),
 				$ref_fields( 'news_ref', true, ' Leave empty to use the linked event’s people.' )
 			),
 		)
@@ -463,6 +508,9 @@ function nano_register_acf_fields() {
 						'media_upload' => 0,
 						'instructions' => 'Body of the event page.',
 					),
+				),
+				$attachment_fields( 'event' ),
+				array(
 					array(
 						'key'           => 'field_nano_event_gallery',
 						'label'         => 'Gallery',
@@ -631,22 +679,16 @@ function nano_register_acf_fields() {
 					'instructions' => 'Optional. Body of the class page; may describe level/credits in prose.',
 				),
 				array(
-					'key'           => 'field_nano_class_syllabus_file',
-					'label'         => 'Syllabus (PDF)',
-					'name'          => 'nano_syllabus_file',
-					'type'          => 'file',
-					'return_format' => 'array',
-					'mime_types'    => 'pdf',
-					'instructions'  => 'Optional. Upload the syllabus as a PDF — the usual way to share it. The page links straight to this file.',
-				),
-				array(
 					'key'          => 'field_nano_class_syllabus_link',
 					'label'        => 'Syllabus (external link)',
 					'name'         => 'nano_syllabus_link',
 					'type'         => 'link',
 					'return_format' => 'array',
-					'instructions' => 'Optional alternative to the PDF: link to a syllabus published elsewhere. Used only if no PDF is uploaded — leave empty if there is no public page.',
+					'instructions' => 'Optional: link to a syllabus published elsewhere. A syllabus PDF belongs in the Documents repeater below instead.',
 				),
+				),
+				$attachment_fields( 'class' ),
+				array(
 				array(
 					'key'                  => 'field_nano_class_related',
 					'label'                => 'Related content',

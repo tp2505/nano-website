@@ -140,6 +140,11 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 	<?php endif; ?>
 
 	<?php
+	// Documents (PDF attachments) — above the gallery, before the sponsor
+	// credits. Renders nothing when empty.
+	if ( function_exists( 'nano_attachment_rows' ) && function_exists( 'nano_render_attachments' ) ) {
+		nano_render_attachments( nano_attachment_rows( $post_id ) );
+	}
 	// Sponsors — the same repeater + block the Support-us page uses (the block
 	// reads the current post, here the event). Renders nothing when empty.
 	echo do_blocks( '<!-- wp:nano/sponsors /-->' ); // phpcs:ignore WordPress.Security.EscapeOutput

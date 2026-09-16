@@ -97,41 +97,16 @@ if ( ! function_exists( 'nano_get_classes' ) ) {
 
 if ( ! function_exists( 'nano_class_syllabus' ) ) {
 	/**
-	 * Resolve a class's syllabus to a single renderable link, preferring an
-	 * uploaded PDF over an external link. Works whether the fields resolve through
-	 * ACF (arrays) or raw post meta (an attachment ID / a URL string).
+	 * Resolve a class's EXTERNAL syllabus link. Uploaded syllabus PDFs live in
+	 * the shared Documents repeater (nano_attachments) since 0.6.0 — the old
+	 * nano_syllabus_file values were migrated there — so this reads only
+	 * nano_syllabus_link. Works whether the field resolves through ACF (array)
+	 * or raw post meta (a URL string).
 	 *
 	 * @param int $post_id Class ID.
 	 * @return array|null array( 'url', 'is_file', 'mime', 'size', 'title' ) or null.
 	 */
 	function nano_class_syllabus( $post_id ) {
-		$file = function_exists( 'nano_field' ) ? nano_field( 'nano_syllabus_file', $post_id ) : null;
-
-		if ( is_array( $file ) && ! empty( $file['url'] ) ) {
-			return array(
-				'url'     => $file['url'],
-				'is_file' => true,
-				'mime'    => ! empty( $file['subtype'] ) ? strtoupper( $file['subtype'] ) : 'PDF',
-				'size'    => isset( $file['filesize'] ) ? size_format( (int) $file['filesize'] ) : '',
-				'title'   => '',
-			);
-		}
-		if ( is_numeric( $file ) && (int) $file ) {
-			$id  = (int) $file;
-			$url = wp_get_attachment_url( $id );
-			if ( $url ) {
-				$path  = get_attached_file( $id );
-				$bytes = ( $path && file_exists( $path ) ) ? filesize( $path ) : 0;
-				return array(
-					'url'     => $url,
-					'is_file' => true,
-					'mime'    => 'PDF',
-					'size'    => $bytes ? size_format( $bytes ) : '',
-					'title'   => '',
-				);
-			}
-		}
-
 		$link = function_exists( 'nano_field' ) ? nano_field( 'nano_syllabus_link', $post_id ) : null;
 		if ( is_array( $link ) && ! empty( $link['url'] ) ) {
 			return array(

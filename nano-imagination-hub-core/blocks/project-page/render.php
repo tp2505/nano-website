@@ -182,6 +182,15 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 	<?php endif; ?>
 
 	<?php
+	// Documents (PDF attachments): own rows win; blank and linked, the
+	// event's documents show (a flyer belongs with the announcement too).
+	if ( function_exists( 'nano_attachment_rows' ) && function_exists( 'nano_render_attachments' ) ) {
+		$attachment_rows = nano_attachment_rows( $post_id );
+		if ( ! $attachment_rows && $event_id ) {
+			$attachment_rows = nano_attachment_rows( $event_id );
+		}
+		nano_render_attachments( $attachment_rows );
+	}
 	if ( function_exists( 'nano_render_sponsors' ) ) {
 		nano_render_sponsors( $sponsor_rows );
 	}

@@ -134,6 +134,14 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 	<?php endif; ?>
 
 	<?php
+	// Documents (PDF attachments) — includes any migrated syllabus PDF.
+	// Renders nothing when empty.
+	if ( function_exists( 'nano_attachment_rows' ) && function_exists( 'nano_render_attachments' ) ) {
+		nano_render_attachments( nano_attachment_rows( $post_id ) );
+	}
+	?>
+
+	<?php
 	if ( $syllabus ) :
 		if ( $syllabus['is_file'] ) {
 			$bits  = array_filter( array( $syllabus['mime'], $syllabus['size'] ) );

@@ -32,6 +32,11 @@
  *     thumbnail (as 0.4.0 did for events). The same slot-image → page-image
  *     copy runs for news posts.
  *
+ * 0.6.0:
+ *   - Uploaded class syllabi move into the shared Documents repeater
+ *     (nano_attachments, label "Syllabus"); the separate nano_syllabus_file
+ *     field is gone (the external-link variant remains its own field).
+ *
  * @package Nano\ImaginationHubCore
  */
 
@@ -50,6 +55,7 @@ function nano_core_upgrade() {
 	nano_upgrade_event_poster_to_media();
 	nano_upgrade_event_page_image();
 	nano_upgrade_news_page_image();
+	nano_upgrade_syllabus_to_attachments();
 	update_option( 'nano_core_upgraded', NANO_CORE_VERSION );
 }
 add_action( 'admin_init', 'nano_core_upgrade' );
@@ -206,5 +212,42 @@ function nano_upgrade_slot_image_to_page_image( $post_type, $field_key ) {
 			update_post_meta( $event_id, 'nano_page_image', $slot_image );
 			update_post_meta( $event_id, '_nano_page_image', $field_key );
 		}
+	}
+}
+
+/**
+ * Append each class's uploaded syllabus PDF (legacy nano_syllabus_file) to
+ * its Documents repeater as a row labelled "Syllabus", then drop the old
+ * meta. Skips classes whose attachments already contain that file.
+ */
+function nano_upgrade_syllabus_to_attachments() {
+	$ids = get_posts(
+		array(
+			'post_type'   => 'class',
+			'numberposts' => -1,
+			'post_status' => 'any',
+			'fields'      => 'ids',
+		)
+	);
+	foreach ( $ids as $class_id ) {
+		$file = (int) get_post_meta( $class_id, 'nano_syllabus_file', true );
+		if ( $file ) {
+			$count   = (int) get_post_meta( $class_id, 'nano_attachments', true );
+			$already = false;
+			for ( $i = 0; $i < $count; $i++ ) {
+				if ( (int) get_post_meta( $class_id, "nano_attachments_{$i}_file", true ) === $file ) {
+					$already = true;
+					break;
+				}
+			}
+			if ( ! $already ) {
+				update_post_meta( $class_id, "nano_attachments_{$count}_file", $file );
+				update_post_meta( $class_id, "nano_attachments_{$count}_label", 'Syllabus' );
+				update_post_meta( $class_id, 'nano_attachments', $count + 1 );
+				update_post_meta( $class_id, '_nano_attachments', 'field_class_attachments' );
+			}
+		}
+		delete_post_meta( $class_id, 'nano_syllabus_file' );
+		delete_post_meta( $class_id, '_nano_syllabus_file' );
 	}
 }

@@ -1646,6 +1646,64 @@ a.nano-initiative__media:hover,
 /* Sponsors on an event page sit tighter than the Support-us band (which has
    its own page-bottom padding). */
 .nano-event-page .nano-sponsors { margin-top: var(--wp--preset--spacing--60); padding-bottom: 0; }
+/* Documents (PDF attachments) — flyers, catalogues, syllabi with first-page
+   thumbnails. The thumbnails are deliberately FREE RATIO, an exception to the
+   16:9 standardisation (same as the event page image): flyers come portrait
+   and catalogues landscape, and a first page cropped to 16:9 is meaningless.
+   Mixed orientations stay tidy through CONSISTENT HEIGHT, variable width —
+   every thumbnail shares one height so a row aligns on top and bottom edges,
+   with each keeping its natural proportions. Do not "correct" this to 16:9. */
+.nano-attachments { margin-top: var(--wp--preset--spacing--60); }
+.nano-attachments__label { margin-bottom: var(--wp--preset--spacing--50); }
+.nano-attachments__grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--wp--preset--spacing--40);
+	align-items: flex-start;
+}
+.nano-attachment { margin: 0; }
+.nano-attachment__link { display: block; color: inherit; text-decoration: none; }
+.nano-attachment__thumb {
+	display: block;
+	height: clamp(11rem, 8rem + 6vw, 16rem);
+}
+.nano-attachment__thumb .nano-media {
+	display: block;
+	height: 100%;
+	width: auto;
+	border: 1px solid var(--wp--preset--color--line); /* white first pages read as objects */
+}
+/* No preview available: a neutral A4-proportioned card marked PDF. */
+.nano-attachment__thumb--placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	aspect-ratio: 1 / 1.414;
+	background: var(--wp--preset--color--surface);
+	border: 1px solid var(--wp--preset--color--line);
+}
+.nano-attachment__filetype {
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.1em;
+	color: var(--wp--preset--color--muted);
+}
+.nano-attachment__label {
+	display: block;
+	margin-top: 0.7rem;
+	font-weight: 500;
+}
+.nano-attachment__link:hover .nano-attachment__label { text-decoration: underline; }
+.nano-attachment__meta {
+	display: block;
+	margin-top: 0.15rem;
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--muted);
+}
 .nano-class-page__syllabus { margin-top: var(--wp--preset--spacing--40); }
 .nano-class-page__syllabus-link {
 	display: inline-block;
