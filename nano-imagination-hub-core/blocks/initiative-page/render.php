@@ -48,11 +48,12 @@ $news_archive = add_query_arg(
 // Pedagogies is the one Initiative that also hosts Classes. Its "View all"
 // targets the Archive filtered to Type=Classes (Initiative is auto-constrained
 // to Pedagogies there, so no initiative param is needed).
-// The row shows the three newest classes across terms (term-sorted, newest
-// first) — restricting to the single current term left the row with however
-// few classes that term happened to have, sometimes just one.
+// The row always shows the FOUR most recent classes across terms (term-
+// sorted, newest first), current or past — restricting to the current term
+// left the grid short whenever that term had fewer than a full row. Past
+// classes still appear in the archive; this only keeps the grid populated.
 $is_pedagogies   = ( 'pedagogies' === $init_slug );
-$current_classes = ( $is_pedagogies && function_exists( 'nano_get_classes' ) ) ? array_slice( nano_get_classes(), 0, 3 ) : array();
+$current_classes = ( $is_pedagogies && function_exists( 'nano_get_classes' ) ) ? array_slice( nano_get_classes(), 0, 4 ) : array();
 $classes_archive = add_query_arg( array( 'ftype' => 'classes' ), $archive_url );
 
 /**
