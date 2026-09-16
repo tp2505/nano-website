@@ -23,15 +23,14 @@ $people  = function_exists( 'nano_field' ) ? nano_field( 'nano_people', $post_id
 $related = is_array( $related ) ? array_filter( array_map( 'intval', $related ) ) : array();
 $people  = is_array( $people ) ? array_filter( array_map( 'intval', $people ) ) : array();
 
-// News with a linked event: the event's people join this People row (event's
-// first, deduped) — pulled live from the event record, same position and
-// component as on the event page itself, never duplicated onto the news item.
-if ( 'news' === get_post_type( $post_id ) && function_exists( 'nano_field' ) ) {
+// News with a linked event inherits People like every other field: the news
+// item's own list wins when set; empty, the linked event's people show —
+// pulled live from the event record, never duplicated onto the news item.
+if ( empty( $people ) && 'news' === get_post_type( $post_id ) && function_exists( 'nano_field' ) ) {
 	$nano_event_id = (int) nano_field( 'nano_event', $post_id );
 	if ( $nano_event_id && 'event' === get_post_type( $nano_event_id ) && 'publish' === get_post_status( $nano_event_id ) ) {
 		$nano_event_people = nano_field( 'nano_people', $nano_event_id );
-		$nano_event_people = is_array( $nano_event_people ) ? array_filter( array_map( 'intval', $nano_event_people ) ) : array();
-		$people            = array_values( array_unique( array_merge( $nano_event_people, $people ) ) );
+		$people            = is_array( $nano_event_people ) ? array_filter( array_map( 'intval', $nano_event_people ) ) : array();
 	}
 }
 

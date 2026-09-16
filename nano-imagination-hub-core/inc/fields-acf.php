@@ -209,20 +209,9 @@ function nano_register_acf_fields() {
 				),
 			),
 			'menu_order'            => 0,
-			'position'              => 'side',
+			'position'              => 'normal',
 			'fields'                => array_merge(
 				array(
-					array(
-						'key'            => 'field_nano_news_date',
-						'label'          => 'Display date',
-						'name'           => 'nano_date',
-						'type'           => 'date_picker',
-						'display_format' => 'd.m.Y',
-						'return_format'  => 'Ymd',
-						'first_day'      => 1,
-						'instructions'   => 'Shown on the card; also used to sort newest-first.',
-						'required'       => 1,
-					),
 					array(
 						'key'           => 'field_nano_news_event',
 						'label'         => 'Linked event',
@@ -232,11 +221,108 @@ function nano_register_acf_fields() {
 						'return_format' => 'id',
 						'ui'            => 1,
 						'allow_null'    => 1,
-						'instructions'  => 'Optional. The event this news item reports on — its date, venue, and people render on the news page automatically, pulled live from the event. No need to duplicate them here.',
+						'instructions'  => 'Optional. The event this news item reports on. When set, any blank field below (and the subtitle / participants above) shows the event’s value on the news page — enter a value here only to override it.',
+					),
+					array(
+						'key'            => 'field_nano_news_date',
+						'label'          => 'Display date',
+						'name'           => 'nano_date',
+						'type'           => 'date_picker',
+						'display_format' => 'm/d/Y',
+						'return_format'  => 'Ymd',
+						'first_day'      => 1,
+						'instructions'   => 'Shown on the card and used to sort the feed newest-first. On the news page itself, a linked event’s date and times render instead.',
+						'required'       => 1,
+					),
+					array(
+						'key'            => 'field_nano_news_date_end',
+						'label'          => 'End date',
+						'name'           => 'nano_date_end',
+						'type'           => 'date_picker',
+						'display_format' => 'm/d/Y',
+						'return_format'  => 'Ymd',
+						'first_day'      => 1,
+						'instructions'   => 'Optional, for unlinked news about a multi-day happening. A linked event’s dates render instead.',
+					),
+					array(
+						'key'            => 'field_nano_news_time_start',
+						'label'          => 'Start time',
+						'name'           => 'nano_time_start',
+						'type'           => 'time_picker',
+						'display_format' => 'g:i a',
+						'return_format'  => 'H:i:s',
+						'instructions'   => 'Optional. A linked event’s times render instead.',
+					),
+					array(
+						'key'            => 'field_nano_news_time_end',
+						'label'          => 'End time',
+						'name'           => 'nano_time_end',
+						'type'           => 'time_picker',
+						'display_format' => 'g:i a',
+						'return_format'  => 'H:i:s',
+						'instructions'   => 'Optional. A linked event’s times render instead.',
+					),
+					array(
+						'key'          => 'field_nano_news_venue',
+						'label'        => 'Venue',
+						'name'         => 'nano_venue',
+						'type'         => 'text',
+						'instructions' => 'Optional. Leave blank to use the linked event’s venue.',
+					),
+					array(
+						'key'           => 'field_nano_news_page_image',
+						'label'         => 'Page image',
+						'name'          => 'nano_page_image',
+						'type'          => 'image',
+						'return_format' => 'id',
+						'preview_size'  => 'medium',
+						'library'       => 'all',
+						'instructions'  => 'Shown at the top of the news page at its natural proportions — any shape works. Leave blank to use the linked event’s page image. Separate from the card media below, which listings always crop to 16:9.',
 					),
 				),
 				$media_fields( 'news' ),
-				$ref_fields( 'news_ref' )
+				$ref_fields( 'news_ref', false )
+			),
+		)
+	);
+
+	// News — headline fields, mirroring the event Headline group. (News still
+	// uses the block editor, so this renders first in its meta panel; on a
+	// classic screen it would sit directly after the title.) The People field
+	// keeps its original key so stored values carry over unchanged.
+	acf_add_local_field_group(
+		array(
+			'key'        => 'group_nano_news_headline',
+			'title'      => 'Headline',
+			'location'   => array(
+				array(
+					array(
+						'param'    => 'post_type',
+						'operator' => '==',
+						'value'    => 'news',
+					),
+				),
+			),
+			'menu_order' => -1,
+			'position'   => 'acf_after_title',
+			'fields'     => array(
+				array(
+					'key'          => 'field_nano_news_subtitle',
+					'label'        => 'Subtitle',
+					'name'         => 'nano_subtitle',
+					'type'         => 'text',
+					'instructions' => 'Optional secondary line beneath the title. Leave blank to use the linked event’s subtitle.',
+				),
+				array(
+					'key'           => 'field_news_ref_people',
+					'label'         => 'Participants',
+					'name'          => 'nano_people',
+					'type'          => 'relationship',
+					'post_type'     => array( 'person' ),
+					'filters'       => array( 'search' ),
+					'return_format' => 'id',
+					'instructions'  => 'Credited by name beneath the subtitle and listed in the People section. Leave empty to use the linked event’s people.',
+				),
 			),
 		)
 	);
@@ -678,15 +764,18 @@ function nano_register_acf_fields() {
 				),
 			),
 		);
-	// Events carry the same sponsors repeater (same field name, so the same
-	// nano_sponsor_rows() reader serves both): location groups OR together.
-	$support_location[] = array(
-		array(
-			'param'    => 'post_type',
-			'operator' => '==',
-			'value'    => 'event',
-		),
-	);
+		// Events and news carry the same sponsors repeater (same field name, so
+	// the same nano_sponsor_rows() reader serves all three): location groups
+	// OR together. On news, empty falls back to the linked event's sponsors.
+	foreach ( array( 'event', 'news' ) as $nano_sponsor_pt ) {
+		$support_location[] = array(
+			array(
+				'param'    => 'post_type',
+				'operator' => '==',
+				'value'    => $nano_sponsor_pt,
+			),
+		);
+	}
 	acf_add_local_field_group(
 		array(
 			'key'        => 'group_nano_sponsors',

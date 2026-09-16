@@ -26,6 +26,12 @@
  *     slot holds an image (including the posters 0.3.0 moved there) get it
  *     copied into nano_page_image so their page display is preserved.
  *
+ * 0.5.0:
+ *   - News adopts the event page structure, including the free-ratio Page
+ *     image; the news media slot's image type becomes purely the card
+ *     thumbnail (as 0.4.0 did for events). The same slot-image → page-image
+ *     copy runs for news posts.
+ *
  * @package Nano\ImaginationHubCore
  */
 
@@ -43,6 +49,7 @@ function nano_core_upgrade() {
 	nano_upgrade_backfill_related();
 	nano_upgrade_event_poster_to_media();
 	nano_upgrade_event_page_image();
+	nano_upgrade_news_page_image();
 	update_option( 'nano_core_upgraded', NANO_CORE_VERSION );
 }
 add_action( 'admin_init', 'nano_core_upgrade' );
@@ -161,9 +168,28 @@ function nano_upgrade_event_poster_to_media() {
  * the slot's image type renders only in listings.
  */
 function nano_upgrade_event_page_image() {
+	nano_upgrade_slot_image_to_page_image( 'event', 'field_nano_event_page_image' );
+}
+
+/**
+ * Same copy for news (0.5.0): the news media slot's image was the single-page
+ * feature; it moves into nano_page_image so pages keep their image.
+ */
+function nano_upgrade_news_page_image() {
+	nano_upgrade_slot_image_to_page_image( 'news', 'field_nano_news_page_image' );
+}
+
+/**
+ * Copy a post type's media-slot image into the Page image field (where the
+ * page image isn't already set).
+ *
+ * @param string $post_type Post type.
+ * @param string $field_key ACF key of that type's page-image field.
+ */
+function nano_upgrade_slot_image_to_page_image( $post_type, $field_key ) {
 	$ids = get_posts(
 		array(
-			'post_type'   => 'event',
+			'post_type'   => $post_type,
 			'numberposts' => -1,
 			'post_status' => 'any',
 			'fields'      => 'ids',
@@ -178,7 +204,7 @@ function nano_upgrade_event_page_image() {
 			: 0;
 		if ( $slot_image ) {
 			update_post_meta( $event_id, 'nano_page_image', $slot_image );
-			update_post_meta( $event_id, '_nano_page_image', 'field_nano_event_page_image' );
+			update_post_meta( $event_id, '_nano_page_image', $field_key );
 		}
 	}
 }
