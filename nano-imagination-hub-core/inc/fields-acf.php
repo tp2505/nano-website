@@ -147,10 +147,11 @@ function nano_register_acf_fields() {
 
 	// Shared reference fields (Initiative link + manual Related + People), reused
 	// by News and Event. Keys are prefixed per group; field names stay identical
-	// so the accessor reads them the same way. Event passes $include_people =
-	// false: its People field lives in the headline group after the title
-	// instead (same key, so stored values carry over).
-	$ref_fields = function ( $prefix, $include_people = true ) {
+	// so the accessor reads them the same way. People here is "everyone else
+	// involved" (the People section); the AUTHORS of the work are a separate
+	// field in each type's headline group. $people_note appends a per-type
+	// instruction (news: the linked-event fallback).
+	$ref_fields = function ( $prefix, $include_people = true, $people_note = '' ) {
 		$fields = array(
 			array(
 				'key'           => "field_{$prefix}_initiative",
@@ -185,7 +186,7 @@ function nano_register_acf_fields() {
 				'post_type'     => array( 'person' ),
 				'filters'       => array( 'search' ),
 				'return_format' => 'id',
-				'instructions'  => 'Linked artists / people for the Related section (manual).',
+				'instructions'  => 'Everyone else involved — panel respondents, collaborators, contributors (the authors of the work have their own field up top). Shown with photos and roles in the People section at the bottom of the page.' . $people_note,
 			),
 		);
 		if ( ! $include_people ) {
@@ -281,7 +282,7 @@ function nano_register_acf_fields() {
 					),
 				),
 				$media_fields( 'news' ),
-				$ref_fields( 'news_ref', false )
+				$ref_fields( 'news_ref', true, ' Leave empty to use the linked event’s people.' )
 			),
 		)
 	);
@@ -328,10 +329,12 @@ function nano_register_acf_fields() {
 	);
 
 	// Event — headline fields. Positioned acf_after_title so they sit with the
-	// title on the edit screen, not down in the Meta Boxes panel: subtitle and
-	// the participant credit belong where the editor is already typing. The
-	// People field keeps its original key (field_event_ref_people), so values
-	// saved when it lived in the details group below carry over unchanged.
+	// title on the edit screen (the classic editor honours it): subtitle and
+	// the author credit belong where the editor is already typing. Authors are
+	// the people the work is BY (the speaker, the artists in a residency) and
+	// render as the credit line beneath the subtitle; the separate People
+	// field (details group) is everyone else involved and renders in the
+	// People section at the bottom.
 	acf_add_local_field_group(
 		array(
 			'key'        => 'group_nano_event_headline',
@@ -473,7 +476,7 @@ function nano_register_acf_fields() {
 						'instructions'  => 'Photos and videos, shown two-up in the order set here (drag to reorder). Videos play on click. Click an item to edit its caption and alt text in the sidebar; for a video, the sidebar also has a “Poster (still)” field for the image shown before playback.',
 					),
 				),
-				$ref_fields( 'event_ref', false )
+				$ref_fields( 'event_ref' )
 			),
 		)
 	);

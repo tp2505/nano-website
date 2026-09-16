@@ -52,7 +52,7 @@ $inherit = function ( $name ) use ( $post_id, $event_id ) {
 
 $subtitle = trim( (string) $inherit( 'nano_subtitle' ) );
 
-$participants = $inherit( 'nano_people' );
+$participants = $inherit( 'nano_authors' ); // The credit line = authors; People (section below) is a separate field.
 $participants = array_values(
 	array_filter(
 		array_map( 'intval', is_array( $participants ) ? $participants : array() ),

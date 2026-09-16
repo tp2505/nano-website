@@ -228,15 +228,16 @@ add_action( 'init', 'nano_register_facility_post_type' );
  * screen gives all three the same, predictable shape: title, then any
  * after-title group (the event Headline: subtitle + participants), then a
  * fixed-size content editor, then the field groups stacked below — all
- * reachable regardless of content length. Per-post-type: news, pages, and
- * everything else keep the block editor.
+ * reachable regardless of content length. Per-post-type: pages and
+ * everything else keep the block editor. News joined once it adopted the
+ * event structure — its interface should be identical to events.
  *
  * @param bool   $use_block_editor Whether to use the block editor.
  * @param string $post_type        Post type being edited.
  * @return bool
  */
 function nano_classic_editor_for_field_types( $use_block_editor, $post_type ) {
-	if ( in_array( $post_type, array( 'event', 'class', 'initiative' ), true ) ) {
+	if ( in_array( $post_type, array( 'event', 'news', 'class', 'initiative' ), true ) ) {
 		return false;
 	}
 	return $use_block_editor;

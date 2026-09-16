@@ -130,8 +130,16 @@ if ( ! function_exists( 'nano_content_people_map' ) ) {
 			)
 		);
 		foreach ( $q->posts as $pid ) {
-			$people = function_exists( 'nano_field' ) ? nano_field( 'nano_people', $pid ) : array();
-			$people = is_array( $people ) ? array_values( array_filter( array_map( 'intval', $people ) ) ) : array();
+			// Authors and People both count as taking part (a speaker only in
+			// nano_authors still gets the event on their person page and a row
+			// on the Participants page).
+			$people  = function_exists( 'nano_field' ) ? nano_field( 'nano_people', $pid ) : array();
+			$authors = function_exists( 'nano_field' ) ? nano_field( 'nano_authors', $pid ) : array();
+			$people  = array_merge(
+				is_array( $people ) ? $people : array(),
+				is_array( $authors ) ? $authors : array()
+			);
+			$people  = array_values( array_unique( array_filter( array_map( 'intval', $people ) ) ) );
 			$date   = function_exists( 'nano_field' ) ? (string) nano_field( 'nano_date', $pid ) : '';
 			if ( '' === $date && 'class' === get_post_type( $pid ) && function_exists( 'nano_class_term_key' ) ) {
 				// Classes have no date; fold the term into a comparable Ymd-ish key.

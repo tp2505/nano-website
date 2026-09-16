@@ -27,10 +27,11 @@ $description = function_exists( 'nano_field' ) ? nano_field( 'nano_description',
 // Optional; empty renders nothing at all.
 $subtitle = function_exists( 'nano_field' ) ? trim( (string) nano_field( 'nano_subtitle', $post_id ) ) : '';
 
-// Participants credited beneath the subtitle — the SAME people linked on the
-// event (nano_people), shown as names so a reader sees who's involved
-// immediately; the People section further down lists them with photos.
-$participants = function_exists( 'nano_field' ) ? nano_field( 'nano_people', $post_id ) : array();
+// Authors credited beneath the subtitle — the people the work is BY
+// (nano_authors: the speaker, the artists in a residency). Independent of
+// the People field, which holds everyone else involved and renders in the
+// People section further down with photos and roles.
+$participants = function_exists( 'nano_field' ) ? nano_field( 'nano_authors', $post_id ) : array();
 $participants = array_values(
 	array_filter(
 		array_map( 'intval', is_array( $participants ) ? $participants : array() ),
