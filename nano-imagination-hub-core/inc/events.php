@@ -25,6 +25,77 @@
 
 defined( 'ABSPATH' ) || exit;
 
+if ( ! function_exists( 'nano_strip_ids' ) ) {
+	/**
+	 * The vertical image strip's ordered attachment IDs (ACF Pro Gallery
+	 * field nano_strip), reading raw meta like nano_gallery_rows() so it
+	 * resolves with or without ACF loaded. Empty array when unset.
+	 *
+	 * @param int $post_id Event ID.
+	 * @return int[]
+	 */
+	function nano_strip_ids( $post_id ) {
+		$raw = get_post_meta( (int) $post_id, 'nano_strip', true );
+		if ( ! is_array( $raw ) ) {
+			return array();
+		}
+		return array_values(
+			array_filter(
+				array_map( 'intval', $raw ),
+				function ( $id ) {
+					return $id && wp_attachment_is_image( $id );
+				}
+			)
+		);
+	}
+}
+
+if ( ! function_exists( 'nano_render_strip' ) ) {
+	/**
+	 * Echo the vertical image strip: one horizontally-scrolling row of 9:16
+	 * panels with minimal gaps, each a button opening the shared lightbox
+	 * (assets/js/nano.js → initLightbox). Fractional panel widths leave a
+	 * partial panel peeking at the right edge at every viewport, so the
+	 * scroll is discoverable without extra chrome. Echoes nothing when empty.
+	 *
+	 * Markup contract for the lightbox (reusable by other components): a
+	 * [data-nano-lightbox] container whose buttons carry data-full (the
+	 * full-size URL) and data-alt.
+	 *
+	 * @param int[] $ids Image attachment IDs.
+	 */
+	function nano_render_strip( $ids ) {
+		$ids = array_values( array_filter( array_map( 'intval', (array) $ids ) ) );
+		if ( ! $ids ) {
+			return;
+		}
+		$total = count( $ids );
+		?>
+		<div class="nano-strip" data-nano-lightbox>
+			<ul class="nano-strip__track" role="list">
+				<?php foreach ( $ids as $i => $id ) : ?>
+					<?php
+					$full = wp_get_attachment_image_url( $id, 'large' );
+					$alt  = (string) get_post_meta( $id, '_wp_attachment_image_alt', true );
+					?>
+					<li class="nano-strip__item">
+						<button
+							class="nano-strip__thumb"
+							type="button"
+							data-full="<?php echo esc_url( $full ); ?>"
+							data-alt="<?php echo esc_attr( $alt ); ?>"
+							aria-label="<?php echo esc_attr( sprintf( /* translators: 1: position, 2: total */ __( 'View image %1$d of %2$d full screen', 'nano' ), $i + 1, $total ) ); ?>"
+						>
+							<?php echo wp_get_attachment_image( $id, 'medium', false, array( 'class' => 'nano-media nano-media--image', 'loading' => 'lazy', 'sizes' => '(max-width: 781px) 55vw, 20vw' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+						</button>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+		<?php
+	}
+}
+
 if ( ! function_exists( 'nano_event_when' ) ) {
 	/**
 	 * The event's formatted date(s) and, optionally, times.

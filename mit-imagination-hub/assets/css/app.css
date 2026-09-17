@@ -1646,6 +1646,132 @@ a.nano-initiative__media:hover,
 /* Sponsors on an event page sit tighter than the Support-us band (which has
    its own page-bottom padding). */
 .nano-event-page .nano-sponsors { margin-top: var(--wp--preset--spacing--60); padding-bottom: 0; }
+/* Vertical image strip — one horizontally-scrolling row of VERTICAL 9:16
+   panels (the Correlations twelve-channel corridor screen, generalised).
+   Deliberately not the 16:9 editorial frame: the subject IS a wall of
+   vertical panels, so the crop is the inverse ratio — do not "correct" it.
+   Minimal 2px gaps read as one continuous array; fractional panel widths
+   (4.5 visible on desktop, 1.8 on phones) leave a partial panel peeking at
+   the right edge at every viewport, which is what makes the scroll
+   discoverable. Same interaction everywhere: horizontal scroll/swipe. */
+.nano-strip {
+	margin-top: var(--wp--preset--spacing--60);
+}
+.nano-strip__track {
+	list-style: none;
+	margin: 0;
+	padding: 0 0 0.5rem;
+	display: flex;
+	gap: 2px;
+	overflow-x: auto;
+	/* explicit, like the news slider: keep vertical wheel gestures scrolling
+	   the page, not trapped by the strip */
+	overflow-y: hidden;
+	scroll-snap-type: x proximity;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+.nano-strip__track::-webkit-scrollbar { display: none; }
+.nano-strip__item {
+	flex: 0 0 auto;
+	width: calc( ( 100% - 3.5 * 2px ) / 4.5 );
+	margin: 0;
+	scroll-snap-align: start;
+}
+.nano-strip__thumb {
+	display: block;
+	width: 100%;
+	aspect-ratio: 9 / 16;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: var(--wp--preset--color--surface);
+	cursor: pointer;
+}
+.nano-strip__thumb .nano-media { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nano-strip__thumb:focus-visible { outline: 2px solid var(--wp--preset--color--contrast); outline-offset: 2px; }
+@media (max-width: 781px) {
+	.nano-strip__item { width: calc( ( 100% - 0.8 * 2px ) / 1.8 ); }
+}
+
+/* Lightbox — the site's first, deliberately minimal and self-contained
+   (built by assets/js/nano.js → initLightbox, reusable by anything that
+   emits the [data-nano-lightbox] markup contract). Near-black ground,
+   image contained, thin white controls in the site's stroke style. */
+.nano-lightbox {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	background: rgba(8, 8, 8, 0.96);
+}
+.nano-lightbox.is-open { display: flex; }
+.nano-lightbox__img {
+	max-width: min(92vw, 1320px);
+	max-height: 86vh;
+	display: block;
+}
+.nano-lightbox__close,
+.nano-lightbox__prev,
+.nano-lightbox__next {
+	appearance: none;
+	-webkit-appearance: none;
+	position: absolute;
+	width: 3rem;
+	height: 3rem;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+	color: #fff;
+}
+.nano-lightbox__close { top: 1.2rem; right: 1.4rem; }
+.nano-lightbox__prev { left: 0.8rem; top: 50%; transform: translateY(-50%); }
+.nano-lightbox__next { right: 0.8rem; top: 50%; transform: translateY(-50%); }
+/* Thin-stroke glyphs, drawn like the site's arrowhead (rotated borders). */
+.nano-lightbox__prev::before,
+.nano-lightbox__next::before {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 0.9rem;
+	height: 0.9rem;
+	border-top: 1px solid currentColor;
+	border-right: 1px solid currentColor;
+}
+.nano-lightbox__prev::before { transform: translate(-30%, -50%) rotate(-135deg); }
+.nano-lightbox__next::before { transform: translate(-70%, -50%) rotate(45deg); }
+.nano-lightbox__close::before,
+.nano-lightbox__close::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 1.5rem;
+	height: 1px;
+	background: currentColor;
+}
+.nano-lightbox__close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.nano-lightbox__close::after { transform: translate(-50%, -50%) rotate(-45deg); }
+.nano-lightbox__close:focus-visible,
+.nano-lightbox__prev:focus-visible,
+.nano-lightbox__next:focus-visible { outline: 1px solid #fff; outline-offset: 2px; }
+.nano-lightbox__counter {
+	position: absolute;
+	left: 50%;
+	bottom: 1.2rem;
+	transform: translateX(-50%);
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.1em;
+	color: #fff;
+}
+body.nano-lightbox-open { overflow: hidden; }
+
 /* Documents (PDF attachments) — flyers, catalogues, syllabi with first-page
    thumbnails. The thumbnails are deliberately FREE RATIO, an exception to the
    16:9 standardisation (same as the event page image): flyers come portrait

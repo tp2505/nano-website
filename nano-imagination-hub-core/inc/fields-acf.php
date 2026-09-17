@@ -523,6 +523,18 @@ function nano_register_acf_fields() {
 						'mime_types'    => 'jpg,jpeg,png,gif,webp,mp4,webm',
 						'instructions'  => 'Photos and videos, shown two-up in the order set here (drag to reorder). Videos play on click. Click an item to edit its caption and alt text in the sidebar; for a video, the sidebar also has a “Poster (still)” field for the image shown before playback.',
 					),
+					array(
+						'key'           => 'field_nano_event_strip',
+						'label'         => 'Vertical image strip',
+						'name'          => 'nano_strip',
+						'type'          => 'gallery',
+						'return_format' => 'id',
+						'preview_size'  => 'thumbnail',
+						'insert'        => 'append',
+						'library'       => 'all',
+						'mime_types'    => 'jpg,jpeg,png,gif,webp',
+						'instructions'  => 'A horizontally-scrolling strip of vertical images below the body text (originally for Correlations’ twelve-channel corridor screen — any count works). Each image is cropped to a vertical 9:16 panel; clicking opens it full screen.',
+					),
 				),
 				$ref_fields( 'event_ref' )
 			),

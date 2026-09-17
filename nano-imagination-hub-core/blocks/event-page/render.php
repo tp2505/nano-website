@@ -140,6 +140,12 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 	<?php endif; ?>
 
 	<?php
+	// Vertical image strip — a horizontally-scrolling row of 9:16 panels
+	// below the body text (originally the Correlations twelve-channel
+	// corridor screen; any event, any count). Renders nothing when empty.
+	if ( function_exists( 'nano_strip_ids' ) && function_exists( 'nano_render_strip' ) ) {
+		nano_render_strip( nano_strip_ids( $post_id ) );
+	}
 	// Documents (PDF attachments) — above the gallery, before the sponsor
 	// credits. Renders nothing when empty.
 	if ( function_exists( 'nano_attachment_rows' ) && function_exists( 'nano_render_attachments' ) ) {

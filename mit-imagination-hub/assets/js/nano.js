@@ -164,6 +164,167 @@
 		} );
 	}
 
+	// Lightbox — the site's first, minimal and self-contained (no library).
+	// Reusable contract: any [data-nano-lightbox] container whose buttons
+	// carry data-full (full-size URL) and data-alt joins in; clicking opens
+	// the image full screen with prev/next between that container's images.
+	// Accessible: role=dialog, Esc closes, arrow keys navigate, Tab cycles
+	// the three controls, focus returns to the opening thumbnail on close,
+	// horizontal swipe navigates on touch.
+	function initLightbox() {
+		var containers = document.querySelectorAll( '[data-nano-lightbox]' );
+		if ( ! containers.length ) {
+			return;
+		}
+
+		var overlay, imgEl, counterEl, btnClose, btnPrev, btnNext;
+		var items = [];
+		var current = -1;
+		var lastFocus = null;
+
+		function build() {
+			if ( overlay ) {
+				return;
+			}
+			overlay = document.createElement( 'div' );
+			overlay.className = 'nano-lightbox';
+			overlay.setAttribute( 'role', 'dialog' );
+			overlay.setAttribute( 'aria-modal', 'true' );
+			overlay.setAttribute( 'aria-label', 'Image viewer' );
+
+			imgEl = document.createElement( 'img' );
+			imgEl.className = 'nano-lightbox__img';
+
+			btnClose = document.createElement( 'button' );
+			btnClose.type = 'button';
+			btnClose.className = 'nano-lightbox__close';
+			btnClose.setAttribute( 'aria-label', 'Close' );
+
+			btnPrev = document.createElement( 'button' );
+			btnPrev.type = 'button';
+			btnPrev.className = 'nano-lightbox__prev';
+			btnPrev.setAttribute( 'aria-label', 'Previous image' );
+
+			btnNext = document.createElement( 'button' );
+			btnNext.type = 'button';
+			btnNext.className = 'nano-lightbox__next';
+			btnNext.setAttribute( 'aria-label', 'Next image' );
+
+			counterEl = document.createElement( 'p' );
+			counterEl.className = 'nano-lightbox__counter';
+			counterEl.setAttribute( 'aria-live', 'polite' );
+
+			overlay.appendChild( imgEl );
+			overlay.appendChild( btnClose );
+			overlay.appendChild( btnPrev );
+			overlay.appendChild( btnNext );
+			overlay.appendChild( counterEl );
+			document.body.appendChild( overlay );
+
+			btnClose.addEventListener( 'click', close );
+			btnPrev.addEventListener( 'click', function () {
+				show( current - 1 );
+			} );
+			btnNext.addEventListener( 'click', function () {
+				show( current + 1 );
+			} );
+			// Clicking the dark ground (not the image or controls) closes.
+			overlay.addEventListener( 'click', function ( e ) {
+				if ( e.target === overlay ) {
+					close();
+				}
+			} );
+
+			// Horizontal swipe navigates on touch.
+			var touchX = null;
+			overlay.addEventListener( 'touchstart', function ( e ) {
+				touchX = e.changedTouches[ 0 ].clientX;
+			}, { passive: true } );
+			overlay.addEventListener( 'touchend', function ( e ) {
+				if ( null === touchX ) {
+					return;
+				}
+				var dx = e.changedTouches[ 0 ].clientX - touchX;
+				touchX = null;
+				if ( Math.abs( dx ) > 40 ) {
+					show( dx < 0 ? current + 1 : current - 1 );
+				}
+			}, { passive: true } );
+		}
+
+		function show( index ) {
+			// Wrap around at the ends.
+			current = ( index + items.length ) % items.length;
+			var item = items[ current ];
+			imgEl.src = item.full;
+			imgEl.alt = item.alt;
+			counterEl.textContent = ( current + 1 ) + ' / ' + items.length;
+			// Warm the neighbours so arrowing feels instant.
+			[ current + 1, current - 1 ].forEach( function ( n ) {
+				var pre = new Image();
+				pre.src = items[ ( n + items.length ) % items.length ].full;
+			} );
+		}
+
+		function onKeydown( e ) {
+			if ( 'Escape' === e.key ) {
+				close();
+			} else if ( 'ArrowLeft' === e.key ) {
+				show( current - 1 );
+			} else if ( 'ArrowRight' === e.key ) {
+				show( current + 1 );
+			} else if ( 'Tab' === e.key ) {
+				// Trap focus among the three controls.
+				var order = [ btnClose, btnPrev, btnNext ];
+				var i = order.indexOf( document.activeElement );
+				e.preventDefault();
+				var next = e.shiftKey
+					? order[ ( i - 1 + order.length ) % order.length ]
+					: order[ ( i + 1 ) % order.length ];
+				next.focus();
+			}
+		}
+
+		function open( list, index, opener ) {
+			build();
+			items = list;
+			lastFocus = opener;
+			overlay.classList.add( 'is-open' );
+			document.body.classList.add( 'nano-lightbox-open' );
+			document.addEventListener( 'keydown', onKeydown );
+			show( index );
+			btnClose.focus();
+		}
+
+		function close() {
+			overlay.classList.remove( 'is-open' );
+			document.body.classList.remove( 'nano-lightbox-open' );
+			document.removeEventListener( 'keydown', onKeydown );
+			imgEl.src = '';
+			if ( lastFocus ) {
+				lastFocus.focus();
+				lastFocus = null;
+			}
+		}
+
+		Array.prototype.forEach.call( containers, function ( container ) {
+			var thumbs = Array.prototype.slice.call(
+				container.querySelectorAll( 'button[data-full]' )
+			);
+			var list = thumbs.map( function ( b ) {
+				return {
+					full: b.getAttribute( 'data-full' ),
+					alt: b.getAttribute( 'data-alt' ) || '',
+				};
+			} );
+			thumbs.forEach( function ( b, i ) {
+				b.addEventListener( 'click', function () {
+					open( list, i, b );
+				} );
+			} );
+		} );
+	}
+
 	// Vimeo hero: the markup carries only the poster image (instant first paint,
 	// zero video bytes). On desktop — and never under data-saver / reduced-motion
 	// — this builds the chrome-less background player iframe and fades it in over
@@ -598,6 +759,7 @@
 		initMenuHover();
 		initArchive();
 		initGalleryVideos();
+		initLightbox();
 	}
 
 	if ( document.readyState === 'loading' ) {
