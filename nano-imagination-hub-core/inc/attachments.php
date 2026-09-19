@@ -71,12 +71,20 @@ if ( ! function_exists( 'nano_render_attachments' ) ) {
 	 * Echo the Documents band — thumbnail + label + size per file, each
 	 * linking to the PDF. Echoes nothing for an empty set.
 	 *
-	 * @param array $rows Rows from nano_attachment_rows().
+	 * Besides uploaded-file rows, a row may carry an external 'url' (+ 'label',
+	 * optional 'meta' string) instead of a 'file' ID — how the class syllabus
+	 * link joins the band as an ordinary document.
+	 *
+	 * @param array $rows Rows from nano_attachment_rows(), optionally with
+	 *                    url-rows mixed in.
 	 */
 	function nano_render_attachments( $rows ) {
 		$rows = array_filter(
 			(array) $rows,
 			function ( $row ) {
+				if ( ! empty( $row['url'] ) && ! empty( $row['label'] ) ) {
+					return true;
+				}
 				return ! empty( $row['file'] ) && wp_get_attachment_url( (int) $row['file'] );
 			}
 		);
@@ -89,17 +97,23 @@ if ( ! function_exists( 'nano_render_attachments' ) ) {
 			<ul class="nano-attachments__grid" role="list">
 				<?php
 				foreach ( $rows as $row ) :
-					$file_id = (int) $row['file'];
-					$url     = wp_get_attachment_url( $file_id );
+					$file_id = ! empty( $row['file'] ) ? (int) $row['file'] : 0;
 					$label   = trim( (string) $row['label'] );
-					if ( '' === $label ) {
-						$label = get_the_title( $file_id );
-					}
-					$path  = get_attached_file( $file_id );
-					$bytes = ( $path && file_exists( $path ) ) ? filesize( $path ) : 0;
-					$meta  = strtoupper( (string) preg_replace( '#^.+/#', '', (string) get_post_mime_type( $file_id ) ) );
-					if ( $bytes ) {
-						$meta .= ' · ' . size_format( $bytes );
+					if ( $file_id ) {
+						$url = wp_get_attachment_url( $file_id );
+						if ( '' === $label ) {
+							$label = get_the_title( $file_id );
+						}
+						$path  = get_attached_file( $file_id );
+						$bytes = ( $path && file_exists( $path ) ) ? filesize( $path ) : 0;
+						$meta  = strtoupper( (string) preg_replace( '#^.+/#', '', (string) get_post_mime_type( $file_id ) ) );
+						if ( $bytes ) {
+							$meta .= ' · ' . size_format( $bytes );
+						}
+					} else {
+						// External-URL row (the class syllabus link).
+						$url  = (string) $row['url'];
+						$meta = isset( $row['meta'] ) ? (string) $row['meta'] : '';
 					}
 					// The manually-uploaded thumbnail only (no automatic
 				// first-page render — long single-page documents would
@@ -115,7 +129,9 @@ if ( ! function_exists( 'nano_render_attachments' ) ) {
 								<span class="nano-attachment__thumb"><?php echo $thumb; // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 							<?php endif; ?>
 							<span class="nano-attachment__label"><?php echo esc_html( $label ); ?></span>
-							<span class="nano-attachment__meta"><?php echo esc_html( $meta ); ?></span>
+							<?php if ( '' !== $meta ) : ?>
+								<span class="nano-attachment__meta"><?php echo esc_html( $meta ); ?></span>
+							<?php endif; ?>
 						</a>
 					</li>
 				<?php endforeach; ?>

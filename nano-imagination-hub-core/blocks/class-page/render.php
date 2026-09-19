@@ -1,10 +1,12 @@
 <?php
 /**
- * Class page block — the single-class body: title, a structured meta line
- * (Term · Department · Level · Credits), Instructor / TA links to their People
- * pages, the description, and a syllabus link/file. Every field except the term
- * is optional and renders nothing when empty — no empty labels, no dangling
- * separators. The manual Related section is a separate reusable block.
+ * Class page block — the single-class body: title, subtitle, banner media, a
+ * structured meta line (Term · Department · Level · Credits), Instructor / TA,
+ * the content-editor body, the Documents band (PDFs + the external syllabus
+ * link as a "Syllabus" row), and the shared documentation gallery. Every field
+ * except the term is optional and renders nothing when empty — no empty
+ * labels, no dangling separators. The manual People/Related section is a
+ * separate reusable block.
  *
  * @package Nano\ImaginationHubCore
  *
@@ -59,7 +61,16 @@ if ( ctype_digit( $ta ) && 'person' === get_post_type( (int) $ta ) ) {
 // it can never render twice.
 $long_form = trim( (string) get_post_field( 'post_content', $post_id ) );
 
+// Subtitle — its own field (Headline group, after the title in the editor),
+// same treatment as events/news. Optional; empty renders nothing.
+$subtitle = trim( (string) $field( 'nano_subtitle' ) );
+
+// The external syllabus link renders inside the Documents band (first row,
+// labelled "Syllabus") — a syllabus is just another document.
 $syllabus = function_exists( 'nano_class_syllabus' ) ? nano_class_syllabus( $post_id ) : null;
+
+// Documentation gallery — the shared two-up component from the event page.
+$gallery = function_exists( 'nano_gallery_rows' ) ? nano_gallery_rows( $post_id ) : array();
 
 $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news--grid nano-class-page' ) );
 ?>
@@ -78,6 +89,10 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 			</svg>
 		</div>
 	</header>
+
+	<?php if ( '' !== $subtitle ) : ?>
+		<p class="nano-event-page__subtitle nano-class-page__subtitle"><?php echo esc_html( $subtitle ); ?></p>
+	<?php endif; ?>
 
 	<?php
 	// Banner — the standard image-or-clip media slot; nano_media() falls back
@@ -134,39 +149,29 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 
 	<?php
 	// Documents (PDF attachments) — includes any migrated syllabus PDF.
-	// Renders nothing when empty.
+	// The external syllabus link joins the band as its first row, labelled
+	// "Syllabus" (link-only style, no size meta). Renders nothing when both
+	// are empty.
 	if ( function_exists( 'nano_attachment_rows' ) && function_exists( 'nano_render_attachments' ) ) {
-		nano_render_attachments( nano_attachment_rows( $post_id ) );
+		$doc_rows = nano_attachment_rows( $post_id );
+		if ( $syllabus ) {
+			array_unshift(
+				$doc_rows,
+				array(
+					'url'   => $syllabus['url'],
+					'label' => __( 'Syllabus', 'nano' ),
+					'meta'  => __( 'External link', 'nano' ),
+				)
+			);
+		}
+		nano_render_attachments( $doc_rows );
+	}
+
+	// Documentation gallery — the shared two-up component (same field and
+	// rendering as events, click-to-play videos included).
+	if ( function_exists( 'nano_render_gallery' ) ) {
+		nano_render_gallery( $gallery );
 	}
 	?>
-
-	<?php
-	if ( $syllabus ) :
-		if ( $syllabus['is_file'] ) {
-			$bits  = array_filter( array( $syllabus['mime'], $syllabus['size'] ) );
-			$label = sprintf(
-				/* translators: %s: file type and size, e.g. "PDF, 240 KB". */
-				__( 'Syllabus (%s)', 'nano' ),
-				implode( ', ', $bits )
-			);
-			$aria = sprintf(
-				/* translators: %s: file type and size, e.g. "PDF, 240 KB". */
-				__( 'Download the syllabus (%s)', 'nano' ),
-				implode( ', ', $bits )
-			);
-		} else {
-			$label = __( 'Syllabus', 'nano' );
-			$aria  = __( 'Open the syllabus (external link)', 'nano' );
-		}
-		?>
-		<p class="nano-class-page__syllabus">
-			<a class="nano-class-page__syllabus-link"
-				href="<?php echo esc_url( $syllabus['url'] ); ?>"
-				aria-label="<?php echo esc_attr( $aria ); ?>"
-				<?php echo $syllabus['is_file'] ? '' : 'target="_blank" rel="noopener noreferrer"'; ?>>
-				<?php echo esc_html( $label ); ?>
-			</a>
-		</p>
-	<?php endif; ?>
 </section>
 <?php

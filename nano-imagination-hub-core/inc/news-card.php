@@ -83,6 +83,69 @@ if ( ! function_exists( 'nano_gallery_rows' ) ) {
 	}
 }
 
+if ( ! function_exists( 'nano_render_gallery' ) ) {
+	/**
+	 * Echo the two-up documentation gallery — images directly, videos as their
+	 * poster with a play button (assets/js/nano.js → initGalleryVideos swaps in
+	 * a playing <video> on click). Extracted from the event page so classes
+	 * render the identical component. Echoes nothing for an empty set.
+	 *
+	 * @param array $rows Rows from nano_gallery_rows().
+	 */
+	function nano_render_gallery( $rows ) {
+		$rows = array_filter(
+			(array) $rows,
+			function ( $row ) {
+				return ! empty( $row['media'] );
+			}
+		);
+		if ( ! $rows ) {
+			return;
+		}
+		?>
+		<ul class="nano-gallery" role="list">
+			<?php
+			foreach ( $rows as $row ) :
+				$att_id = (int) $row['media'];
+				$alt    = get_post_meta( $att_id, '_wp_attachment_image_alt', true );
+				if ( ! $alt ) {
+					$alt = get_the_title( $att_id );
+				}
+				$caption  = isset( $row['caption'] ) ? trim( (string) $row['caption'] ) : '';
+				$is_video = wp_attachment_is( 'video', $att_id );
+				?>
+				<li class="nano-gallery__item<?php echo $is_video ? ' nano-gallery__item--video' : ''; ?>">
+					<figure class="nano-gallery__figure">
+						<span class="nano-gallery__media">
+							<?php if ( $is_video ) : ?>
+								<?php
+								$poster_id  = (int) $row['poster'];
+								$poster_url = $poster_id ? wp_get_attachment_image_url( $poster_id, 'large' ) : '';
+								$video_url  = wp_get_attachment_url( $att_id );
+								?>
+								<button class="nano-gallery__play" type="button" data-nano-video-src="<?php echo esc_url( $video_url ); ?>" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: video title */ __( 'Play video: %s', 'nano' ), $alt ) ); ?>">
+									<?php if ( $poster_url ) : ?>
+										<img class="nano-media nano-media--image" src="<?php echo esc_url( $poster_url ); ?>" alt="<?php echo esc_attr( $alt ); ?>" loading="lazy" decoding="async" />
+									<?php else : ?>
+										<span class="nano-media nano-media--empty" aria-hidden="true"></span>
+									<?php endif; ?>
+									<span class="nano-gallery__playicon" aria-hidden="true"></span>
+								</button>
+							<?php else : ?>
+								<?php echo wp_get_attachment_image( $att_id, 'large', false, array( 'class' => 'nano-media nano-media--image', 'sizes' => '(max-width: 781px) 100vw, 50vw', 'loading' => 'lazy' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+							<?php endif; ?>
+						</span>
+						<?php if ( $caption ) : ?>
+							<figcaption class="nano-gallery__caption"><?php echo esc_html( $caption ); ?></figcaption>
+						<?php endif; ?>
+					</figure>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+		<?php
+	}
+}
+
 if ( ! function_exists( 'nano_card_thumb_id' ) ) {
 	/**
 	 * Best thumbnail attachment ID for a post: featured image, else the News

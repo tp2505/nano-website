@@ -582,6 +582,35 @@ function nano_register_acf_fields() {
 		)
 	);
 
+	// Class headline — after the title, matching the event/news pattern (no
+	// Authors field: classes credit people through Instructor instead).
+	acf_add_local_field_group(
+		array(
+			'key'        => 'group_nano_class_headline',
+			'title'      => 'Headline',
+			'location'   => array(
+				array(
+					array(
+						'param'    => 'post_type',
+						'operator' => '==',
+						'value'    => 'class',
+					),
+				),
+			),
+			'menu_order' => -1,
+			'position'   => 'acf_after_title',
+			'fields'     => array(
+				array(
+					'key'          => 'field_nano_class_subtitle',
+					'label'        => 'Subtitle',
+					'name'         => 'nano_subtitle',
+					'type'         => 'text',
+					'instructions' => 'Optional secondary line directly beneath the title, e.g. the course number or series name.',
+				),
+			),
+		)
+	);
+
 	// Class (a Pedagogies course). Only the term is required; every other field
 	// is optional and its template renders nothing when empty.
 	acf_add_local_field_group(
@@ -692,11 +721,23 @@ function nano_register_acf_fields() {
 					'name'         => 'nano_syllabus_link',
 					'type'         => 'link',
 					'return_format' => 'array',
-					'instructions' => 'Optional: link to a syllabus published elsewhere. A syllabus PDF belongs in the Documents repeater below instead.',
+					'instructions' => 'Optional: link to a syllabus published elsewhere. Appears in the Documents band on the page, labelled “Syllabus”. A syllabus PDF belongs in the Documents repeater below instead.',
 				),
 				),
 				$attachment_fields( 'class' ),
 				array(
+				array(
+					'key'           => 'field_nano_class_gallery',
+					'label'         => 'Gallery',
+					'name'          => 'nano_gallery',
+					'type'          => 'gallery',
+					'return_format' => 'id',
+					'preview_size'  => 'medium',
+					'insert'        => 'append',
+					'library'       => 'all',
+					'mime_types'    => 'jpg,jpeg,png,gif,webp,mp4,webm',
+					'instructions'  => 'Documentation photos and videos near the bottom of the page, shown two-up in the order set here (drag to reorder). Videos play on click. Click an item to edit its caption and alt text in the sidebar; for a video, the sidebar also has a “Poster (still)” field for the image shown before playback.',
+				),
 				array(
 					'key'                  => 'field_nano_class_related',
 					'label'                => 'Related content',

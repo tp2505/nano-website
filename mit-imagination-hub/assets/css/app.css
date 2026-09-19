@@ -1531,7 +1531,9 @@ a.nano-initiative__media:hover,
 }
 
 /* ---------------------------------------------------------------------------
- * Single class page — structured meta line, instructor/TA links, syllabus.
+ * Single class page — structured meta line, instructor/TA links; the syllabus
+ * link renders inside the shared Documents band, the gallery is the shared
+ * event component, and the subtitle shares .nano-event-page__subtitle.
  * ------------------------------------------------------------------------- */
 .nano-class-page__facts {
 	display: flex;
@@ -1814,19 +1816,6 @@ body.nano-lightbox-open { overflow: hidden; }
 	text-transform: uppercase;
 	color: var(--wp--preset--color--muted);
 }
-.nano-class-page__syllabus { margin-top: var(--wp--preset--spacing--40); }
-.nano-class-page__syllabus-link {
-	display: inline-block;
-	padding: 0 2.6em 0.55em 0;
-	border-bottom: 1px solid var(--wp--preset--color--contrast);
-	font-size: var(--wp--preset--font-size--small);
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	font-weight: 500;
-	line-height: 1;
-	color: var(--wp--preset--color--contrast);
-}
-.nano-class-page__syllabus-link:hover { color: var(--wp--preset--color--muted); }
 
 /* ---------------------------------------------------------------------------
  * Mission — large statement, offset right on wide screens (per wireframe).
