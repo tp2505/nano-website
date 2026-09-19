@@ -506,7 +506,7 @@ function nano_register_acf_fields() {
 						'type'         => 'wysiwyg',
 						'tabs'         => 'visual',
 						'media_upload' => 0,
-						'instructions' => 'Body of the event page.',
+						'instructions' => 'Card / listing teaser only (truncated to ~24 words on cards). The page body is the main content editor.',
 					),
 				),
 				$attachment_fields( 'event' ),
@@ -684,7 +684,7 @@ function nano_register_acf_fields() {
 					'type'         => 'wysiwyg',
 					'tabs'         => 'visual',
 					'media_upload' => 0,
-					'instructions' => 'Optional. Body of the class page; may describe level/credits in prose.',
+					'instructions' => 'Card / listing teaser only (truncated to ~24 words on cards). The page body is the main content editor.',
 				),
 				array(
 					'key'          => 'field_nano_class_syllabus_link',
@@ -787,7 +787,7 @@ function nano_register_acf_fields() {
 					'name'         => 'nano_intro',
 					'type'         => 'textarea',
 					'rows'         => 4,
-					'instructions' => 'Short paragraph shown in the homepage Initiatives row and at the top of the initiative page. The long-form description lives in the content editor below and appears only on the initiative page, beneath this.',
+					'instructions' => 'Short paragraph shown in the homepage Initiatives row (listing teaser only — it does not render on the initiative page). The page body is the main content editor.',
 				),
 			),
 		)

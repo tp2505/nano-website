@@ -50,7 +50,8 @@ if ( ctype_digit( $ta ) && 'person' === get_post_type( (int) $ta ) ) {
 	$ta = get_the_title( (int) $ta );
 }
 
-$description = $field( 'nano_description' );
+// (nano_description is card / listing teaser text only — the page body is
+// the content editor.)
 
 // Long-form body — the post content editor, rendered below the description
 // through the core content pipeline (blocks/formatting work). Optional;
@@ -123,12 +124,6 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 				</li>
 			<?php endif; ?>
 		</ul>
-	<?php endif; ?>
-
-	<?php if ( $description ) : ?>
-		<div class="nano-class-page__body">
-			<?php echo wp_kses_post( wpautop( $description ) ); ?>
-		</div>
 	<?php endif; ?>
 
 	<?php if ( '' !== $long_form ) : ?>

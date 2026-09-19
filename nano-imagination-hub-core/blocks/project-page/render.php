@@ -73,16 +73,12 @@ $venue = trim( (string) $inherit( 'nano_venue' ) );
 
 $page_image = (int) $inherit( 'nano_page_image' );
 
-// Body: the news item's own article text wins; blank and linked, the event's
-// full text (description + long-form) shows; the excerpt is the last resort.
-$own_body   = trim( (string) get_post_field( 'post_content', $post_id ) );
-$ev_desc    = '';
-$ev_body    = '';
-if ( '' === $own_body && $event_id ) {
-	$ev_desc = function_exists( 'nano_field' ) ? trim( (string) nano_field( 'nano_description', $event_id ) ) : '';
-	$ev_body = trim( (string) get_post_field( 'post_content', $event_id ) );
-}
-$excerpt = ( '' === $own_body && '' === $ev_desc && '' === $ev_body ) ? get_the_excerpt() : '';
+// Body: the news item's own article text wins; blank and linked, the
+// event's content-editor body shows (nano_description is card / listing
+// teaser only and never renders on pages); the excerpt is the last resort.
+$own_body = trim( (string) get_post_field( 'post_content', $post_id ) );
+$ev_body  = ( '' === $own_body && $event_id ) ? trim( (string) get_post_field( 'post_content', $event_id ) ) : '';
+$excerpt  = ( '' === $own_body && '' === $ev_body ) ? get_the_excerpt() : '';
 
 // Sponsors: the news item's own rows, else the linked event's.
 $sponsor_rows = function_exists( 'nano_sponsor_rows' ) ? nano_sponsor_rows( $post_id ) : array();
@@ -164,11 +160,6 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 			<?php echo apply_filters( 'the_content', $own_body ); // phpcs:ignore WordPress.Security.EscapeOutput -- core content pipeline ?>
 		</div>
 	<?php else : ?>
-		<?php if ( '' !== $ev_desc ) : ?>
-			<div class="nano-event-page__body">
-				<?php echo wp_kses_post( wpautop( $ev_desc ) ); ?>
-			</div>
-		<?php endif; ?>
 		<?php if ( '' !== $ev_body ) : ?>
 			<div class="nano-event-page__content">
 				<?php echo apply_filters( 'the_content', $ev_body ); // phpcs:ignore WordPress.Security.EscapeOutput -- core content pipeline ?>

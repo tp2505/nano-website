@@ -21,7 +21,8 @@ if ( ! $post_id ) {
 	return;
 }
 
-$description = function_exists( 'nano_field' ) ? nano_field( 'nano_description', $post_id ) : '';
+// (nano_description is card / listing teaser text only — the page body is
+// the content editor.)
 
 // Subtitle — its own field (headline group, after the title in the editor).
 // Optional; empty renders nothing at all.
@@ -41,8 +42,9 @@ $participants = array_values(
 	)
 );
 
-// Long-form body — the post content editor, rendered below the description
-// through the core content pipeline. Optional; empty renders nothing.
+// Body — the post content editor, through the core content pipeline.
+// Optional; empty renders nothing (the page then has no descriptive text —
+// accepted; nano_description is listing teaser only).
 $long_form = trim( (string) get_post_field( 'post_content', $post_id ) );
 
 $gallery = function_exists( 'nano_gallery_rows' ) ? nano_gallery_rows( $post_id ) : array();
@@ -125,12 +127,6 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 		<figure class="nano-event-page__media">
 			<?php echo nano_render_media( $top_media, array( 'sizes' => '(max-width: 781px) 100vw, 52rem', 'eager' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 		</figure>
-	<?php endif; ?>
-
-	<?php if ( $description ) : ?>
-		<div class="nano-event-page__body">
-			<?php echo wp_kses_post( wpautop( $description ) ); ?>
-		</div>
 	<?php endif; ?>
 
 	<?php if ( '' !== $long_form ) : ?>

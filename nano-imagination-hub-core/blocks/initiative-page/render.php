@@ -22,7 +22,8 @@ if ( ! $post_id ) {
 	return;
 }
 
-$intro = function_exists( 'nano_field' ) ? nano_field( 'nano_intro', $post_id ) : '';
+// (nano_intro is the homepage-row teaser only — the page body is the
+// content editor.)
 
 // "View all" deep-links into the Archive, pre-filtered by Type + this Initiative.
 $archive_page = get_page_by_path( 'archive' );
@@ -108,17 +109,9 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 		</div>
 	</header>
 
-	<?php if ( $intro ) : ?>
-		<div class="nano-initiative-page__intro">
-			<?php echo wp_kses_post( wpautop( $intro ) ); ?>
-		</div>
-	<?php endif; ?>
-
 	<?php
-	// Long-form description — the post content editor (the initiative CPT has
-	// editor support). Renders below the short description (nano_intro) on the
-	// single page only; empty content renders nothing. The homepage row keeps
-	// showing just the short description.
+	// Body — the post content editor; empty renders nothing. nano_intro is
+	// the homepage-row teaser only and does not render here.
 	$nano_long = trim( (string) get_post_field( 'post_content', $post_id ) );
 	if ( '' !== $nano_long ) :
 		?>
