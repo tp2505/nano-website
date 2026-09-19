@@ -7,10 +7,10 @@
  * nano_render_attachments() as first-page thumbnails with label and file
  * size, linking to the file.
  *
- * Thumbnails: WordPress generates first-page previews for PDF uploads only
- * when the server has Imagick + Ghostscript. Where that produced sizes, the
- * automatic preview is used; otherwise the row's manual thumbnail image; a
- * neutral "PDF" placeholder card is the last resort.
+ * Thumbnails are MANUALLY UPLOADED images only — deliberately no automatic
+ * first-page rendering: the Hub's documents are often a single long page, so
+ * a first-page render would be a tall unusable strip. A row without a
+ * thumbnail falls back to a plain labelled download link.
  *
  * @package Nano\ImaginationHubCore
  */
@@ -101,19 +101,19 @@ if ( ! function_exists( 'nano_render_attachments' ) ) {
 					if ( $bytes ) {
 						$meta .= ' · ' . size_format( $bytes );
 					}
-					// First-page preview where the host generated one
-					// (Imagick + Ghostscript); else the manual thumbnail;
-					// else a neutral placeholder card.
-					$thumb = wp_get_attachment_image( $file_id, 'medium', false, array( 'class' => 'nano-media', 'loading' => 'lazy', 'alt' => '' ) );
-					if ( ! $thumb && ! empty( $row['thumb'] ) ) {
-						$thumb = wp_get_attachment_image( (int) $row['thumb'], 'medium', false, array( 'class' => 'nano-media', 'loading' => 'lazy', 'alt' => '' ) );
-					}
-					?>
-					<li class="nano-attachment">
+					// The manually-uploaded thumbnail only (no automatic
+				// first-page render — long single-page documents would
+				// produce unusable strips). Without one, the row is a
+				// plain labelled download link.
+				$thumb = ! empty( $row['thumb'] )
+					? wp_get_attachment_image( (int) $row['thumb'], 'medium', false, array( 'class' => 'nano-media', 'loading' => 'lazy', 'alt' => '' ) )
+					: '';
+				?>
+					<li class="nano-attachment<?php echo $thumb ? '' : ' nano-attachment--linkonly'; ?>">
 						<a class="nano-attachment__link" href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener">
-							<span class="nano-attachment__thumb<?php echo $thumb ? '' : ' nano-attachment__thumb--placeholder'; ?>">
-								<?php echo $thumb ? $thumb : '<span class="nano-attachment__filetype" aria-hidden="true">PDF</span>'; // phpcs:ignore WordPress.Security.EscapeOutput ?>
-							</span>
+							<?php if ( $thumb ) : ?>
+								<span class="nano-attachment__thumb"><?php echo $thumb; // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+							<?php endif; ?>
 							<span class="nano-attachment__label"><?php echo esc_html( $label ); ?></span>
 							<span class="nano-attachment__meta"><?php echo esc_html( $meta ); ?></span>
 						</a>

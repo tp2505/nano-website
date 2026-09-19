@@ -37,6 +37,10 @@
  *     (nano_attachments, label "Syllabus"); the separate nano_syllabus_file
  *     field is gone (the external-link variant remains its own field).
  *
+ * 0.7.0:
+ *   - The class TA field becomes plain text (TAs don't get People pages).
+ *     Existing person-reference values resolve to the person's name.
+ *
  * @package Nano\ImaginationHubCore
  */
 
@@ -56,6 +60,7 @@ function nano_core_upgrade() {
 	nano_upgrade_event_page_image();
 	nano_upgrade_news_page_image();
 	nano_upgrade_syllabus_to_attachments();
+	nano_upgrade_ta_to_text();
 	update_option( 'nano_core_upgraded', NANO_CORE_VERSION );
 }
 add_action( 'admin_init', 'nano_core_upgrade' );
@@ -249,5 +254,26 @@ function nano_upgrade_syllabus_to_attachments() {
 		}
 		delete_post_meta( $class_id, 'nano_syllabus_file' );
 		delete_post_meta( $class_id, '_nano_syllabus_file' );
+	}
+}
+
+/**
+ * Convert legacy class TA person-references into the person's name as plain
+ * text (the field is text now). Non-numeric values are already names.
+ */
+function nano_upgrade_ta_to_text() {
+	$ids = get_posts(
+		array(
+			'post_type'   => 'class',
+			'numberposts' => -1,
+			'post_status' => 'any',
+			'fields'      => 'ids',
+		)
+	);
+	foreach ( $ids as $class_id ) {
+		$ta = (string) get_post_meta( $class_id, 'nano_ta', true );
+		if ( '' !== $ta && ctype_digit( $ta ) && 'person' === get_post_type( (int) $ta ) ) {
+			update_post_meta( $class_id, 'nano_ta', get_the_title( (int) $ta ) );
+		}
 	}
 }

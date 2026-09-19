@@ -43,8 +43,12 @@ $instructor_ids = array_values(
 		}
 	)
 );
-$ta_id = (int) $field( 'nano_ta' );
-$ta_id = ( $ta_id && 'publish' === get_post_status( $ta_id ) ) ? $ta_id : 0;
+// TA is plain text (one or more names) — no People page, no link. A leftover
+// numeric ID (pre-0.7.0 value not yet migrated) resolves to the person's name.
+$ta = trim( (string) $field( 'nano_ta' ) );
+if ( ctype_digit( $ta ) && 'person' === get_post_type( (int) $ta ) ) {
+	$ta = get_the_title( (int) $ta );
+}
 
 $description = $field( 'nano_description' );
 
@@ -94,7 +98,7 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 		</p>
 	<?php endif; ?>
 
-	<?php if ( $instructor_ids || $ta_id ) : ?>
+	<?php if ( $instructor_ids || '' !== $ta ) : ?>
 		<ul class="nano-class-page__people" role="list">
 			<?php if ( $instructor_ids ) : ?>
 				<li class="nano-class-page__person">
@@ -112,10 +116,10 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-news nano-news-
 					?>
 				</li>
 			<?php endif; ?>
-			<?php if ( $ta_id ) : ?>
+			<?php if ( '' !== $ta ) : ?>
 				<li class="nano-class-page__person">
 					<span class="nano-class-page__role"><?php esc_html_e( 'Teaching Assistant', 'nano' ); ?></span>
-					<a href="<?php echo esc_url( get_permalink( $ta_id ) ); ?>"><?php echo esc_html( get_the_title( $ta_id ) ); ?></a>
+					<?php echo esc_html( $ta ); ?>
 				</li>
 			<?php endif; ?>
 		</ul>

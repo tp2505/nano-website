@@ -1802,19 +1802,14 @@ body.nano-lightbox-open { overflow: hidden; }
 	width: auto;
 	border: 1px solid var(--wp--preset--color--line); /* white first pages read as objects */
 }
-/* No preview available: a neutral A4-proportioned card marked PDF. */
-.nano-attachment__thumb--placeholder {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	aspect-ratio: 1 / 1.414;
-	background: var(--wp--preset--color--surface);
-	border: 1px solid var(--wp--preset--color--line);
-}
-.nano-attachment__filetype {
-	font-size: var(--wp--preset--font-size--small);
-	letter-spacing: 0.1em;
-	color: var(--wp--preset--color--muted);
+/* No thumbnail uploaded: the document is a plain labelled download link
+   (deliberately no automatic first-page preview — the Hub's PDFs are often
+   one long page, which would render as an unusable strip). */
+.nano-attachment--linkonly { align-self: flex-start; }
+.nano-attachment--linkonly .nano-attachment__label {
+	margin-top: 0;
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
 }
 .nano-attachment__label {
 	display: block;
