@@ -245,6 +245,48 @@ function nano_classic_editor_for_field_types( $use_block_editor, $post_type ) {
 add_filter( 'use_block_editor_for_post_type', 'nano_classic_editor_for_field_types', 10, 2 );
 
 /**
+ * On the classic-editor types, relabel the editor's "Add Media" button.
+ *
+ * Those types all have dedicated image fields (media slot, event/news page
+ * image), yet "Add Media" above the content editor reads like THE way to add
+ * an image to the page — and what it actually does is drop the image inline
+ * mid-prose. Keep the button (inline images in body text are occasionally
+ * useful) but make it say what it does, with a pointer to the real fields.
+ */
+function nano_classic_media_button_setup() {
+	$screen = get_current_screen();
+	if ( ! $screen || ! in_array( $screen->post_type, array( 'event', 'news', 'class', 'initiative' ), true ) ) {
+		return;
+	}
+	remove_action( 'media_buttons', 'media_buttons' );
+	add_action( 'media_buttons', 'nano_media_button_inline' );
+	add_action(
+		'admin_head',
+		function () {
+			echo '<style>.nano-media-button-note{margin-left:8px;color:#646970;font-size:12px;font-style:italic;vertical-align:middle;}</style>';
+		}
+	);
+}
+add_action( 'load-post.php', 'nano_classic_media_button_setup' );
+add_action( 'load-post-new.php', 'nano_classic_media_button_setup' );
+
+/**
+ * The replacement button — same classes/data-editor as core's (wp.media's
+ * editor JS binds on `.insert-media` + `data-editor`, so behaviour is
+ * untouched), different words.
+ *
+ * @param string $editor_id Editor instance the button targets.
+ */
+function nano_media_button_inline( $editor_id = 'content' ) {
+	printf(
+		'<button type="button" class="button insert-media add_media" data-editor="%s"><span class="wp-media-buttons-icon"></span> %s</button><span class="nano-media-button-note">%s</span>',
+		esc_attr( $editor_id ),
+		esc_html__( 'Insert image into text', 'nano' ),
+		esc_html__( 'Places an image inside the body text. The page and thumbnail images have their own fields below.', 'nano' )
+	);
+}
+
+/**
  * Manually-ordered types get an Order column in their admin list (sortable), so
  * an editor can see and check the sequence without opening every post. The
  * value itself is edited in the post's Page Attributes → Order box.
