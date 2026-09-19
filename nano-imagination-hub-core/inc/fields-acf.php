@@ -506,7 +506,7 @@ function nano_register_acf_fields() {
 						'type'         => 'wysiwyg',
 						'tabs'         => 'visual',
 						'media_upload' => 0,
-						'instructions' => 'Card / listing teaser only (truncated to ~24 words on cards). The page body is the main content editor.',
+						'instructions' => 'A sentence or two shown under the thumbnail in listings (cards trim it to ~24 words). It does not appear on the page itself — the full page text goes in the main content editor above.',
 					),
 				),
 				$attachment_fields( 'event' ),
@@ -684,7 +684,7 @@ function nano_register_acf_fields() {
 					'type'         => 'wysiwyg',
 					'tabs'         => 'visual',
 					'media_upload' => 0,
-					'instructions' => 'Card / listing teaser only (truncated to ~24 words on cards). The page body is the main content editor.',
+					'instructions' => 'A sentence or two shown under the thumbnail in listings (cards trim it to ~24 words). It does not appear on the page itself — the full page text goes in the main content editor above.',
 				),
 				array(
 					'key'          => 'field_nano_class_syllabus_link',
@@ -787,7 +787,7 @@ function nano_register_acf_fields() {
 					'name'         => 'nano_intro',
 					'type'         => 'textarea',
 					'rows'         => 4,
-					'instructions' => 'Short paragraph shown in the homepage Initiatives row (listing teaser only — it does not render on the initiative page). The page body is the main content editor.',
+					'instructions' => 'A short paragraph shown in the homepage Initiatives row. It does not appear on the initiative page itself — the full page text goes in the main content editor below.',
 				),
 			),
 		)
