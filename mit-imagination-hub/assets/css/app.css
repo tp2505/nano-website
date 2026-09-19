@@ -1235,13 +1235,6 @@ a.nano-initiative__media:hover,
 /* Venue stacks beneath the date in the same meta style; standing alone (no
    date) it takes the date's position via the shared class above. */
 .nano-event-page__date + .nano-event-page__venue { margin-top: 0.35rem; }
-.nano-event-page__body {
-	max-width: 52rem;
-	margin-top: var(--wp--preset--spacing--40);
-	font-size: var(--wp--preset--font-size--lead); /* match the Initiative-page description */
-	line-height: 1.55;
-}
-.nano-event-page__body p { margin: 0 0 1em; }
 /* Event top media slot — a still (announcement poster), a short looping clip,
    or a long-form Vimeo player, below the date in a consistent column (same
    width as the body text). One fixed 16:9 frame like every editorial image
@@ -1584,20 +1577,16 @@ a.nano-initiative__media:hover,
 	background: var(--wp--preset--color--surface);
 }
 .nano-class-page__image .nano-media { width: 100%; height: 100%; object-fit: cover; display: block; }
-.nano-class-page__body {
-	max-width: 52rem;
-	margin-top: var(--wp--preset--spacing--50);
-	font-size: var(--wp--preset--font-size--lead); /* match the Initiative-page description */
-	line-height: 1.55;
-}
-.nano-class-page__body p { margin: 0 0 1em; }
 /* Long-form body (the post content editor) below the lead-size description —
    body sizing like the Initiative page's long-form; absent when empty. */
 .nano-class-page__content,
 .nano-event-page__content {
 	max-width: 52rem;
 	margin-top: var(--wp--preset--spacing--40);
-	line-height: 1.6;
+	/* the description's former size — the body is now the page's only text,
+	   so it takes the more generous setting */
+	font-size: var(--wp--preset--font-size--lead);
+	line-height: 1.55;
 }
 .nano-class-page__content p,
 .nano-event-page__content p { margin: 0 0 1em; }
