@@ -57,10 +57,11 @@ is empty.
 
 These three types order by WordPress's native **menu_order** — the **Page
 Attributes → Order** box on the edit screen, plus a sortable "Order" column in
-their admin lists (`inc/cpt.php`). People lists (About groups, Participants)
+their admin lists (`inc/cpt.php`). The About-page groups
 show explicitly-ordered people first (1, 2, 3…), then everyone left at 0
 alphabetically by last name — so a director can be pinned first without having
-to number the whole roster (`inc/people.php` → `nano_sort_people()`). The
+to number the whole roster (`inc/people.php` → `nano_sort_people()`); the Participants directory is purely
+alphabetical by last name. The
 homepage/archive initiative sequence follows the same box; the old ACF
 `nano_order` field is gone and existing values were migrated by
 `inc/upgrade.php`.

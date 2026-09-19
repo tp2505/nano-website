@@ -33,9 +33,20 @@ if ( ! $people ) {
 	return;
 }
 
-// Curated order first (menu_order, ascending), then everyone without an
-// explicit order alphabetically by last name — see nano_sort_people().
-$people = nano_sort_people( $people );
+// Purely alphabetical by last name (full name as tiebreak) — the directory
+// ignores the curated menu_order pinning, which is an About-page affordance
+// (a director pinned first); a directory reads best A→Z.
+usort(
+	$people,
+	function ( $a, $b ) {
+		$last = function ( $name ) {
+			$parts = preg_split( '/\s+/', trim( $name ) );
+			return end( $parts );
+		};
+		$cmp = strcasecmp( $last( $a->post_title ), $last( $b->post_title ) );
+		return 0 !== $cmp ? $cmp : strcasecmp( $a->post_title, $b->post_title );
+	}
+);
 
 $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-participants' ) );
 ?>
