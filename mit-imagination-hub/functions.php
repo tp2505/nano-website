@@ -44,6 +44,35 @@ function nano_enqueue_assets() {
 add_action( 'wp_enqueue_scripts', 'nano_enqueue_assets' );
 
 /**
+ * Preconnect to Vimeo on the front page, where the hero builds its player
+ * iframe after DOMContentLoaded — warming DNS/TCP/TLS while the document
+ * still loads shaves a few hundred ms off video start. player.vimeo.com
+ * serves the iframe + config, f.vimeocdn.com the player JS; only emitted
+ * when the hero is actually Vimeo-backed (and the JS would build a player —
+ * it skips phones and data-saver, but those hints going unused is cheap).
+ *
+ * @param array  $urls          Resource-hint URLs.
+ * @param string $relation_type Hint type being printed.
+ * @return array
+ */
+function nano_vimeo_resource_hints( $urls, $relation_type ) {
+	if ( 'preconnect' !== $relation_type || ! is_front_page() ) {
+		return $urls;
+	}
+	$hero = function_exists( 'nano_hero_media' ) ? nano_hero_media() : array( 'vimeo' => '' );
+	if ( empty( $hero['vimeo'] ) ) {
+		return $urls;
+	}
+	// Plain (non-CORS) connections: the iframe navigation and the player's
+	// classic <script> loads are no-cors requests, and a crossorigin
+	// preconnect's connection would not be reused for them.
+	$urls[] = 'https://player.vimeo.com';
+	$urls[] = 'https://f.vimeocdn.com';
+	return $urls;
+}
+add_filter( 'wp_resource_hints', 'nano_vimeo_resource_hints', 10, 2 );
+
+/**
  * Editor styles so blocks look right inside the site editor too.
  */
 function nano_theme_supports() {
