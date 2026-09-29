@@ -2117,14 +2117,14 @@ body.nano-lightbox-open { overflow: hidden; }
 	padding-bottom: 0.7rem;
 	font-size: calc(1.3 * var(--wp--preset--font-size--medium));
 	letter-spacing: 0.08em;
-	font-weight: 400;
+	font-weight: 300; /* the thin face — lightest weight the theme ships */
 	text-transform: uppercase;
 	white-space: nowrap;
 	border-bottom: 1px solid var(--wp--preset--color--contrast);
 }
 /* Secondary page links: lighter than the uppercase column headings (lead
    token + the 300 face) so they read open without competing — the headings
-   are 1.3 × the medium token at regular/400. */
+   are 1.3 × the medium token at the thin 300 face. */
 .nano-footer__list {
 	list-style: none;
 	margin: 0;
