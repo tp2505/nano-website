@@ -867,8 +867,7 @@ svg path[vector-effect="non-scaling-stroke"],
 .nano-participant__link:hover .nano-participant__name { text-decoration: underline; }
 .nano-participant__role {
 	font-size: var(--wp--preset--font-size--small);
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
+	letter-spacing: 0.02em;
 	color: var(--wp--preset--color--muted);
 }
 /* Person page: the "Related" content this person took part in. */
@@ -1130,8 +1129,8 @@ a.nano-initiative__media:hover,
 .nano-person__role {
 	margin: 0.3rem 0 0;
 	font-size: var(--wp--preset--font-size--small);
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	/* mixed case as entered — uppercase read as shouting under every name */
 	color: var(--wp--preset--color--muted);
 }
 @media (max-width: 900px) {
@@ -1404,8 +1403,7 @@ a.nano-initiative__media:hover,
 .nano-person-page__role {
 	margin: 0.6rem 0 0;
 	font-size: var(--wp--preset--font-size--small);
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
+	letter-spacing: 0.02em;
 	color: var(--wp--preset--color--muted);
 }
 .nano-person-page__bio {
