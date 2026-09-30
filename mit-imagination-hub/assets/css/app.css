@@ -950,7 +950,10 @@ a.nano-initiative__media:hover,
 .nano-facility__link:hover .nano-facility__caption { text-decoration: underline; }
 .nano-facility__media {
 	display: block;
-	aspect-ratio: 16 / 9; /* the sitewide editorial frame */
+	/* Deliberate exception to the sitewide 16:9 editorial frame: a third
+	   shorter (16:6), so the two-column grid reads as wide architectural
+	   bands; the cover-crop simply tightens vertically. */
+	aspect-ratio: 16 / 6;
 	overflow: hidden;
 	background: var(--wp--preset--color--surface);
 }
