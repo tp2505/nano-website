@@ -833,7 +833,9 @@ svg path[vector-effect="non-scaling-stroke"],
 .nano-page-heading .nano-section-head { margin-bottom: var(--wp--preset--spacing--40); }
 .nano-main > .nano-page-heading + .nano-page-body { margin-top: 0; }
 .nano-page-body > * { max-width: 58rem; margin-left: 0; margin-right: 0; }
-.nano-page-body p { font-size: var(--wp--preset--font-size--lead); line-height: 1.45; }
+/* Same body treatment as event/class pages (the large token), so every
+   page's text below its title reads at one sitewide size. */
+.nano-page-body p { font-size: var(--wp--preset--font-size--large); line-height: 1.4; }
 
 /* Participants: a clickable directory of people — name + title per row, each
    linking to that person's page. */
