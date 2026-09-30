@@ -834,8 +834,11 @@ svg path[vector-effect="non-scaling-stroke"],
 .nano-main > .nano-page-heading + .nano-page-body { margin-top: 0; }
 .nano-page-body > * { max-width: 58rem; margin-left: 0; margin-right: 0; }
 /* Same body treatment as event/class pages (the large token), so every
-   page's text below its title reads at one sitewide size. */
-.nano-page-body p { font-size: var(--wp--preset--font-size--large); line-height: 1.4; }
+   page's text below its title reads at one sitewide size. Paragraph spacing
+   = line spacing (see the event/class body note): margins off, empty
+   paragraphs carry one line of height. */
+.nano-page-body p { font-size: var(--wp--preset--font-size--large); line-height: 1.4; margin: 0; }
+.nano-page-body p:empty { min-height: 1.4em; }
 
 /* Participants: a clickable directory of people — name + title per row, each
    linking to that person's page. */
@@ -1594,8 +1597,15 @@ a.nano-initiative__media:hover,
 	font-size: var(--wp--preset--font-size--large);
 	line-height: 1.4;
 }
+/* Paragraph spacing = line spacing: no margins, so a paragraph break reads
+   as a line break and the author separates paragraphs with an EMPTY LINE in
+   the editor. A truly empty <p> (block editor) gets one line of height so
+   that blank line actually shows; the classic editor writes &nbsp; into
+   empty paragraphs, which has height on its own. */
 .nano-class-page__content p,
-.nano-event-page__content p { margin: 0 0 1em; }
+.nano-event-page__content p { margin: 0; }
+.nano-class-page__content p:empty,
+.nano-event-page__content p:empty { min-height: 1.4em; }
 /* Event subtitle (the post content editor) directly beneath the title —
    typically a one/two-line participant listing. One step above the lead-size
    description on the type scale; absent entirely when the content is empty. */
