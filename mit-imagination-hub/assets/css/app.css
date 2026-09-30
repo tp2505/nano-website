@@ -1579,16 +1579,15 @@ a.nano-initiative__media:hover,
 	background: var(--wp--preset--color--surface);
 }
 .nano-class-page__image .nano-media { width: 100%; height: 100%; object-fit: cover; display: block; }
-/* Long-form body (the post content editor) below the lead-size description —
-   body sizing like the Initiative page's long-form; absent when empty. */
+/* Long-form body (the post content editor) — absent when empty. */
 .nano-class-page__content,
 .nano-event-page__content {
 	max-width: 52rem;
 	margin-top: var(--wp--preset--spacing--40);
-	/* the description's former size — the body is now the page's only text,
-	   so it takes the more generous setting */
-	font-size: var(--wp--preset--font-size--lead);
-	line-height: 1.55;
+	/* the subtitle's size, so a page reads at ONE size top to bottom; tighter
+	   leading than the old lead setting — 1.55 turns airy at this scale */
+	font-size: var(--wp--preset--font-size--large);
+	line-height: 1.4;
 }
 .nano-class-page__content p,
 .nano-event-page__content p { margin: 0 0 1em; }
