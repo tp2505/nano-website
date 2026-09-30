@@ -27,6 +27,7 @@ require_once NANO_CORE_DIR . 'inc/events.php';
 require_once NANO_CORE_DIR . 'inc/people.php';
 require_once NANO_CORE_DIR . 'inc/sponsors.php';
 require_once NANO_CORE_DIR . 'inc/attachments.php';
+require_once NANO_CORE_DIR . 'inc/newsletter.php';
 require_once NANO_CORE_DIR . 'inc/upgrade.php';
 
 /**

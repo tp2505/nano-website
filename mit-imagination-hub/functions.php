@@ -145,8 +145,9 @@ add_action( 'init', 'nano_register_pattern_category' );
  * Minimal, dependency-free newsletter submission handler.
  *
  * The form (see patterns/newsletter.php) posts here with a nonce. We validate
- * the email and the consent box, then redirect back with a status flag. Nothing
- * is stored — this is a wired-up placeholder for a real ESP integration later.
+ * the email and the consent box, file the address in the plugin's signup
+ * store (wp-admin → Signups, with CSV export — the hand-off format for a
+ * future ESP integration), then redirect back with a status flag.
  */
 function nano_handle_newsletter() {
 	$ok = isset( $_POST['nano_newsletter_nonce'] )
@@ -155,6 +156,12 @@ function nano_handle_newsletter() {
 	$email   = isset( $_POST['nano_email'] ) ? sanitize_email( wp_unslash( $_POST['nano_email'] ) ) : '';
 	$consent = ! empty( $_POST['nano_consent'] );
 	$status  = ( $ok && is_email( $email ) && $consent ) ? 'success' : 'error';
+
+	if ( 'success' === $status && function_exists( 'nano_store_newsletter_signup' ) ) {
+		if ( ! nano_store_newsletter_signup( $email ) ) {
+			$status = 'error';
+		}
+	}
 
 	$back = wp_get_referer() ? wp_get_referer() : home_url( '/' );
 	wp_safe_redirect( add_query_arg( 'newsletter', $status, remove_query_arg( 'newsletter', $back ) ) . '#newsletter' );
