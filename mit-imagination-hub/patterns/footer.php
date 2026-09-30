@@ -87,9 +87,13 @@ $nano_home = home_url( '/' );
 			<!-- wp:list {"className":"nano-footer__list"} -->
 			<ul class="wp-block-list nano-footer__list">
 				<!-- wp:list-item --><li><a href="<?php echo esc_url( nano_page_url( 'about-us' ) ); ?>">About us</a></li><!-- /wp:list-item -->
+				<?php if ( false ) : // Hidden for the initial launch — restore by removing this guard. ?>
 				<!-- wp:list-item --><li><a href="<?php echo esc_url( nano_page_url( 'support-us' ) ); ?>">Support us</a></li><!-- /wp:list-item -->
+				<?php endif; ?>
 				<!-- wp:list-item --><li><a href="<?php echo esc_url( $nano_home . '#newsletter' ); ?>">Newsletter</a></li><!-- /wp:list-item -->
+				<?php if ( false ) : // Hidden for the initial launch — restore by removing this guard. ?>
 				<!-- wp:list-item --><li><a href="<?php echo esc_url( nano_page_url( 'press' ) ); ?>">Press</a></li><!-- /wp:list-item -->
+				<?php endif; ?>
 			</ul>
 			<!-- /wp:list -->
 		</div>

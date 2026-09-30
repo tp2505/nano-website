@@ -44,9 +44,13 @@ $nano_home = home_url( '/' );
 			<!-- /wp:navigation-submenu -->
 			<!-- wp:navigation-submenu {"label":"About","url":"#","kind":"custom","isTopLevelLink":true} -->
 				<!-- wp:navigation-link {"label":"About us","url":"<?php echo esc_url( nano_page_url( 'about-us' ) ); ?>","kind":"custom"} /-->
+				<?php if ( false ) : // Hidden for the initial launch — restore by removing this guard. ?>
 				<!-- wp:navigation-link {"label":"Support us","url":"<?php echo esc_url( nano_page_url( 'support-us' ) ); ?>","kind":"custom"} /-->
+				<?php endif; ?>
 				<!-- wp:navigation-link {"label":"Newsletter","url":"<?php echo esc_url( $nano_home . '#newsletter' ); ?>","kind":"custom"} /-->
+				<?php if ( false ) : // Hidden for the initial launch — restore by removing this guard. ?>
 				<!-- wp:navigation-link {"label":"Press","url":"<?php echo esc_url( nano_page_url( 'press' ) ); ?>","kind":"custom"} /-->
+				<?php endif; ?>
 			<!-- /wp:navigation-submenu -->
 		<!-- /wp:navigation -->
 	</div>
