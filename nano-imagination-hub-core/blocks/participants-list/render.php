@@ -16,6 +16,27 @@
 defined( 'ABSPATH' ) || exit;
 
 $ids = function_exists( 'nano_participant_person_ids' ) ? nano_participant_person_ids() : array();
+
+// Student Advisory Board members belong on the directory by membership alone —
+// they may not (yet) be referenced by any Event/News/Class, which is what
+// nano_participant_person_ids() collects.
+$sab = get_posts(
+	array(
+		'post_type'      => 'person',
+		'posts_per_page' => -1,
+		'post_status'    => 'publish',
+		'fields'         => 'ids',
+		'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+			array(
+				'taxonomy' => 'people_group',
+				'field'    => 'slug',
+				'terms'    => 'student-advisory-board',
+			),
+		),
+	)
+);
+$ids = array_values( array_unique( array_merge( $ids, array_map( 'intval', $sab ) ) ) );
+
 if ( ! $ids ) {
 	return;
 }
