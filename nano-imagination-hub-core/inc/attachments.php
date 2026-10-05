@@ -104,9 +104,14 @@ if ( ! function_exists( 'nano_render_attachments' ) ) {
 						if ( '' === $label ) {
 							$label = get_the_title( $file_id );
 						}
-						$path  = get_attached_file( $file_id );
-						$bytes = ( $path && file_exists( $path ) ) ? filesize( $path ) : 0;
-						$meta  = strtoupper( (string) preg_replace( '#^.+/#', '', (string) get_post_mime_type( $file_id ) ) );
+						// Size from attachment metadata, never the filesystem —
+						// CampusPress offloads uploads to S3, so a disk stat
+						// is a remote call. WP records filesize on upload
+						// (6.0+); older uploads may lack it, in which case the
+						// row shows just the type, no size.
+						$attmeta = wp_get_attachment_metadata( $file_id );
+						$bytes   = ( is_array( $attmeta ) && ! empty( $attmeta['filesize'] ) ) ? (int) $attmeta['filesize'] : 0;
+						$meta    = strtoupper( (string) preg_replace( '#^.+/#', '', (string) get_post_mime_type( $file_id ) ) );
 						if ( $bytes ) {
 							$meta .= ' · ' . size_format( $bytes );
 						}
