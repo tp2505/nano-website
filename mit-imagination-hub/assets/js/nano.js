@@ -508,8 +508,10 @@
 				opacity = 1;
 			}
 			logo.style.opacity = opacity;
+			// Positive drift: the logo LAGS the scroll — it slides down
+			// relative to the departing header, fading as it goes.
 			logo.style.transform = drift
-				? 'translateY(' + ( -y * drift ).toFixed( 1 ) + 'px)'
+				? 'translateY(' + ( y * drift ).toFixed( 1 ) + 'px)'
 				: '';
 			// Once invisible, don't let the ghost logo swallow clicks.
 			logo.style.pointerEvents = opacity < 0.05 ? 'none' : '';

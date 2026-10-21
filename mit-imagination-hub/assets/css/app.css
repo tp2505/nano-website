@@ -78,6 +78,30 @@
 	width: auto;
 	color: var(--wp--preset--color--contrast);
 }
+/* Header lockup: the stacked "MIT Imagination Hub" logo, scaled so its type
+   is 17px (15px on phones) — the PNG's cap height is 97 of its 693px, i.e.
+   138.6px type at full size. */
+.nano-brand { text-decoration: none; }
+.nano-brand__lockup { display: block; height: 85px; width: auto; } /* 693 x 17/138.6 */
+@media (max-width: 781px) {
+	.nano-brand__lockup { height: 75px; } /* 693 x 15/138.6 */
+}
+/* Every title hangs at the lockup's vertical line: the line sits 204/693 of
+   the lockup height into the PNG, from the 32px header gutter — 57px at the
+   85px lockup, 54px at the phone 75px. The margin re-anchors each heading
+   from its natural left (the content column: centred 1320px, min 32px
+   gutter) to that absolute x, so titles and logo line share one vertical. */
+/* 57px = exact; -6px optical overshoot so the glyphs' side bearing doesn't
+   read as the title floating right of the line. */
+:root { --nano-title-line: 51px; }
+.nano-section-head,
+.nano-inithead,
+.nano-newsletterhead {
+	margin-left: calc(var(--nano-title-line) - max(32px, (100vw - 1320px) / 2));
+}
+@media (max-width: 781px) {
+	:root { --nano-title-line: 49px; } /* 54px exact - 5px overshoot */
+}
 /* Hamburger pinned to the top-right on the hero (top bar aligns with "MIT"). */
 .home .nano-header__inner { align-items: flex-start; }
 .home .nano-header .wp-block-navigation__responsive-container-open {
@@ -97,6 +121,77 @@
 	color: var(--wp--preset--color--contrast);
 }
 .nano-nav .wp-block-navigation-item__content:hover { text-decoration: underline; }
+
+/* MIT logo, top right of every page (MIT branding requirement). Black on the
+   white interior pages, white over the homepage hero. Clear space per
+   brand.mit.edu: at least the width of the logo's "M" on every side — the M is
+   1280 of the mark's 1440-unit height, so 0.889 x the logo height. The header
+   padding and the screen edge supply it above/right; the margin supplies it
+   between the hamburger and the logo. */
+.nano-header { --nano-mit-h: 2rem; }
+.nano-header .nano-nav { margin-left: auto; align-self: center; } /* nav + logo sit together at the right, on one centre line */
+.nano-mit {
+	display: block;
+	flex-shrink: 0;
+	align-self: center;
+	line-height: 0;
+}
+/* Specific enough to beat core's flex-layout `> * { margin: 0 }` reset. The
+   group's own 1.25rem block gap (theme.json) sits on top of this. */
+.nano-header .nano-header__inner > .nano-mit {
+	margin-left: calc(var(--nano-mit-h) * 1.375 - 1.25rem); /* ~44px total at desktop; min is 0.889 x height */
+}
+/* The hamburger + MIT logo pair keeps ONE top position everywhere: the
+   homepage's 27px line (20px header padding + 7px nudge). The interior
+   header box renders 20px lower than the homepage's, so there the pair
+   top-aligns with a -13px margin (7px nudge - that 20px) instead of
+   centring on the taller lockup row. */
+.nano-header .nano-header__inner > .nano-mit { margin-top: 7px; }
+body:not(.home) .nano-header__inner { align-items: flex-start; }
+/* The lockup rises to the same 27px line, so logo, hamburger and MIT logo
+   all hang from one top edge. */
+body:not(.home) .nano-brand { margin-top: -13px; }
+body:not(.home) .nano-header .nano-nav,
+body:not(.home) .nano-header .nano-header__inner > .nano-mit {
+	align-self: flex-start;
+	margin-top: -13px;
+}
+/* Phones: the interior header is position:fixed at the real top (no 20px
+   offset), so the plain 7px nudge lands the pair on the same 27px line. */
+@media (max-width: 781px) {
+	body:not(.home) .nano-header .nano-nav,
+	body:not(.home) .nano-header .nano-header__inner > .nano-mit {
+		margin-top: 7px;
+	}
+	body:not(.home) .nano-brand { margin-top: 7px; }
+}
+/* Hamburger: three heavy bars, the same height as the MIT logo, so the two
+   read as a pair. Drawn as background stripes on the button (the core
+   two-line SVG is hidden). */
+.nano-header .wp-block-navigation__responsive-container-open {
+	--nano-bar: calc(var(--nano-mit-h) * 0.2222); /* = the MIT logo bar: 320 of its 1440-unit height */
+	width: calc(var(--nano-mit-h) * 1.25);
+	height: var(--nano-mit-h);
+	padding: 0;
+	align-self: center;
+	background:
+		linear-gradient(currentColor, currentColor) top / 100% var(--nano-bar) no-repeat,
+		linear-gradient(currentColor, currentColor) center / 100% var(--nano-bar) no-repeat,
+		linear-gradient(currentColor, currentColor) bottom / 100% var(--nano-bar) no-repeat;
+}
+.nano-header .wp-block-navigation__responsive-container-open svg { display: none; }
+.nano-mit__logo {
+	display: block;
+	height: var(--nano-mit-h);
+	width: auto;
+}
+.nano-mit__logo--white { display: none; }
+.home .nano-mit__logo--white { display: block; }
+.home .nano-mit__logo--black { display: none; }
+/* The homepage hamburger is nudged down 7px; the logo matches (rule above). */
+@media (max-width: 781px) {
+	.nano-header { --nano-mit-h: 1.4rem; }
+}
 
 /* Header options live in the hamburger pull-down only (overlayMenu: always).
    Make that overlay readable: white sheet, large dark links + close icon. */
@@ -264,13 +359,21 @@
 }
 
 /* Secondary pages (News archive, etc.): a compact wordmark top-left that
-   parallax-fades on scroll (handled in nano.js), and a fixed hamburger top-right
-   that stays put. The bar is transparent so content scrolls underneath. */
+   parallax-fades on scroll (handled in nano.js), and the hamburger + MIT logo top-right,
+   all scrolling away with the page. The bar is transparent. */
+/* The header scrolls away with the page (no longer fixed): the menu and MIT
+   logo sit at the top and leave with it, so nothing floats over content. */
+body:not(.home) .wp-site-blocks { position: relative; }
 body:not(.home) .wp-site-blocks > header.wp-block-template-part {
-	position: fixed;
+	position: absolute;
 	inset: 0 0 auto 0;
 	z-index: 50;
 	pointer-events: none; /* transparent bar must not block the content behind it */
+}
+/* Phones: keep the menu + MIT logo fixed in the corner so the menu is always
+   one tap away (the lockup still fades out as the page scrolls). */
+@media (max-width: 781px) {
+	body:not(.home) .wp-site-blocks > header.wp-block-template-part { position: fixed; }
 }
 body:not(.home) .nano-header {
 	border-bottom: none;
@@ -284,7 +387,11 @@ body:not(.home) .nano-header .nano-brand {
 	will-change: opacity, transform;
 }
 /* Content clears the fixed header. */
-body:not(.home) .nano-main { padding-top: 5rem !important; }
+/* Header (lockup ~85px from a 20px top) + ~50px of air before the page title. */
+body:not(.home) .nano-main { padding-top: 9.75rem !important; }
+@media (max-width: 781px) {
+	body:not(.home) .nano-main { padding-top: 8.75rem !important; }
+}
 
 /* ---------------------------------------------------------------------------
  * Section rhythm.
@@ -2034,7 +2141,8 @@ body.nano-lightbox-open { overflow: hidden; }
 /* ---------------------------------------------------------------------------
  * Footer.
  * ------------------------------------------------------------------------- */
-.nano-footer { margin-top: 4.5rem; } /* match the Correlations-image -> line gap */
+.nano-footer { margin-top: 4.5rem; padding-bottom: 2.45rem; } /* match the Correlations-image -> line gap; bottom air = 70% of the columns -> copyright gap */
+@media (max-width: 781px) { .nano-footer { padding-bottom: 1.575rem; } }
 .nano-footer a { color: inherit; }
 /* Logo + columns share a row: logo top-left, columns spread across the right. */
 .nano-footer__top { align-items: flex-start; column-gap: 2rem; }
@@ -2241,6 +2349,10 @@ body.nano-lightbox-open { overflow: hidden; }
 		font-size: 0.75rem !important;
 		white-space: nowrap;
 	}
+	/* Phones: the legal links drop to their own line so the row never
+	   overflows a 375px screen. */
+	.nano-footer__sep { display: none; }
+	.nano-footer__legal { display: block; }
 	.nano-footer__cols > .wp-block-column { flex: 0 1 100% !important; width: auto; }
 	.nano-initiative { grid-template-columns: 1fr; gap: var(--wp--preset--spacing--40); }
 	.nano-initiative--flip .nano-initiative__media { order: 0; }
