@@ -139,8 +139,10 @@ add_action( 'customize_register', 'nano_customize_register_copy' );
 function nano_social_platforms() {
 	return array(
 		'nano_social_instagram' => 'Instagram',
-		'nano_social_linkedin'  => 'LinkedIn',
-		'nano_social_x'         => 'X',
+		// LinkedIn and X are off for the initial launch — restore by
+		// uncommenting; their URLs stay saved in the Customizer meanwhile.
+		// 'nano_social_linkedin'  => 'LinkedIn',
+		// 'nano_social_x'         => 'X',
 	);
 }
 
