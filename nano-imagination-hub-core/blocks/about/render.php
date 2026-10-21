@@ -67,7 +67,8 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'nano-about' ) );
 					<circle cx="-67.14" cy="-12.24" r="5.12" fill="var(--wp--preset--color--accent-purple)" stroke="none"/>
 				</g>
 			</svg>
-			<p class="nano-about__intro"><?php echo esc_html( $intro ); ?></p>
+			<?php // nl2br AFTER escaping: line breaks typed in the field (e.g. a quote attribution on its own line) survive. ?>
+			<p class="nano-about__intro"><?php echo nl2br( esc_html( $intro ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped above ?></p>
 		</div>
 	<?php endif; ?>
 
